@@ -83,8 +83,15 @@ def create_app() -> Flask:
 
     log_handlers = None
     log_file = app.config.get('LOG_FILE')
+    # If log_file is not set, use the default log file
+    if not log_file:
+        log_file = "./logs/dify.log"
+    print(f'Logging to {log_file}')
+    
     if log_file:
         log_dir = os.path.dirname(log_file)
+        print("运行了吧")
+        logging.log
         os.makedirs(log_dir, exist_ok=True)
         log_handlers = [
             RotatingFileHandler(

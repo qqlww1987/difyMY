@@ -50,7 +50,8 @@ class IndexingRunner:
                 dataset = Dataset.query.filter_by(
                     id=dataset_document.dataset_id
                 ).first()
-
+                logging.info(f"run document: {dataset_document.id}")
+        
                 if not dataset:
                     raise ValueError("no dataset found")
 
@@ -58,6 +59,7 @@ class IndexingRunner:
                 processing_rule = db.session.query(DatasetProcessRule). \
                     filter(DatasetProcessRule.id == dataset_document.dataset_process_rule_id). \
                     first()
+                logging.info(f"processing_rule: {processing_rule}")
                 index_type = dataset_document.doc_form
                 index_processor = IndexProcessorFactory(index_type).init_index_processor()
                 # extract
@@ -116,7 +118,9 @@ class IndexingRunner:
             processing_rule = db.session.query(DatasetProcessRule). \
                 filter(DatasetProcessRule.id == dataset_document.dataset_process_rule_id). \
                 first()
-
+            # 打印 processing_rule
+            print("processing_rule:", processing_rule)
+            
             index_type = dataset_document.doc_form
             index_processor = IndexProcessorFactory(index_type).init_index_processor()
             # extract
@@ -504,6 +508,8 @@ class IndexingRunner:
             # parse document to nodes
             documents = splitter.split_documents([text_doc])
             split_documents = []
+            print("dsdsdsdsds")
+            logging.info("44445454545454545454")
             for document_node in documents:
 
                 if document_node.page_content.strip():
@@ -576,7 +582,7 @@ class IndexingRunner:
 
             # parse document to nodes
             documents = splitter.split_documents([text_doc])
-
+            logging.info("44445454545454545454")
             split_documents = []
             for document in documents:
                 if document.page_content is None or not document.page_content.strip():
@@ -807,6 +813,9 @@ class IndexingRunner:
         # get embedding model instance
         embedding_model_instance = None
         if dataset.indexing_technique == 'high_quality':
+            # 打印dataset
+            print(dataset)
+            
             if dataset.embedding_model_provider:
                 embedding_model_instance = self.model_manager.get_model_instance(
                     tenant_id=dataset.tenant_id,

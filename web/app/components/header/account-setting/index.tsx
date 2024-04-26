@@ -121,6 +121,7 @@ export default function AccountSetting({
           icon: <User01 className={iconClassName} />,
           activeIcon: <User01Solid className={iconClassName} />,
         },
+        // guorq 在那还是屏蔽
         // {
         //   key: 'integrations',
         //   name: t('common.settings.integrations'),
@@ -209,7 +210,7 @@ export default function AccountSetting({
             {activeMenu === 'members' && <MembersPage />}
             {activeMenu === 'billing' && <BillingPage />}
             {/* {activeMenu === 'integrations' && <IntegrationsPage />} */}
-            {/* 屏蔽多语言 */}
+            {/* 屏蔽多语言 guorq */}
             {/* {activeMenu === 'language' && <LanguagePage />} */}
             {activeMenu === 'provider' && <ModelProviderPage />}
             {activeMenu === 'data-source' && <DataSourcePage />}

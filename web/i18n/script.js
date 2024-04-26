@@ -3,8 +3,14 @@ const fs = require('node:fs')
 const path = require('node:path')
 const transpile = require('typescript').transpile
 
+<<<<<<< HEAD
 const targetLanguage = 'en-US'
 const languages = ['zh-Hans', 'fr-FR', 'ja-JP', 'pt-BR', 'uk-UA', 'vi-VN', 'zh-Hant']
+=======
+// const targetLanguage = 'en-US'
+const targetLanguage = 'zh-Hans'
+const languages = ['zh-Hans', 'fr-FR', 'ja-JP', 'pt-BR', 'uk-UA', 'vi-VN']
+>>>>>>> 7d7d6485 (csv文件的切分处理)
 
 async function getKeysFromLanuage(language) {
   return new Promise((resolve, reject) => {

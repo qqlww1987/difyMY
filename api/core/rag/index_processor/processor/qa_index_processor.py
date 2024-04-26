@@ -44,7 +44,7 @@ class QAIndexProcessor(BaseIndexProcessor):
             document_nodes = splitter.split_documents([document])
             split_documents = []
             for document_node in document_nodes:
-
+                
                 if document_node.page_content.strip():
                     doc_id = str(uuid.uuid4())
                     hash = helper.generate_text_hash(document_node.page_content)
@@ -59,20 +59,21 @@ class QAIndexProcessor(BaseIndexProcessor):
                     document_node.page_content = page_content
                     split_documents.append(document_node)
             all_documents.extend(split_documents)
-        for i in range(0, len(all_documents), 10):
-            threads = []
-            sub_documents = all_documents[i:i + 10]
-            for doc in sub_documents:
-                document_format_thread = threading.Thread(target=self._format_qa_document, kwargs={
-                    'flask_app': current_app._get_current_object(),
-                    'tenant_id': kwargs.get('tenant_id'),
-                    'document_node': doc,
-                    'all_qa_documents': all_qa_documents,
-                    'document_language': kwargs.get('doc_language', 'English')})
-                threads.append(document_format_thread)
-                document_format_thread.start()
-            for thread in threads:
-                thread.join()
+            # //这里不需要
+        # for i in range(0, len(all_documents), 10):
+        #     threads = []
+        #     sub_documents = all_documents[i:i + 10]
+        #     for doc in sub_documents:
+        #         document_format_thread = threading.Thread(target=self._format_qa_document, kwargs={
+        #             'flask_app': current_app._get_current_object(),
+        #             'tenant_id': kwargs.get('tenant_id'),
+        #             'document_node': doc,
+        #             'all_qa_documents': all_qa_documents,
+        #             'document_language': kwargs.get('doc_language', 'English')})
+        #         threads.append(document_format_thread)
+        #         document_format_thread.start()
+        #     for thread in threads:
+        #         thread.join()
         return all_qa_documents
 
     def format_by_template(self, file: FileStorage, **kwargs) -> list[Document]:
@@ -130,8 +131,11 @@ class QAIndexProcessor(BaseIndexProcessor):
         with flask_app.app_context():
             try:
                 # qa model document
+                # logging.info(f"LLMGenerator.generate_qa_document: {document_node.page_content}")
                 response = LLMGenerator.generate_qa_document(tenant_id, document_node.page_content, document_language)
+                # logging.info(f"是这里坑爹吗: {document_node.page_content}")
                 document_qa_list = self._format_split_text(response)
+                # logging.info(f"一直访问: {document_node.page_content}")
                 qa_documents = []
                 for result in document_qa_list:
                     qa_document = Document(page_content=result['question'], metadata=document_node.metadata.copy())
