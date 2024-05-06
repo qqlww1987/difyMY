@@ -12,7 +12,7 @@ type II18NContext = {
 }
 
 const I18NContext = createContext<II18NContext>({
-  locale: 'en-US',
+  locale: 'zh-Hans',
   i18n: {},
   setLocaleOnClient: (lang: Locale, reloadPage?: boolean) => { },
 })

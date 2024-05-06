@@ -112,9 +112,10 @@ const Sidebar = () => {
           )
         }
       </div>
-      <div className='px-4 pb-4 text-xs text-gray-400'>
+      {/* guorq 不显示这些鬼东西 */}
+      {/* <div className='px-4 pb-4 text-xs text-gray-400'>
         © {appData?.site.copyright || appData?.site.title} {(new Date()).getFullYear()}
-      </div>
+      </div> */}
       {!!showConfirm && (
         <Confirm
           title={t('share.chat.deleteConversation.title')}

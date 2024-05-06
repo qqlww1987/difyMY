@@ -75,7 +75,7 @@ class XinferenceAILargeLanguageModel(LargeLanguageModel):
                 model_parameters['temperature'] = 0.01
             elif model_parameters['temperature'] > 1.0:
                 model_parameters['temperature'] = 0.99
-
+        
         return self._generate(
             model=model, credentials=credentials, prompt_messages=prompt_messages, model_parameters=model_parameters,
             tools=tools, stop=stop, stream=stream, user=user,
@@ -382,14 +382,15 @@ class XinferenceAILargeLanguageModel(LargeLanguageModel):
         client = OpenAI(
             base_url=f'{credentials["server_url"]}/v1',
             api_key='abc',
-            max_retries=3,
+            # by guorq
+            max_retries=1,
             timeout=60,
         )
 
         xinference_client = Client(
             base_url=credentials['server_url'],
         )
-
+     
         xinference_model = xinference_client.get_model(credentials['model_uid'])
 
         generate_config = {
@@ -410,6 +411,8 @@ class XinferenceAILargeLanguageModel(LargeLanguageModel):
             ]
 
         if isinstance(xinference_model, RESTfulChatModelHandle | RESTfulChatglmCppChatModelHandle):
+            print("sss"+ credentials['model_uid'])
+            
             resp = client.chat.completions.create(
                 model=credentials['model_uid'],
                 messages=[self._convert_prompt_message_to_dict(message) for message in prompt_messages], 
@@ -417,6 +420,7 @@ class XinferenceAILargeLanguageModel(LargeLanguageModel):
                 user=user,
                 **generate_config,
             )
+            print("xxxxx123")
             if stream:
                 if tools and len(tools) > 0:
                     raise InvokeBadRequestError('xinference tool calls does not support stream mode')

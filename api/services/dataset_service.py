@@ -646,6 +646,7 @@ class DocumentService:
                     db.session.add(document)
                     db.session.flush()
                     document_ids.append(document.id)
+                    logging.info(f'Added document {document.id}')
                     documents.append(document)
                     position += 1
             elif document_data["data_source"]["type"] == "notion_import":

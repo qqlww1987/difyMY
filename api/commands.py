@@ -290,6 +290,7 @@ def migrate_knowledge_vector_database():
                     dataset.index_struct = json.dumps(index_struct_dict)
 
                 elif vector_type == "milvus":
+                    
                     dataset_id = dataset.id
                     collection_name = Dataset.gen_collection_name_by_id(dataset_id)
                     index_struct_dict = {
