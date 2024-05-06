@@ -14,22 +14,19 @@ import { NEED_REFRESH_APP_LIST_KEY } from '@/config'
 import { CheckModal } from '@/hooks/use-pay'
 import TabSliderNew from '@/app/components/base/tab-slider-new'
 import { useTabSearchParams } from '@/hooks/use-tab-searchparams'
-import { DotsGrid } from '@/app/components/base/icons/src/vender/line/general'
+import { DotsGrid, SearchLg } from '@/app/components/base/icons/src/vender/line/general'
+import { XCircle } from '@/app/components/base/icons/src/vender/solid/general'
 import {
+  // AiText,
   ChatBot,
   CuteRobot,
 } from '@/app/components/base/icons/src/vender/line/communication'
 import { Route } from '@/app/components/base/icons/src/vender/line/mapsAndTravel'
-import SearchInput from '@/app/components/base/search-input'
-import { useStore as useTagStore } from '@/app/components/base/tag-management/store'
-import TagManagementModal from '@/app/components/base/tag-management'
-import TagFilter from '@/app/components/base/tag-management/filter'
 
 const getKey = (
   pageIndex: number,
   previousPageData: AppListResponse,
   activeTab: string,
-  tags: string[],
   keywords: string,
 ) => {
   if (!pageIndex || previousPageData.has_more) {
@@ -40,9 +37,6 @@ const getKey = (
     else
       delete params.params.mode
 
-    if (tags.length)
-      params.params.tag_ids = tags
-
     return params
   }
   return null
@@ -51,7 +45,6 @@ const getKey = (
 const Apps = () => {
   const { t } = useTranslation()
   const { isCurrentWorkspaceManager } = useAppContext()
-  const showTagManagementModal = useTagStore(s => s.showTagManagementModal)
   const [activeTab, setActiveTab] = useTabSearchParams({
     defaultTab: 'all',
   })
@@ -65,8 +58,9 @@ const Apps = () => {
     setQuery(prev => ({ ...prev, tagIDs }))
   }, [setQuery])
 
+
   const { data, isLoading, setSize, mutate } = useSWRInfinite(
-    (pageIndex: number, previousPageData: AppListResponse) => getKey(pageIndex, previousPageData, activeTab, tagIDs, searchKeywords),
+    (pageIndex: number, previousPageData: AppListResponse) => getKey(pageIndex, previousPageData, activeTab, searchKeywords),
     fetchAppList,
     { revalidateFirstPage: true },
   )
@@ -76,9 +70,13 @@ const Apps = () => {
     { value: 'all', text: t('app.types.all'), icon: <DotsGrid className='w-[14px] h-[14px] mr-1'/> },
     { value: 'chat', text: t('app.types.chatbot'), icon: <ChatBot className='w-[14px] h-[14px] mr-1'/> },
     { value: 'agent-chat', text: t('app.types.agent'), icon: <CuteRobot className='w-[14px] h-[14px] mr-1'/> },
+
 // //guorq 屏蔽先把工作流屏蔽了先搞明白再说
 //     { value: 'workflow', text: t('app.types.workflow'), icon: <Route className='w-[14px] h-[14px] mr-1'/> },
 
+    // { value: 'completion', text: t('app.newApp.completeApp'), icon: <AiText className='w-[14px] h-[14px] mr-1'/> },
+    //guorq 屏蔽先把工作流屏蔽了先搞明白再说
+    // { value: 'workflow', text: t('app.types.workflow'), icon: <Route className='w-[14px] h-[14px] mr-1'/> },
   ]
 
   useEffect(() => {
@@ -105,17 +103,14 @@ const Apps = () => {
   const { run: handleSearch } = useDebounceFn(() => {
     setSearchKeywords(keywords)
   }, { wait: 500 })
+
   const handleKeywordsChange = (value: string) => {
     setKeywords(value)
     handleSearch()
   }
 
-  const { run: handleTagsUpdate } = useDebounceFn(() => {
-    setTagIDs(tagFilterValue)
-  }, { wait: 500 })
-  const handleTagsChange = (value: string[]) => {
-    setTagFilterValue(value)
-    handleTagsUpdate()
+  const handleClear = () => {
+    handleKeywordsChange('')
   }
 
   return (
@@ -126,9 +121,31 @@ const Apps = () => {
           onChange={setActiveTab}
           options={options}
         />
-        <div className='flex items-center gap-2'>
-          <TagFilter type='app' value={tagFilterValue} onChange={handleTagsChange} />
-          <SearchInput className='w-[200px]' value={keywords} onChange={handleKeywordsChange} />
+        <div className="flex items-center px-2 w-[200px] h-8 rounded-lg bg-gray-200">
+          <div className="pointer-events-none shrink-0 flex items-center mr-1.5 justify-center w-4 h-4">
+            <SearchLg className="h-3.5 w-3.5 text-gray-500" aria-hidden="true" />
+          </div>
+          <input
+            type="text"
+            name="query"
+            className="grow block h-[18px] bg-gray-200 rounded-md border-0 text-gray-600 text-[13px] placeholder:text-gray-500 appearance-none outline-none"
+            placeholder={t('common.operation.search')!}
+            value={keywords}
+            onChange={(e) => {
+              handleKeywordsChange(e.target.value)
+            }}
+            autoComplete="off"
+          />
+          {
+            keywords && (
+              <div
+                className='shrink-0 flex items-center justify-center w-4 h-4 cursor-pointer'
+                onClick={handleClear}
+              >
+                <XCircle className='w-3.5 h-3.5 text-gray-400' />
+              </div>
+            )
+          }
         </div>
       </div>
       <nav className='grid content-start grid-cols-1 gap-4 px-12 pt-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 grow shrink-0'>
@@ -140,9 +157,6 @@ const Apps = () => {
         <CheckModal />
       </nav>
       <div ref={anchorRef} className='h-0'> </div>
-      {showTagManagementModal && (
-        <TagManagementModal type='app' show={showTagManagementModal} />
-      )}
     </>
   )
 }

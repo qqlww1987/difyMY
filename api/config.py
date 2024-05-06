@@ -5,7 +5,6 @@ import dotenv
 dotenv.load_dotenv()
 
 DEFAULTS = {
-    'EDITION': 'SELF_HOSTED',
     'DB_USERNAME': 'postgres',
     'DB_PASSWORD': '',
     'DB_HOST': 'localhost',
@@ -108,7 +107,9 @@ class Config:
         # General Configurations.
         # ------------------------
         self.CURRENT_VERSION = "0.6.6"
+
         self.COMMIT_SHA = get_env('COMMIT_SHA')
+        # self.EDITION = "SELF_HOSTED"
         self.EDITION = get_env('EDITION')
         self.DEPLOY_ENV = get_env('DEPLOY_ENV')
         self.TESTING = False
@@ -220,6 +221,7 @@ class Config:
         self.GOOGLE_STORAGE_BUCKET_NAME = get_env('GOOGLE_STORAGE_BUCKET_NAME')
         self.GOOGLE_STORAGE_SERVICE_ACCOUNT_JSON_BASE64 = get_env('GOOGLE_STORAGE_SERVICE_ACCOUNT_JSON_BASE64')
 
+
         # ------------------------
         # Vector Store Configurations.
         # Currently, only support: qdrant, milvus, zilliz, weaviate, relyt
@@ -276,7 +278,7 @@ class Config:
         self.SMTP_USE_TLS = get_bool_env('SMTP_USE_TLS')
         
         # ------------------------
-        # Workspace Configurations.
+        # Workpace Configurations.
         # ------------------------
         self.INVITE_EXPIRY_HOURS = int(get_env('INVITE_EXPIRY_HOURS'))
 
@@ -315,12 +317,6 @@ class Config:
         # ------------------------
         # Platform Configurations.
         # ------------------------
-        self.GITHUB_CLIENT_ID = get_env('GITHUB_CLIENT_ID')
-        self.GITHUB_CLIENT_SECRET = get_env('GITHUB_CLIENT_SECRET')
-        self.GOOGLE_CLIENT_ID = get_env('GOOGLE_CLIENT_ID')
-        self.GOOGLE_CLIENT_SECRET = get_env('GOOGLE_CLIENT_SECRET')
-        self.OAUTH_REDIRECT_PATH = get_env('OAUTH_REDIRECT_PATH')
-
         self.HOSTED_OPENAI_API_KEY = get_env('HOSTED_OPENAI_API_KEY')
         self.HOSTED_OPENAI_API_BASE = get_env('HOSTED_OPENAI_API_BASE')
         self.HOSTED_OPENAI_API_ORGANIZATION = get_env('HOSTED_OPENAI_API_ORGANIZATION')
@@ -367,3 +363,17 @@ class Config:
 
         self.KEYWORD_DATA_SOURCE_TYPE = get_env('KEYWORD_DATA_SOURCE_TYPE')
         self.ENTERPRISE_ENABLED = get_bool_env('ENTERPRISE_ENABLED')
+
+
+class CloudEditionConfig(Config):
+
+    def __init__(self):
+        super().__init__()
+
+        self.EDITION = "CLOUD"
+
+        self.GITHUB_CLIENT_ID = get_env('GITHUB_CLIENT_ID')
+        self.GITHUB_CLIENT_SECRET = get_env('GITHUB_CLIENT_SECRET')
+        self.GOOGLE_CLIENT_ID = get_env('GOOGLE_CLIENT_ID')
+        self.GOOGLE_CLIENT_SECRET = get_env('GOOGLE_CLIENT_SECRET')
+        self.OAUTH_REDIRECT_PATH = get_env('OAUTH_REDIRECT_PATH')
