@@ -77,6 +77,7 @@ const Apps = () => {
     // { value: 'completion', text: t('app.newApp.completeApp'), icon: <AiText className='w-[14px] h-[14px] mr-1'/> },
     //guorq 屏蔽先把工作流屏蔽了先搞明白再说
     // { value: 'workflow', text: t('app.types.workflow'), icon: <Route className='w-[14px] h-[14px] mr-1'/> },
+
   ]
 
   useEffect(() => {
