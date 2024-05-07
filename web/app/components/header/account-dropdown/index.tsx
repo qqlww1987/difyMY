@@ -139,7 +139,7 @@ export default function AppSelector({ isMobile }: IAppSelecotr) {
                     <Menu.Item>
                       <Link
                         className={classNames(itemClassName, 'group justify-between')}
-                        href='https://discord.gg/5AEfbxcd9k'
+                        href='https://www.toone.com.cn/wenda/'
                         target='_blank' rel='noopener noreferrer'>
                         <div>{t('common.userProfile.community')}</div>
                         <ArrowUpRight className='hidden w-[14px] h-[14px] text-gray-500 group-hover:flex' />
@@ -148,9 +148,11 @@ export default function AppSelector({ isMobile }: IAppSelecotr) {
                     <Menu.Item>
                       <Link
                         className={classNames(itemClassName, 'group justify-between')}
-                        href={
-                          locale !== LanguagesSupported[1] ? 'https://docs.dify.ai/' : `https://docs.dify.ai/v/${locale.toLowerCase()}/`
-                        }
+                        // guorq 改变对应的链接
+                        href='https://www.toone.com.cn/wenda/'
+                        // href={
+                        //   locale !== LanguagesSupported[1] ? 'https://docs.dify.ai/' : `https://docs.dify.ai/v/${locale.toLowerCase()}/`
+                        // }
                         target='_blank' rel='noopener noreferrer'>
                         <div>{t('common.userProfile.helpCenter')}</div>
                         <ArrowUpRight className='hidden w-[14px] h-[14px] text-gray-500 group-hover:flex' />
