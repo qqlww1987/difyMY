@@ -60,20 +60,20 @@ class QAIndexProcessor(BaseIndexProcessor):
                     split_documents.append(document_node)
             all_documents.extend(split_documents)
             # //这里不需要
-        # for i in range(0, len(all_documents), 10):
-        #     threads = []
-        #     sub_documents = all_documents[i:i + 10]
-        #     for doc in sub_documents:
-        #         document_format_thread = threading.Thread(target=self._format_qa_document, kwargs={
-        #             'flask_app': current_app._get_current_object(),
-        #             'tenant_id': kwargs.get('tenant_id'),
-        #             'document_node': doc,
-        #             'all_qa_documents': all_qa_documents,
-        #             'document_language': kwargs.get('doc_language', 'English')})
-        #         threads.append(document_format_thread)
-        #         document_format_thread.start()
-        #     for thread in threads:
-        #         thread.join()
+        for i in range(0, len(all_documents), 10):
+            threads = []
+            sub_documents = all_documents[i:i + 10]
+            for doc in sub_documents:
+                document_format_thread = threading.Thread(target=self._format_qa_document, kwargs={
+                    'flask_app': current_app._get_current_object(),
+                    'tenant_id': kwargs.get('tenant_id'),
+                    'document_node': doc,
+                    'all_qa_documents': all_qa_documents,
+                    'document_language': kwargs.get('doc_language', 'English')})
+                threads.append(document_format_thread)
+                document_format_thread.start()
+            for thread in threads:
+                thread.join()
         return all_qa_documents
 
     def format_by_template(self, file: FileStorage, **kwargs) -> list[Document]:
