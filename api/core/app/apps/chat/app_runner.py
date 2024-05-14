@@ -145,6 +145,7 @@ class ChatAppRunner(AppRunner):
 
         # get context from datasets
         context = None
+        docUrl=None
         if app_config.dataset and app_config.dataset.dataset_ids:
             hit_callback = DatasetIndexToolCallbackHandler(
                 queue_manager,
@@ -167,7 +168,11 @@ class ChatAppRunner(AppRunner):
                 hit_callback=hit_callback,
                 memory=memory
             )
-
+            # 聊天是在这里进行组装 guorq
+            if context:
+                if 'url' in context[0]:
+                    docUrl=context[0].get('url')
+                    logger.info(f"context: {context[0]}")
         # reorganize all inputs and template to prompt messages
         # Include: prompt template, inputs, query(optional), files(optional)
         #          memory(optional), external data, dataset context(optional)
@@ -213,10 +218,11 @@ class ChatAppRunner(AppRunner):
             stream=application_generate_entity.stream,
             user=application_generate_entity.user_id,
         )
-
+        # 打印日志 guorq
         # handle invoke result
         self._handle_invoke_result(
             invoke_result=invoke_result,
             queue_manager=queue_manager,
-            stream=application_generate_entity.stream
+            stream=application_generate_entity.stream,
+            url=docUrl
         )

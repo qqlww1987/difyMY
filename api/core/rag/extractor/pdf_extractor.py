@@ -57,8 +57,22 @@ class PdfExtractor(BaseExtractor):
     def parse(self, blob: Blob) -> Iterator[Document]:
         """Lazily parse the blob."""
         import pypdfium2
-
+        import fitz
+        from unstructured.partition.text import partition_text
         with blob.as_bytes_io() as file_path:
+            # doc = fitz.open(file_path)
+            # resp = ""
+            # for i, page in enumerate(doc):
+                
+            #     text = page.get_text("")
+                
+            #     resp += text + "\n"
+            #     elements = partition_text(text=text, **self.unstructured_kwargs)
+            #     resp="\n\n".join([str(el) for el in elements])
+            #     metadata = {"source": blob.source, "page": i}
+            #     yield Document(page_content=resp, metadata=metadata)
+
+                # 更新进度
             pdf_reader = pypdfium2.PdfDocument(file_path, autoclose=True)
             try:
                 for page_number, page in enumerate(pdf_reader):

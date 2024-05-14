@@ -84,7 +84,9 @@ function AppCard({
   const runningStatus = isApp ? appInfo.enable_site : appInfo.enable_api
   const { app_base_url, access_token } = appInfo.site ?? {}
   const appMode = (appInfo.mode !== 'completion' && appInfo.mode !== 'workflow') ? 'chat' : appInfo.mode
-  const appUrl = `${app_base_url}/${appMode}/${access_token}`
+  window.location.host
+  const appUrl = `http://${ window.location.host}/${appMode}/${access_token}`
+  // const appUrl = `${app_base_url}/${appMode}/${access_token}`
   const apiUrl = appInfo?.api_base_url
 
   let bgColor = 'bg-primary-50 bg-opacity-40'

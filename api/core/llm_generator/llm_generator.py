@@ -91,7 +91,7 @@ class LLMGenerator:
         except Exception as e:
             logging.exception(e)
             questions = []
-
+        print(questions)
         return questions
 
     @classmethod

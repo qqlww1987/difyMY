@@ -247,7 +247,8 @@ class AppRunner:
     def _handle_invoke_result(self, invoke_result: Union[LLMResult, Generator],
                               queue_manager: AppQueueManager,
                               stream: bool,
-                              agent: bool = False) -> None:
+                              agent: bool = False,
+                              url: Optional[str] = None) -> None:
         """
         Handle invoke result
         :param invoke_result: invoke result
@@ -259,18 +260,21 @@ class AppRunner:
             self._handle_invoke_result_direct(
                 invoke_result=invoke_result,
                 queue_manager=queue_manager,
-                agent=agent
+                agent=agent,
+                url=url
             )
         else:
             self._handle_invoke_result_stream(
                 invoke_result=invoke_result,
                 queue_manager=queue_manager,
-                agent=agent
+                agent=agent,
+                url=url
             )
 
     def _handle_invoke_result_direct(self, invoke_result: LLMResult,
                                      queue_manager: AppQueueManager,
-                                     agent: bool) -> None:
+                                     agent: bool,
+                                     url: Optional[str] = None) -> None:
         """
         Handle invoke result direct
         :param invoke_result: invoke result
@@ -285,7 +289,8 @@ class AppRunner:
 
     def _handle_invoke_result_stream(self, invoke_result: Generator,
                                      queue_manager: AppQueueManager,
-                                     agent: bool) -> None:
+                                     agent: bool,
+                                     url: Optional[str] = None) -> None:
         """
         Handle invoke result
         :param invoke_result: invoke result
@@ -320,7 +325,8 @@ class AppRunner:
 
             if not usage and result.delta.usage:
                 usage = result.delta.usage
-
+        if url:
+            text += "详细操作见链接：" +url
         if not usage:
             usage = LLMUsage.empty_usage()
 

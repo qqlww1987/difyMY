@@ -1,4 +1,5 @@
 import threading
+import logging
 from typing import Optional, cast
 
 from flask import Flask, current_app
@@ -23,6 +24,7 @@ from core.tools.tool.dataset_retriever.dataset_retriever_tool import DatasetRetr
 from extensions.ext_database import db
 from models.dataset import Dataset, DatasetQuery, DocumentSegment
 from models.dataset import Document as DatasetDocument
+logger = logging.getLogger(__name__)
 
 default_retrieval_model = {
     'search_method': 'semantic_search',
@@ -254,9 +256,12 @@ class DatasetRetrieval:
                                                     query=query,
                                                     top_k=top_k, score_threshold=score_threshold,
                                                     reranking_model=reranking_model)
+                logger.info(f"Retrieval results: {results}")
                 self._on_query(query, [dataset_id], app_id, user_from, user_id)
                 if results:
                     self._on_retrival_end(results)
+                # 日志里输入results 这里已经加工了很多
+               
                 return results
         return []
 

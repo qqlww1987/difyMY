@@ -44,7 +44,7 @@ class RetrievalService:
             })
             threads.append(keyword_thread)
             keyword_thread.start()
-        # retrieval_model source with semantic
+        # retrieval_model source with semantic guorq 向量库搜索
         if retrival_method == 'semantic_search' or retrival_method == 'hybrid_search':
             embedding_thread = threading.Thread(target=RetrievalService.embedding_search, kwargs={
                 'flask_app': current_app._get_current_object(),
@@ -127,7 +127,7 @@ class RetrievalService:
                     'group_id': [dataset.id]
                 }
             )
-
+            # guorq 这玩意就是在这里转换丢了
             if documents:
                 if reranking_model and retrival_method == 'semantic_search':
                     data_post_processor = DataPostProcessor(str(dataset.tenant_id), reranking_model, False)

@@ -41,17 +41,23 @@ class RerankRunner:
         rerank_documents = []
 
         for result in rerank_result.docs:
-            # format document
+            # format document 
             rerank_document = Document(
                 page_content=result.text,
+                
                 metadata={
                     "doc_id": documents[result.index].metadata['doc_id'],
                     "doc_hash": documents[result.index].metadata['doc_hash'],
                     "document_id": documents[result.index].metadata['document_id'],
                     "dataset_id": documents[result.index].metadata['dataset_id'],
+                    # # 判断documents[result.index].metadata 是不是有url
+                    # "document_url": documents[result.index].metadata['url'],
                     'score': result.score
                 }
             )
+            if 'url' in documents[result.index].metadata:
+                rerank_document.metadata['url'] = documents[result.index].metadata['url']
+            rerank_documents.append(rerank_document)
             rerank_documents.append(rerank_document)
 
         return rerank_documents

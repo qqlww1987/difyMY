@@ -1,5 +1,5 @@
 import type { Fetcher } from 'swr'
-import { del, get, patch, post, put } from './base'
+import { del, get, patch, post,postNew, put } from './base'
 import type {
   AccountIntegrate,
   ApiBasedExtension,
@@ -125,7 +125,9 @@ export const updateCurrentWorkspace: Fetcher<ICurrentWorkspace, { url: string; b
 export const createWorkspaceNew: Fetcher<ICurrentWorkspace, { url: string; body: Record<string, any> }> = ({ url, body }) => {
   return post<ICurrentWorkspace>(url, { body })
 }
-
+export const annotationConvertFaq: Fetcher<{ response: Response }, { url: string; body: FormData }> = ({ url, body }) => {
+  return postNew<{ response: Response}>(url, { body }, { bodyStringify: false, deleteContentType: true })
+}
 
 export const fetchWorkspaces: Fetcher<{ workspaces: IWorkspace[] }, { url: string; params: Record<string, any> }> = ({ url, params }) => {
   return get<{ workspaces: IWorkspace[] }>(url, { params })

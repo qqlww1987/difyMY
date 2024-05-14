@@ -1,12 +1,14 @@
 'use client'
 import type { FC } from 'react'
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+// import React, { useMemo, useState } from 'react'
 import useSWR from 'swr'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/navigation'
 import { debounce, groupBy, omit } from 'lodash-es'
 import { PlusIcon } from '@heroicons/react/24/solid'
 import List from './list'
+import Modal from '@/app/components/base/modal'
 import s from './style.module.css'
 import Loading from '@/app/components/base/loading'
 import Button from '@/app/components/base/button'
@@ -20,6 +22,8 @@ import type { NotionPage } from '@/models/common'
 import type { CreateDocumentReq } from '@/models/datasets'
 import { DataSourceType } from '@/models/datasets'
 import RetryButton from '@/app/components/base/retry-button'
+import cn from 'classnames'
+import ChildPage from './faq/index';
 // Custom page count is not currently supported.
 const limit = 15
 
@@ -189,8 +193,24 @@ const Documents: FC<IDocumentsProps> = ({ datasetId }) => {
   }
 
   const documentsList = isDataSourceNotion ? documentsWithProgress?.data : documentsRes?.data
+  const [showModal, setShowModal] = useState(false)
+  // guorq 实现上传和下载
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [dragging, setDragging] = useState(false)
+  const dropRef = useRef<HTMLDivElement>(null)
+  const dragRef = useRef<HTMLDivElement>(null)
+  const fileUploader = useRef<HTMLInputElement>(null)
+  const selectHandle = () => {
+    if (fileUploader.current)
+      fileUploader.current.click()
+  }
+  const itemClassName = `
+    flex items-center w-full h-9 px-3 text-gray-700 text-[14px]
+    rounded-lg font-normal hover:bg-gray-50 cursor-pointer
+  `
 
   return (
+    
     <div className='flex flex-col h-full overflow-y-auto'>
       <div className='flex flex-col justify-center gap-1 px-6 pt-4'>
         <h1 className={s.title}>{t('datasetDocuments.list.title')}</h1>
@@ -206,6 +226,16 @@ const Documents: FC<IDocumentsProps> = ({ datasetId }) => {
             value={searchValue}
           />
           <div className='flex gap-2 justify-center items-center !h-8'>
+            {/* 暂时屏蔽 */}
+            {/* <div className='flex gap-2 justify-center items-center !h-8'>
+              <RetryButton datasetId={datasetId} />
+              {embeddingAvailable && (
+                <Button type='primary' onClick={() => setShowModal(true)} className='!h-8 !text-[13px] !shrink-0'>
+                  <PlusIcon className='h-4 w-4 mr-2 stroke-current' />
+                  {'FAQ转换'}
+                </Button>
+              )}
+            </div> */}
             <RetryButton datasetId={datasetId} />
             {embeddingAvailable && (
               <Button type='primary' onClick={routeToDocCreate} className='!h-8 !text-[13px] !shrink-0'>
@@ -213,8 +243,10 @@ const Documents: FC<IDocumentsProps> = ({ datasetId }) => {
                 {isDataSourceNotion && t('datasetDocuments.list.addPages')}
                 {!isDataSourceNotion && t('datasetDocuments.list.addFile')}
               </Button>
+              
             )}
           </div>
+          
         </div>
         {isLoading
           ? <Loading type='app' />
@@ -233,6 +265,16 @@ const Documents: FC<IDocumentsProps> = ({ datasetId }) => {
           datasetId={dataset?.id || ''}
         />
       </div>
+      {showModal && <Modal isShow={showModal} onClose={() => setShowModal(false)}  closable>
+      <div className='mt-6'>
+      <ChildPage appId={''} isShow={true} onCancel={function (): void {
+            throw new Error('Function not implemented.')
+          } } onAdded={function (): void {
+            throw new Error('Function not implemented.')
+          } } />
+
+    </div>
+    </Modal>}
     </div>
   )
 }
