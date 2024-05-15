@@ -29,11 +29,24 @@ class EnterpriseWorkspaceNew(Resource):
 
         tenant = TenantService.create_tenant(args['name'])
         TenantService.create_tenant_member(tenant, account, role='owner')
-
+        TenantService.create_tenant_provider_models(tenant,  role='owner')
         tenant_was_created.send(tenant)
 
         return {
             'message': 'enterprise workspace created.'
+        }
+
+class EnterpriseWorkspaceDelete(Resource):
+    
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('tenant_id', type=str, required=True, location='json')
+        args = parser.parse_args()
+       
+        tenant = TenantService.dissolve_tenant(args['name'])
+        tenant_was_created.send(tenant)
+        return {
+            'message': '工作空间已删除.'
         }
 
 class NewResource(Resource):

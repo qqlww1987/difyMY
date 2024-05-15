@@ -1,6 +1,7 @@
 import base64
 import logging
 import secrets
+import os
 import uuid
 from datetime import datetime, timedelta, timezone
 from hashlib import sha256
@@ -9,7 +10,7 @@ from typing import Any, Optional
 from flask import current_app
 from sqlalchemy import func
 from werkzeug.exceptions import Unauthorized
-
+from models.provider import Provider, ProviderModel
 from constants.languages import language_timezone_mapping, languages
 from events.tenant_event import tenant_was_created
 from extensions.ext_redis import redis_client
@@ -217,7 +218,31 @@ class TenantService:
         tenant.encrypt_public_key = generate_key_pair(tenant.id)
         db.session.commit()
         return tenant
+    @staticmethod
+    def create_tenant_provider_models(tenant: Tenant, role: str = 'normal') -> list[ProviderModel]:
+        """导入对应的provider model，模型已经注册"""
+    
+        # 从dify/api/provider_models.json获取数据
+        current_file_path = os.path.abspath(__file__)
 
+        # 获取当前文件的上层目录
+        parent_dir = os.path.dirname(current_file_path)
+        parent_dir= os.path.dirname(parent_dir)
+        # 获取目录下的provider_models.json的路径
+        provider_models_path = os.path.join(parent_dir, 'provider_models.json')
+        
+        with open(provider_models_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            # 将data中的数据某两列不转换为ProviderModel对象
+            
+            provider_models = [ProviderModel(**item) for item in data]
+            # 循环provider_models 设置tenant_id
+            for provider_model in provider_models:
+                provider_model.tenant_id = tenant.id
+                db.session.add(provider_model)
+            db.session.commit()
+
+            return provider_models
     @staticmethod
     def create_owner_tenant_if_not_exist(account: Account):
         """Create owner tenant if not exist"""
@@ -402,11 +427,16 @@ class TenantService:
         db.session.commit()
 
     @staticmethod
+    # 删除工作空间
     def dissolve_tenant(tenant: Tenant, operator: Account) -> None:
         """Dissolve tenant"""
         if not TenantService.check_member_permission(tenant, operator, operator, 'remove'):
             raise NoPermissionError('No permission to dissolve tenant.')
         db.session.query(TenantAccountJoin).filter_by(tenant_id=tenant.id).delete()
+        # 这里要对默认插入的模型进行删除操作tenant_default_models,provider_models  guorq
+        db.session.query(TenantAccountJoin).filter_by(tenant_id=tenant.id).delete()
+        db.session.query(TenantAccountJoin).filter_by(tenant_id=tenant.id).delete()
+       
         db.session.delete(tenant)
         db.session.commit()
 
