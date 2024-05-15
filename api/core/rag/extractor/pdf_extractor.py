@@ -57,7 +57,7 @@ class PdfExtractor(BaseExtractor):
     def parse(self, blob: Blob) -> Iterator[Document]:
         """Lazily parse the blob."""
         import pypdfium2
-        import fitz
+        # import fitz
         from unstructured.partition.text import partition_text
         with blob.as_bytes_io() as file_path:
             # doc = fitz.open(file_path)
