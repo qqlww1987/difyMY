@@ -125,6 +125,10 @@ export const updateCurrentWorkspace: Fetcher<ICurrentWorkspace, { url: string; b
 export const createWorkspaceNew: Fetcher<ICurrentWorkspace, { url: string; body: Record<string, any> }> = ({ url, body }) => {
   return post<ICurrentWorkspace>(url, { body })
 }
+// 写个调用删除工作空间的函数，api的的post参数有name和owner_email
+export const removeWorkspaceNew: Fetcher<ICurrentWorkspace, { url: string; body: Record<string, any> }> = ({ url, body }) => {
+  return post<ICurrentWorkspace>(url, { body })
+}
 export const annotationConvertFaq: Fetcher<{ response: Response }, { url: string; body: FormData }> = ({ url, body }) => {
   return postNew<{ response: Response}>(url, { body }, { bodyStringify: false, deleteContentType: true })
 }

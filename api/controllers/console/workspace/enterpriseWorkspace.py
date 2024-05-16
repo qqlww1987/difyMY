@@ -29,7 +29,7 @@ class EnterpriseWorkspaceNew(Resource):
 
         tenant = TenantService.create_tenant(args['name'])
         TenantService.create_tenant_member(tenant, account, role='owner')
-        TenantService.create_tenant_provider_models(tenant,  role='owner')
+        # TenantService.create_tenant_provider_models(tenant,  role='owner')
         tenant_was_created.send(tenant)
 
         return {
@@ -43,8 +43,8 @@ class EnterpriseWorkspaceDelete(Resource):
         parser.add_argument('tenant_id', type=str, required=True, location='json')
         args = parser.parse_args()
        
-        tenant = TenantService.dissolve_tenant(args['name'])
-        tenant_was_created.send(tenant)
+        TenantService.archive_tenant(args['tenant_id'])
+        # tenant_was_created.send(tenant)
         return {
             'message': '工作空间已删除.'
         }
@@ -160,5 +160,6 @@ def is_heading_numbered(doc, paragraph):
     return False
 # # 示例用法
 api.add_resource(EnterpriseWorkspaceNew, '/enterprise/workspace')
+api.add_resource(EnterpriseWorkspaceDelete, '/enterprise/workspaceRemove')
 api.add_resource(ConvertFAQApi, '/enterprise/convert-faq')
 

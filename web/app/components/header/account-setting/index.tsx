@@ -14,6 +14,7 @@ import ModelProviderPage from './model-provider-page'
 import s from './index.module.css'
 import BillingPage from '@/app/components/billing/billing-page'
 import CustomPage from '@/app/components/custom/custom-page'
+import MorePage from './more-page'
 import Modal from '@/app/components/base/modal'
 import {
   Database03,
@@ -98,6 +99,12 @@ export default function AccountSetting({
         name: t('custom.custom'),
         icon: <Colors className={iconClassName} />,
         activeIcon: <ColorsSolid className={iconClassName} />,
+      },
+      {
+        key: 'more',
+        name: t('更多设置'),
+        icon: <Users01 className={iconClassName} />,
+        activeIcon: <Users01Solid className={iconClassName} />,
       },
     ].filter(item => !!item.key) as GroupItem[]
   })()
@@ -216,6 +223,7 @@ export default function AccountSetting({
             {activeMenu === 'data-source' && <DataSourcePage />}
             {activeMenu === 'api-based-extension' && <ApiBasedExtensionPage />}
             {activeMenu === 'custom' && <CustomPage />}
+            {activeMenu === 'more' && <MorePage />}
           </div>
         </div>
       </div>

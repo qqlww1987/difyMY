@@ -10,7 +10,7 @@ from typing import Any, Optional
 from flask import current_app
 from sqlalchemy import func
 from werkzeug.exceptions import Unauthorized
-from models.provider import Provider, ProviderModel
+from models.provider import Provider, ProviderModel,TenantDefaultModel
 from constants.languages import language_timezone_mapping, languages
 from events.tenant_event import tenant_was_created
 from extensions.ext_redis import redis_client
@@ -213,13 +213,16 @@ class TenantService:
         tenant = Tenant(name=name)
 
         db.session.add(tenant)
+        # 添加对应的provider model
+        modles=TenantService.create_tenant_provider_models(tenant,False)
+        demodles=TenantService.create_tenant_default_models(tenant,False)
         db.session.commit()
 
         tenant.encrypt_public_key = generate_key_pair(tenant.id)
         db.session.commit()
         return tenant
     @staticmethod
-    def create_tenant_provider_models(tenant: Tenant, role: str = 'normal') -> list[ProviderModel]:
+    def create_tenant_provider_models(tenant: Tenant,commit :bool=True) -> list[ProviderModel]:
         """导入对应的provider model，模型已经注册"""
     
         # 从dify/api/provider_models.json获取数据
@@ -230,6 +233,8 @@ class TenantService:
         parent_dir= os.path.dirname(parent_dir)
         # 获取目录下的provider_models.json的路径
         provider_models_path = os.path.join(parent_dir, 'provider_models.json')
+         # 获取目录下的default_models.json的路径
+        default_models_path = os.path.join(parent_dir, 'default_models.json')
         
         with open(provider_models_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -240,9 +245,35 @@ class TenantService:
             for provider_model in provider_models:
                 provider_model.tenant_id = tenant.id
                 db.session.add(provider_model)
-            db.session.commit()
-
+            if commit:
+                db.session.commit()
             return provider_models
+    # 这个是创建工作空间默认的鬼
+    @staticmethod
+    def create_tenant_default_models(tenant: Tenant,commit :bool=True) -> list[TenantDefaultModel]:
+        """导入对应的provider model，模型已经注册"""
+    
+        # 从dify/api/provider_models.json获取数据
+        current_file_path = os.path.abspath(__file__)
+
+        # 获取当前文件的上层目录
+        parent_dir = os.path.dirname(current_file_path)
+        parent_dir= os.path.dirname(parent_dir)
+        # 获取目录下的default_models.json的路径
+        default_models_path = os.path.join(parent_dir, 'default_models.json')
+        
+        with open(default_models_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            # TenantDefaultModel
+            
+            default_models = [TenantDefaultModel(**item) for item in data]
+            # default_models 设置tenant_id
+            for default_model in default_models:
+                default_model.tenant_id = tenant.id
+                db.session.add(default_model)
+            if commit:
+                db.session.commit()
+            return default_models   
     @staticmethod
     def create_owner_tenant_if_not_exist(account: Account):
         """Create owner tenant if not exist"""
@@ -439,7 +470,18 @@ class TenantService:
        
         db.session.delete(tenant)
         db.session.commit()
-
+      # 归档对应的工作空间
+    def archive_tenant(tenant_id: str, operator: Account) -> None:
+     
+        tenant=db.session.query(TenantAccountJoin).filter_by(tenant_id=tenant.id).first();
+        if not tenant:
+            raise MemberNotInTenantError("工作空间已经过期.")
+        "Dissolve tenant"""
+        if not TenantService.check_member_permission(tenant, operator, operator, 'remove'):
+            raise NoPermissionError('对当前工作空间无权限.')
+        tenant.status=TenantStatus.ARCHIVED.value
+        db.session.commit()
+        # db.session.commit()
     @staticmethod
     def get_custom_config(tenant_id: str) -> None:
         tenant = db.session.query(Tenant).filter(Tenant.id == tenant_id).one_or_404()

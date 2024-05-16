@@ -1,0 +1,17 @@
+[
+    {
+        "provider_name": "xinference",
+        "model_name": "bge-large-zh-v1.5",
+        "model_type": "embeddings"
+    },
+    {
+        "provider_name": "xinference",
+        "model_name": "qwen-chat",
+        "model_type": "text-generation"
+    },
+    {
+        "provider_name": "xinference",
+        "model_name": "bge-reranker-large",
+        "model_type": "reranking"
+    }
+]
