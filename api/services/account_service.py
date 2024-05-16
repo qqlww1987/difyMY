@@ -211,8 +211,10 @@ class TenantService:
     def create_tenant(name: str) -> Tenant:
         """Create tenant"""
         tenant = Tenant(name=name)
-
+        tenant.id=db.text('uuid_generate_v4()')
+        # print(tenant.id)
         db.session.add(tenant)
+        # db.session.commit()
         # 添加对应的provider model
         modles=TenantService.create_tenant_provider_models(tenant,False)
         demodles=TenantService.create_tenant_default_models(tenant,False)
@@ -395,7 +397,25 @@ class TenantService:
     def get_tenant_count() -> int:
         """Get tenant count"""
         return db.session.query(func.count(Tenant.id)).scalar()
+    @staticmethod
+    def check_memberTenant_permission(tenant: Tenant, operator: Account, member: Account, action: str) -> None:
+        """Check member permission"""
+        perms = {
+            'add': [TenantAccountRole.OWNER, TenantAccountRole.ADMIN],
+            'remove': [TenantAccountRole.OWNER],
+            'update': [TenantAccountRole.OWNER]
+        }
+        if action not in ['add', 'remove', 'update']:
+            raise InvalidActionError("Invalid action.")
 
+
+        ta_operator = TenantAccountJoin.query.filter_by(
+            tenant_id=tenant.id,
+            account_id=operator.id
+        ).first()
+
+        if not ta_operator or ta_operator.role not in perms[action]:
+            raise NoPermissionError(f'No permission to {action} member.')
     @staticmethod
     def check_member_permission(tenant: Tenant, operator: Account, member: Account, action: str) -> None:
         """Check member permission"""
@@ -472,14 +492,13 @@ class TenantService:
         db.session.commit()
       # 归档对应的工作空间
     def archive_tenant(tenant_id: str, operator: Account) -> None:
-     
-        tenant=db.session.query(TenantAccountJoin).filter_by(tenant_id=tenant.id).first();
+        tenant =db.session.query(Tenant).filter(Tenant.id == tenant_id).first();
         if not tenant:
             raise MemberNotInTenantError("工作空间已经过期.")
         "Dissolve tenant"""
-        if not TenantService.check_member_permission(tenant, operator, operator, 'remove'):
-            raise NoPermissionError('对当前工作空间无权限.')
-        tenant.status=TenantStatus.ARCHIVED.value
+        # if not TenantService.check_memberTenant_permission(tenant, operator, operator, 'remove'):
+        #     raise NoPermissionError('对当前工作空间无权限.')
+        tenant.status=TenantStatus.ARCHIVE.value
         db.session.commit()
         # db.session.commit()
     @staticmethod

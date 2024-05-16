@@ -84,7 +84,7 @@ const MorePage = () => {
             shadow-xs rounded-lg ${(isCurrentWorkspaceManager && !isMemberFull) ? 'cursor-pointer' : 'grayscale opacity-50 cursor-default'}`
           }  onClick={() => removeWorkspace()}>
             <UserPlusIcon className='w-4 h-4 mr-2 ' />
-            {t('common.members.invite')}
+            {t('删除工作空间')}
           </div>
         </div>
      

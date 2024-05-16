@@ -4,6 +4,9 @@ import os
 from docx import Document
 import csv
 import tempfile
+from werkzeug.local import LocalProxy
+from flask import current_app
+from flask import g
 from io import BytesIO
 from flask_restful import Resource, reqparse
 from flask import request, jsonify, send_file
@@ -13,7 +16,10 @@ from models.account import Account
 from services.account_service import TenantService
 from controllers.console.datasets.error import TooManyFilesError
 from controllers.console.app.error import NoFileUploadedError
+from flask import has_request_context
 logger = logging.getLogger(__name__)
+current_user = LocalProxy(lambda: _get_user())
+
 class EnterpriseWorkspaceNew(Resource):
     
     def post(self):
@@ -42,8 +48,8 @@ class EnterpriseWorkspaceDelete(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('tenant_id', type=str, required=True, location='json')
         args = parser.parse_args()
-       
-        TenantService.archive_tenant(args['tenant_id'])
+        
+        TenantService.archive_tenant(args['tenant_id'],current_user)
         # tenant_was_created.send(tenant)
         return {
             'message': '工作空间已删除.'
@@ -158,6 +164,16 @@ def is_heading_numbered(doc, paragraph):
                 return True
     
     return False
+
+def _get_user():
+    if has_request_context():
+        if "_login_user" not in g:
+            current_app.login_manager._load_user()
+
+        return g._login_user
+
+    return None
+
 # # 示例用法
 api.add_resource(EnterpriseWorkspaceNew, '/enterprise/workspace')
 api.add_resource(EnterpriseWorkspaceDelete, '/enterprise/workspaceRemove')
