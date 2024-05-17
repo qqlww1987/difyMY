@@ -34,7 +34,7 @@ from services.errors.account import (
     TenantNotFound,
 )
 from tasks.mail_invite_member_task import send_invite_member_mail_task
-
+from core.helper import encrypter
 
 class AccountService:
 
@@ -206,27 +206,39 @@ class AccountService:
 
 
 class TenantService:
-
     @staticmethod
-    def create_tenant(name: str) -> Tenant:
-        """Create tenant"""
-        tenant = Tenant(name=name)
-        tenant.id=db.text('uuid_generate_v4()')
-        # print(tenant.id)
-        db.session.add(tenant)
-        # db.session.commit()
-        # 添加对应的provider model
-        modles=TenantService.create_tenant_provider_models(tenant,False)
-        demodles=TenantService.create_tenant_default_models(tenant,False)
+     # 归档对应的工作空间
+    def archive_tenant(tenant_id: str, operator: Account) -> None:
+        tenant =db.session.query(Tenant).filter(Tenant.id == tenant_id).first();
+        if not tenant:
+            raise MemberNotInTenantError("工作空间已经过期.")
+        "Dissolve tenant"""
+        # if not TenantService.check_memberTenant_permission(tenant, operator, operator, 'remove'):
+        #     raise NoPermissionError('对当前工作空间无权限.')
+        tenant.status=TenantStatus.ARCHIVE.value
         db.session.commit()
+    @staticmethod
+    def check_memberTenant_permission(tenant: Tenant, operator: Account, member: Account, action: str) -> None:
+        """Check member permission"""
+        perms = {
+            'add': [TenantAccountRole.OWNER, TenantAccountRole.ADMIN],
+            'remove': [TenantAccountRole.OWNER],
+            'update': [TenantAccountRole.OWNER]
+        }
+        if action not in ['add', 'remove', 'update']:
+            raise InvalidActionError("Invalid action.")
 
-        tenant.encrypt_public_key = generate_key_pair(tenant.id)
-        db.session.commit()
-        return tenant
+
+        ta_operator = TenantAccountJoin.query.filter_by(
+            tenant_id=tenant.id,
+            account_id=operator.id
+        ).first()
+
+        if not ta_operator or ta_operator.role not in perms[action]:
+            raise NoPermissionError(f'No permission to {action} member.')
     @staticmethod
     def create_tenant_provider_models(tenant: Tenant,commit :bool=True) -> list[ProviderModel]:
         """导入对应的provider model，模型已经注册"""
-    
         # 从dify/api/provider_models.json获取数据
         current_file_path = os.path.abspath(__file__)
 
@@ -235,21 +247,36 @@ class TenantService:
         parent_dir= os.path.dirname(parent_dir)
         # 获取目录下的provider_models.json的路径
         provider_models_path = os.path.join(parent_dir, 'provider_models.json')
-         # 获取目录下的default_models.json的路径
-        default_models_path = os.path.join(parent_dir, 'default_models.json')
-        
-        with open(provider_models_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            # 将data中的数据某两列不转换为ProviderModel对象
+        try:
+            with open(provider_models_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                # 将data中的数据某两列不转换为ProviderModel对象
+                
+                provider_models = [ProviderModel(**item) for item in data]
+                # 循环provider_models 设置tenant_id
+                for provider_model in provider_models:
+                    provider_model.tenant_id = tenant.id
+                    provider_credentials =json.loads(provider_model.encrypted_config)
+                    # 获取provider_credentials的server_url的属性
+                    if provider_credentials.get("server_url"):
+                        value = provider_credentials.get("server_url")
+                        valueNew = encrypter.encrypt_token(tenant.id,value)
+                        # valueNew= encrypter.decrypt_token_with_decoding(
+                        #             value,
+                        #             decoding_rsa_key,
+                        #             decoding_cipher_rsa)
+                        # 给provider_credentials的server_url的属性赋值
+                        provider_credentials['server_url'] = valueNew
+                        # 将provider_credentials转换为字符串
+                        provider_model.encrypted_config = json.dumps(provider_credentials)
+                    db.session.add(provider_model)
+                if commit:
+                    db.session.commit()
+                return provider_models
+        except Exception as e:
+                print(e)
+                raise Exception("导入provider model失败")
             
-            provider_models = [ProviderModel(**item) for item in data]
-            # 循环provider_models 设置tenant_id
-            for provider_model in provider_models:
-                provider_model.tenant_id = tenant.id
-                db.session.add(provider_model)
-            if commit:
-                db.session.commit()
-            return provider_models
     # 这个是创建工作空间默认的鬼
     @staticmethod
     def create_tenant_default_models(tenant: Tenant,commit :bool=True) -> list[TenantDefaultModel]:
@@ -276,6 +303,27 @@ class TenantService:
             if commit:
                 db.session.commit()
             return default_models   
+    @staticmethod
+    def create_tenant(name: str) -> Tenant:
+        """Create tenant"""
+        tenant = Tenant(name=name)
+        # tenant.id=db.text('uuid_generate_v4()')
+        # tenant.encrypt_public_key = generate_key_pair(tenant.id)
+       
+        db.session.add(tenant)
+        db.session.commit()
+        # 添加对应的provider model
+        tenant.encrypt_public_key = generate_key_pair(tenant.id)
+     
+        modles=TenantService.create_tenant_provider_models(tenant,False)
+        demodles=TenantService.create_tenant_default_models(tenant,False)
+        db.session.commit()
+
+      
+        db.session.commit()
+        return tenant
+   
+    
     @staticmethod
     def create_owner_tenant_if_not_exist(account: Account):
         """Create owner tenant if not exist"""
@@ -397,25 +445,7 @@ class TenantService:
     def get_tenant_count() -> int:
         """Get tenant count"""
         return db.session.query(func.count(Tenant.id)).scalar()
-    @staticmethod
-    def check_memberTenant_permission(tenant: Tenant, operator: Account, member: Account, action: str) -> None:
-        """Check member permission"""
-        perms = {
-            'add': [TenantAccountRole.OWNER, TenantAccountRole.ADMIN],
-            'remove': [TenantAccountRole.OWNER],
-            'update': [TenantAccountRole.OWNER]
-        }
-        if action not in ['add', 'remove', 'update']:
-            raise InvalidActionError("Invalid action.")
 
-
-        ta_operator = TenantAccountJoin.query.filter_by(
-            tenant_id=tenant.id,
-            account_id=operator.id
-        ).first()
-
-        if not ta_operator or ta_operator.role not in perms[action]:
-            raise NoPermissionError(f'No permission to {action} member.')
     @staticmethod
     def check_member_permission(tenant: Tenant, operator: Account, member: Account, action: str) -> None:
         """Check member permission"""
@@ -478,29 +508,14 @@ class TenantService:
         db.session.commit()
 
     @staticmethod
-    # 删除工作空间
     def dissolve_tenant(tenant: Tenant, operator: Account) -> None:
         """Dissolve tenant"""
         if not TenantService.check_member_permission(tenant, operator, operator, 'remove'):
             raise NoPermissionError('No permission to dissolve tenant.')
         db.session.query(TenantAccountJoin).filter_by(tenant_id=tenant.id).delete()
-        # 这里要对默认插入的模型进行删除操作tenant_default_models,provider_models  guorq
-        db.session.query(TenantAccountJoin).filter_by(tenant_id=tenant.id).delete()
-        db.session.query(TenantAccountJoin).filter_by(tenant_id=tenant.id).delete()
-       
         db.session.delete(tenant)
         db.session.commit()
-      # 归档对应的工作空间
-    def archive_tenant(tenant_id: str, operator: Account) -> None:
-        tenant =db.session.query(Tenant).filter(Tenant.id == tenant_id).first();
-        if not tenant:
-            raise MemberNotInTenantError("工作空间已经过期.")
-        "Dissolve tenant"""
-        # if not TenantService.check_memberTenant_permission(tenant, operator, operator, 'remove'):
-        #     raise NoPermissionError('对当前工作空间无权限.')
-        tenant.status=TenantStatus.ARCHIVE.value
-        db.session.commit()
-        # db.session.commit()
+
     @staticmethod
     def get_custom_config(tenant_id: str) -> None:
         tenant = db.session.query(Tenant).filter(Tenant.id == tenant_id).one_or_404()

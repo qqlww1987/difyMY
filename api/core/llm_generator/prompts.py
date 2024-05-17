@@ -61,12 +61,19 @@ User Input: yo, 你今天咋样？
 User Input: 
 """
 
+# SUGGESTED_QUESTIONS_AFTER_ANSWER_INSTRUCTION_PROMPT = (
+#     "Please help me predict the three most likely questions that human would ask, "
+#     "and keeping each question under 20 characters.\n"
+#     "The output must be an array in JSON format following the specified schema:\n"
+#     "[\"question1\",\"question2\",\"question3\"]\n"
+# )
 SUGGESTED_QUESTIONS_AFTER_ANSWER_INSTRUCTION_PROMPT = (
-    "Please help me predict the three most likely questions that human would ask, "
-    "and keeping each question under 20 characters.\n"
-    "The output must be an array in JSON format following the specified schema:\n"
-    "[\"question1\",\"question2\",\"question3\"]\n"
+    "请帮我预测人类最有可能提出的三个问题, "
+    "并将每个问题控制在20个字符以内.\n"
+    "输出必须是遵循指定架构的JSON格式的数组:\n"
+    "[\"问题1\",\"问题2\",\"问题3\"]\n"
 )
+
 
 GENERATOR_QA_PROMPT = (
     '<Task> The user will send a long text. Generate a Question and Answer pairs only using the knowledge in the long text. Please think step by step.'

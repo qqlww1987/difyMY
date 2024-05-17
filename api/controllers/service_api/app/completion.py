@@ -28,10 +28,9 @@ from services.app_generate_service import AppGenerateService
 class CompletionApi(Resource):
     @validate_app_token(fetch_user_arg=FetchUserArg(fetch_from=WhereisUserArg.JSON, required=True))
     def post(self, app_model: App, end_user: EndUser):
-        print(app_model.mode)
         if app_model.mode != 'completion':
             raise AppUnavailableError()
-        # print("这是咋了")
+
         parser = reqparse.RequestParser()
         parser.add_argument('inputs', type=dict, required=True, location='json')
         parser.add_argument('query', type=str, location='json', default='')

@@ -191,8 +191,6 @@ class MilvusVector(BaseVector):
             if result['distance'] > score_threshold:
                 doc = Document(page_content=result['entity'].get(Field.CONTENT_KEY.value),
                                metadata=metadata)
-                # guorq 这里是读向量数据库的留点记录
-                # logger.info(f"Milvus: {metadata}")
                 docs.append(doc)
         return docs
 
@@ -261,5 +259,5 @@ class MilvusVector(BaseVector):
             uri = "https://" + str(config.host) + ":" + str(config.port)
         else:
             uri = "http://" + str(config.host) + ":" + str(config.port)
-        client = MilvusClient(uri=uri, user=config.user, password=config.password)
+        client = MilvusClient(uri=uri, user=config.user, password=config.password,db_name=config.database)
         return client

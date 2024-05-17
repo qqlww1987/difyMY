@@ -44,7 +44,7 @@ class QAIndexProcessor(BaseIndexProcessor):
             document_nodes = splitter.split_documents([document])
             split_documents = []
             for document_node in document_nodes:
-                
+
                 if document_node.page_content.strip():
                     doc_id = str(uuid.uuid4())
                     hash = helper.generate_text_hash(document_node.page_content)
@@ -59,7 +59,6 @@ class QAIndexProcessor(BaseIndexProcessor):
                     document_node.page_content = page_content
                     split_documents.append(document_node)
             all_documents.extend(split_documents)
-            # //这里不需要
         for i in range(0, len(all_documents), 10):
             threads = []
             sub_documents = all_documents[i:i + 10]
@@ -131,11 +130,8 @@ class QAIndexProcessor(BaseIndexProcessor):
         with flask_app.app_context():
             try:
                 # qa model document
-                # logging.info(f"LLMGenerator.generate_qa_document: {document_node.page_content}")
                 response = LLMGenerator.generate_qa_document(tenant_id, document_node.page_content, document_language)
-                # logging.info(f"是这里坑爹吗: {document_node.page_content}")
                 document_qa_list = self._format_split_text(response)
-                # logging.info(f"一直访问: {document_node.page_content}")
                 qa_documents = []
                 for result in document_qa_list:
                     qa_document = Document(page_content=result['question'], metadata=document_node.metadata.copy())

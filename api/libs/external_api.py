@@ -18,7 +18,7 @@ class ExternalApi(Api):
 
         """
         got_request_exception.send(current_app, exception=e)
-        print("sssss123")
+
         headers = Headers()
         if isinstance(e, HTTPException):
             if e.response is not None:

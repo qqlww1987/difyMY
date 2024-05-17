@@ -3,42 +3,28 @@
         "provider_name": "xinference",
         "model_name": "codeqwen1.5-chat",
         "model_type": "text-generation",
-        "encrypted_config": "{\"server_url\": \"SFlCUklEOghO3txfS++kcgr94Eibix9kKQbaKzjXCxw9nxoxCilOjGe93TJu+/IDA3NvrhH6v6nD/o4U0MSW76CwzkGKbuAuU06sQWasSPXVMUOAjiVuMaJzmeVcof2zbLymbuh0QS0Ui8yhZbsnQ4jbxz835uJlITY+kE8vca7YXvgtdP2Nj2K2pdsBvf/bjfI0SVytLgQGsqvUoNV2378RfcsBu13xAkzUEBnxXGNmbPoQp5V3ZdX4p6sOVxnRbrDAJn3yZj1QyzKr2PDLMB/7nLUGyKGYubJq1wniJx+hEiYMxssNSHsl/5mKm/lV30AA4p+iuyscy6g96B8NK4Pp2KuA5KU7TlXM/LK8ZRZM9YwW75xMB4UPa0Rn56U3pTup5iR5wblAdLlLBTqmoHKiLvoFM9Ub7nrd6LoK\", \"model_uid\": \"codeqwen1.5-chat\", \"completion_type\": \"chat\", \"context_length\": 32768}",
+        "encrypted_config": "{\"server_url\": \"http://10.1.30.43:9997/\", \"model_uid\": \"codeqwen1.5-chat\", \"completion_type\": \"chat\", \"context_length\": 32768}",
         "is_valid": true
     },
     {
         "provider_name": "xinference",
         "model_name": "bge-reranker-large",
         "model_type": "reranking",
-        "encrypted_config": "{\"server_url\": \"SFlCUklEOouDnakyDsY24D7bSXQ/OHAF3p+MluHCZsDvJ2esfIR9ydpfYnmOOc8G+bRtFe/q1QUxA+kDYHePezrhCnjoYOA65ZARcUFqAfHiqOQ7m9MJBoYHZOHyZizTlSPUcmKtmCFR5yuW32mx3JwXg223EobnOChLGjUyoBZWvWf5aqfcnI4MrtWEzgQiPdtsaKaFeYrnkkXksrc063IUPdppz9TvLrNJ5rvMAPGMeOOSHVy2SwnkCZnpoXPLEnAvnOZQFt7BQsliGos3chPVyl/tOcqJ6Pt4XLHA8z2Xlg4qWTHdL72Xw5tJ7AfUkIBBhekLlAirkU/I+pIh9R5rUxRjwHWM8JlErOHA7+zurk0Z9SeWmtsiYrJ4p75oqRTNvBm3pmHArOPheWol6k3w2M7NuQbe0LjRzFhD\", \"model_uid\": \"bge-reranker-large\"}",
+        "encrypted_config": "{\"server_url\": \"http://10.1.33.197:9997/\", \"model_uid\": \"bge-reranker-large\"}",
         "is_valid": true
     },
     {
         "provider_name": "xinference",
         "model_name": "qwen-chat",
         "model_type": "text-generation",
-        "encrypted_config": "{\"server_url\": \"SFlCUklEOiZ7eDD6M8Mq9Lt/h4HTOgDPXpRLgga2a8uUW8rG75pwR39a0+5LLgz1hpT8pDCHbcVH6SKmCpZebS0gXGTrStISDrGoRROzY9urnoTRsV1n76n1M4/RRV5f1NqOF7NxOfHuS5hdvHZNPOd4gZ6XmI7CzDb2BOBqsPOqrGRmtKl9b+WynHZzYSOULjADq+Uf8ky+K9/cHCTGwQ+D4uAD6Hwdd+fNJFO8tRXamkTzKqusFzxg5YDwfK4Vi+w89h7VZEdYSZ7OxxXkBXLvet0iC1F4yrBBYsgUA4b+0JSZZxxfwd+oHj9tOT0McChGeZDycpIwUlX/ip3qknU0dJxr+2xK394r7rNk1mE9ZN/s8VoNoHX/eZ1fV5zEiRaxrgvuaG3k+M+G1nWN/Uw6t/VsxuTxnJ6TNxLx\", \"model_uid\": \"qwen-chat\", \"completion_type\": \"chat\", \"support_function_call\": true, \"context_length\": 32768}",
+        "encrypted_config": "{\"server_url\": \"http://10.1.30.43:9997/\", \"model_uid\": \"qwen-chat\", \"completion_type\": \"chat\", \"support_function_call\": true, \"context_length\": 32768}",
         "is_valid": true
     },
     {
         "provider_name": "xinference",
         "model_name": "bge-large-zh-v1.5",
         "model_type": "embeddings",
-        "encrypted_config": "{\"server_url\": \"SFlCUklEOnIrrsvtzX4HidibsqCFSzvj59rcWfeUHEFasrWavQ56hrfkWdb4cjxd6U7E3i+eHR6/k9C1h7JdnrpKR3iCRhnGkaQHTz7F6vuAmfIdfjn+hQi5ePHvUK7MVjtOrkd8YHdGqwUIjoxQqwqtIhFW22ODXdZf2WqoHsLm2p0CUkkE4dSXJZVV4fBreu9Dby9b0lTIxAygakq0r0ce2WEeHAXrRRWLpIz3+KVQpuZ3Dw3NMnw1CyxCNyENvdTPw2pNrvRznw4QoE5VKmZl0l8Dat6+DyTabBeWe9Xn3CMrvm+W2pJiA4fJd59Bhhx6aVVokXQ6rHkr6iat6RfkG/DK00UDcqKHBqKJ74CMk0HlK/enpF2ilxbyFC7WFqz0PTx3u7Ha8b6hmZ6OSK+5cdVYlunxrWwVU/S4eQ==\", \"model_uid\": \"bge-large-zh-v1.5\", \"max_tokens\": 512}",
-        "is_valid": true
-    },
-    {
-        "provider_name": "xinference",
-        "model_name": "qwen1.5-chat",
-        "model_type": "text-generation",
-        "encrypted_config": "{\"server_url\": \"SFlCUklEOi5VnHuQCE7nJUsVzVxT1k4v+s6n7Oy37jV5zDXj5jLQgFoQhTTot7KjLm6oPtzP3hBU4UTZQcYIN3nqBGwR56rXitZuryDSi5pBOF5XUuwwJmuk58bAME8SmvGTSovoycbdUydqqsEYZuH0xNwOZrBvdf7Bt6WN75jgujGUjlaly+4hJqcbX9/FDmEJFqaAyRrXGd9hmUn/VMtP5qS3Mq/VehSFJmvaMLJYWwdhgqw4IqTg7Ye5PhxSJaD1JvgtzVPpMkLGHmchc87M3qQChF6DqQvTCTh/xgfTzCMtIrLyDwpe94fyy1kLYlK6Y0Gc0Qpuf+T2bbdNQK8HTujbEHOCIJmApZEuzhXkX5nisleeUqiK3m1qqXrm2v11AcJt/lVK+5bCZfMA6IrAH8iqnMSPyFUjty/a\", \"model_uid\": \"qwen1.5-chat\", \"completion_type\": \"chat\", \"support_function_call\": true, \"context_length\": 32768}",
-        "is_valid": true
-    },
-    {
-        "provider_name": "ollama",
-        "model_name": "codeqwen:7b-chat",
-        "model_type": "text-generation",
-        "encrypted_config": "{\"base_url\": \"http://10.1.30.43:11435\", \"mode\": \"chat\", \"context_size\": \"4096\", \"max_tokens\": \"4096\", \"vision_support\": \"false\"}",
+        "encrypted_config": "{\"server_url\": \"http://10.1.33.197:9997/\", \"model_uid\": \"bge-large-zh-v1.5\", \"max_tokens\": 512}",
         "is_valid": true
     },
     {

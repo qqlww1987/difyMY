@@ -91,7 +91,7 @@ class LLMGenerator:
         except Exception as e:
             logging.exception(e)
             questions = []
-        print(questions)
+
         return questions
 
     @classmethod
@@ -156,6 +156,7 @@ class LLMGenerator:
             tenant_id=tenant_id,
             model_type=ModelType.LLM,
         )
+
         prompt_messages = [
             SystemPromptMessage(content=prompt),
             UserPromptMessage(content=query)

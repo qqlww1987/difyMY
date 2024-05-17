@@ -50,7 +50,7 @@ class DatasetRetrieverTool(DatasetRetrieverBaseTool):
             Dataset.tenant_id == self.tenant_id,
             Dataset.id == self.dataset_id
         ).first()
-        # 这里读取的是文档的page_content，guorq 向量读取在这里
+
         if not dataset:
             return ''
 

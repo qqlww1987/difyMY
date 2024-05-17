@@ -91,7 +91,6 @@ class TextSplitter(BaseDocumentTransformer, ABC):
                     index = text.find(chunk, index + 1)
                     metadata["start_index"] = index
                 new_doc = Document(page_content=chunk, metadata=metadata)
-                # logging.info(f"真的不知道咱回事了 {metadata}")
                 documents.append(new_doc)
         return documents
 
