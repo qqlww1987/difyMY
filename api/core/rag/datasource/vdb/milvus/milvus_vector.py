@@ -195,7 +195,7 @@ class MilvusVector(BaseVector):
         results = self._client.search(collection_name=self._collection_name,
                                       data=[query_vector],
                                       search_params=search_params,
-                                      limit=100,
+                                      limit=20,
                                     #   limit=kwargs.get('top_k', 4),
                                       output_fields=[Field.CONTENT_KEY.value, Field.METADATA_KEY.value],
                                       )
