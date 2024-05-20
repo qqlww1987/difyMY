@@ -177,11 +177,30 @@ class MilvusVector(BaseVector):
     def search_by_vector(self, query_vector: list[float], **kwargs: Any) -> list[Document]:
 
         # Set search parameters.
+        # L2 and other	range_filter <= distance < radius
+        # IP and cosine	radius < distance <= range_filter
+        # 这个参数还没搞懂
+        score_threshold = kwargs.get('score_threshold') if kwargs.get('score_threshold') else 0.0
+            
+        search_params = {
+            "metric_type": "IP",
+            "params": {
+                # "radius": 0.4,
+                # "range_filter": 0.6
+                "radius": score_threshold,
+                "range_filter": 1.0
+            }
+        }
+
         results = self._client.search(collection_name=self._collection_name,
                                       data=[query_vector],
-                                      limit=kwargs.get('top_k', 4),
+                                      search_params=search_params,
+                                      limit=100,
+                                    #   limit=kwargs.get('top_k', 4),
                                       output_fields=[Field.CONTENT_KEY.value, Field.METADATA_KEY.value],
                                       )
+        # print(results)
+        # limit=100
         # Organize results.
         docs = []
         for result in results[0]:
