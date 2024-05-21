@@ -71,6 +71,7 @@ class ToolTransformService:
             id=provider_controller.identity.name,
             author=provider_controller.identity.author,
             name=provider_controller.identity.name,
+            isUse=provider_controller.identity.isUse,
             description=I18nObject(
                 en_US=provider_controller.identity.description.en_US,
                 zh_Hans=provider_controller.identity.description.zh_Hans,

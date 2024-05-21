@@ -1,5 +1,6 @@
 identity:
   name: bar_chart
+  isUser: true
   author: Dify
   label:
     en_US: Bar Chart

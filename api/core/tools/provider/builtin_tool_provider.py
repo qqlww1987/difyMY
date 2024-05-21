@@ -42,6 +42,7 @@ class BuiltinToolProviderController(ToolProviderController):
             'identity': provider_yaml['identity'],
             'credentials_schema': provider_yaml['credentials_for_provider'] if 'credentials_for_provider' in provider_yaml else None,
         })
+        # print(f'{provider_yaml['identity']} loaded')
 
     def _get_builtin_tools(self) -> list[Tool]:
         """
@@ -53,6 +54,7 @@ class BuiltinToolProviderController(ToolProviderController):
             return self.tools
         
         provider = self.identity.name
+        isUse=self.identity.isUse
         tool_path = path.join(path.dirname(path.realpath(__file__)), "builtin", provider, "tools")
         # get all the yaml files in the tool path
         tool_files = list(filter(lambda x: x.endswith(".yaml") and not x.startswith("__"), listdir(tool_path)))
@@ -69,8 +71,10 @@ class BuiltinToolProviderController(ToolProviderController):
                                            'builtin', provider, 'tools', f'{tool_name}.py'),
                     parent_type=BuiltinTool)
                 tool["identity"]["provider"] = provider
+                tool["identity"]["isUse"] = isUse
+                
                 tools.append(assistant_tool_class(**tool))
-
+     
         self.tools = tools
         return tools
     

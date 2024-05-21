@@ -1,5 +1,6 @@
 identity:
   author: Bowen Liang
+  isUse: true
   name: wecom
   label:
     en_US: Wecom
