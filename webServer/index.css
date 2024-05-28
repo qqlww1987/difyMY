@@ -1,4 +1,4 @@
-:root {
+@charset "UTF-8";:root {
     --vscode-foreground: #cccccc;
     --vscode-font-family: "Segoe WPC", "Segoe UI", sans-serif;
     --vscode-font-weight: normal;
@@ -44,7 +44,7 @@
     --vscode-input-border: #cecece;
     --vscode-input-placeholderForeground: #767676;
 
-    --tc-chat-card-content-bg: rgb(0 0 0 / 5%);
+    --tc-chat-card-content-bg: rgb(0 0 0 / 4%);
 
     --container-padding: 0;
     --input-padding-vertical: 6px;
@@ -383,6 +383,7 @@ to {
     justify-content: right;
     margin-left: 6px;
 }
+
 html[data-code-theme=dark] {
   /*
 
@@ -569,12 +570,31 @@ html[data-code-theme=light] .hljs-link {
 }
 .chat-box-600 {
   display: flex;
-  /* justify-content: center; */
-  /* align-items: center; */
   width: 100%;
   max-width: 600px;
-  /* min-width: 300px; */
-  /* height: 200px; */
-  /* background-color: #f0f0f0; */
   margin: 0 auto;
+}
+
+/* Chrome, Safari, and Opera */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  /* 设置滚动条宽度 */
+}
+::-webkit-scrollbar-track {
+  background: --var(--vscode-editor-background);
+  /*#f1f1f1;*/
+  border-radius: 2px;
+  /* 滚动条轨道背景色 */
+}
+::-webkit-scrollbar-thumb {
+  background: #888;
+  /* 滚动条滑块背景色 */
+  border-radius: 2px;
+  /* 滑块圆角 */
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  /* 滑块悬停时的背景色 */
+  border-radius: 2px;
 }

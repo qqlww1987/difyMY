@@ -1,6 +1,5 @@
 identity:
   name: wecom_group_bot
-  isUse: true
   author: Bowen Liang
   label:
     en_US: Send Group Message

@@ -35,7 +35,6 @@ class ConversationListApi(InstalledAppResource):
             pinned = True if args['pinned'] == 'true' else False
 
         try:
-           
             return WebConversationService.pagination_by_last_id(
                 app_model=app_model,
                 user=current_user,

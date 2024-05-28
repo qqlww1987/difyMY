@@ -1,8 +1,5 @@
 identity:
-  author: labi
   isUse: true
-  isProvider: true
-  isBuiltin: true
   name: chart
   label:
     en_US: ChartGenerator

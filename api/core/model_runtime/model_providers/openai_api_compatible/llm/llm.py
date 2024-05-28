@@ -108,7 +108,6 @@ class OAIAPICompatLargeLanguageModel(_CommonOAI_API_Compat, LargeLanguageModel):
                 headers["Authorization"] = f"Bearer {api_key}"
 
             endpoint_url = credentials['endpoint_url']
-            
             if not endpoint_url.endswith('/'):
                 endpoint_url += '/'
 
@@ -133,7 +132,7 @@ class OAIAPICompatLargeLanguageModel(_CommonOAI_API_Compat, LargeLanguageModel):
                 endpoint_url = urljoin(endpoint_url, 'completions')
             else:
                 raise ValueError("Unsupported completion type for model configuration.")
-            print(f"这是验证的鬼 {endpoint_url}...")
+
             # send a post request to validate the credentials
             response = requests.post(
                 endpoint_url,
