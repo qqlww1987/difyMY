@@ -31,7 +31,6 @@ class ConversationListApi(WebApiResource):
         pinned = None
         if 'pinned' in args and args['pinned'] is not None:
             pinned = True if args['pinned'] == 'true' else False
-
         try:
             return WebConversationService.pagination_by_last_id(
                 app_model=app_model,

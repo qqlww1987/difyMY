@@ -8,30 +8,37 @@
     },
     {
         "provider_name": "xinference",
+        "model_name": "codeqwen1.5",
+        "model_type": "text-generation",
+        "encrypted_config": "{\"server_url\": \"http://10.1.30.43:9997/\", \"model_uid\": \"codeqwen1.5\", \"completion_type\": \"completion\", \"context_length\": 65536}",
+        "is_valid": true
+    },
+    {
+        "provider_name": "xinference",
         "model_name": "bge-reranker-large",
         "model_type": "reranking",
-        "encrypted_config": "{\"server_url\": \"http://10.1.33.197:9997/\", \"model_uid\": \"bge-reranker-large\"}",
+        "encrypted_config": "{\"server_url\": \"http://10.1.30.43:9999/\", \"model_uid\": \"bge-reranker-large\"}",
         "is_valid": true
     },
     {
         "provider_name": "xinference",
         "model_name": "qwen-chat",
         "model_type": "text-generation",
-        "encrypted_config": "{\"server_url\": \"http://10.1.30.43:9997/\", \"model_uid\": \"qwen-chat\", \"completion_type\": \"chat\", \"support_function_call\": true, \"context_length\": 32768}",
+        "encrypted_config": "{\"server_url\": \"http://10.1.30.43:9999/\", \"model_uid\": \"qwen-chat\", \"completion_type\": \"chat\", \"support_function_call\": true, \"context_length\": 32768}",
         "is_valid": true
     },
     {
         "provider_name": "xinference",
         "model_name": "bge-large-zh-v1.5",
         "model_type": "embeddings",
-        "encrypted_config": "{\"server_url\": \"http://10.1.33.197:9997/\", \"model_uid\": \"bge-large-zh-v1.5\", \"max_tokens\": 512}",
+        "encrypted_config": "{\"server_url\": \"http://10.1.30.43:9999/\", \"model_uid\": \"bge-large-zh-v1.5\", \"max_tokens\": 512}",
         "is_valid": true
     },
     {
         "provider_name": "ollama",
-        "model_name": "codeqwen:code",
+        "model_name": "codeqwen:7b-chat-v1.5-q8_0",
         "model_type": "text-generation",
-        "encrypted_config": "{\"base_url\": \"http://10.1.33.139:11434/\", \"mode\": \"completion\", \"context_size\": \"4096\", \"max_tokens\": \"4096\", \"vision_support\": \"false\"}",
+        "encrypted_config": "{\"base_url\": \"http://10.1.33.139:11434/\", \"mode\": \"completion\", \"context_size\": \"32768\", \"max_tokens\": \"32768\", \"vision_support\": \"false\"}",
         "is_valid": true
     }
 ]

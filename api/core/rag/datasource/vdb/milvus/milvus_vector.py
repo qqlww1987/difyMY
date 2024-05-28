@@ -215,6 +215,7 @@ class MilvusVector(BaseVector):
 
     def search_by_full_text(self, query: str, **kwargs: Any) -> list[Document]:
         # milvus/zilliz doesn't support bm25 search
+        
         return []
 
     def create_collection(
