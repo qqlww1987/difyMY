@@ -10,6 +10,7 @@ from core.tools.tool.tool import ToolParameter
 
 class UserTool(BaseModel):
     author: str
+    isUse:bool = False
     name: str # identifier
     label: I18nObject # label
     description: I18nObject
@@ -32,6 +33,7 @@ class UserToolProvider(BaseModel):
     original_credentials: dict = None
     is_team_authorization: bool = False
     allow_delete: bool = True
+    isUse:bool = False
     tools: list[UserTool] = None
     labels: list[str] = None
 
@@ -59,7 +61,7 @@ class UserToolProvider(BaseModel):
             'allow_delete': self.allow_delete,
             'tools': tools,
             'labels': self.labels,
-        }
+ }
 
 class UserToolProviderCredentials(BaseModel):
     credentials: dict[str, ToolProviderCredentials]

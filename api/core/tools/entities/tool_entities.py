@@ -170,7 +170,8 @@ class ToolIdentity(BaseModel):
     label: I18nObject = Field(..., description="The label of the tool")
     provider: str = Field(..., description="The provider of the tool")
     # guorq 增加属性是否可以使用,这样可以过滤哪些鬼东西可以使用
-    isUse:bool=Field( description="can used in assistant",default=True)
+
+    isUse:bool=Field( description="can used in assistant",default=False)
     icon: Optional[str] = None
 
 class ToolCredentialsOption(BaseModel):
