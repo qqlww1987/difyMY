@@ -1,6 +1,5 @@
 identity:
   name: line_chart
-  isUser: true
   author: Dify
   label:
     en_US: Linear Chart

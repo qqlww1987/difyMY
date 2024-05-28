@@ -1,5 +1,5 @@
 identity:
-  isUse: true
+  author: Dify
   name: chart
   label:
     en_US: ChartGenerator
