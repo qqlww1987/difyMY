@@ -6,13 +6,14 @@ LABEL maintainer="takatost@gmail.com"
 # install packages
 FROM base as packages
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends gcc g++ libc-dev libffi-dev libgmp-dev libmpfr-dev libmpc-dev
+# RUN apt-get update \
+#     && apt-get install -y --no-install-recommends gcc g++ libc-dev libffi-dev libgmp-dev libmpfr-dev libmpc-dev
 
 COPY requirements.txt /requirements.txt
 
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --prefix=/pkg -r requirements.txt
+    pip install --prefix=/pkg -r requirements.txt  -i https://pypi.tuna.tsinghua.edu.cn/simple
+
 
 # production stage
 FROM base AS production

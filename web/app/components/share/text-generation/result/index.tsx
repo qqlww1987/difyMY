@@ -8,7 +8,7 @@ import cn from 'classnames'
 import TextGenerationRes from '@/app/components/app/text-generate/item'
 import NoData from '@/app/components/share/text-generation/no-data'
 import Toast from '@/app/components/base/toast'
-import { sendCompletionMessage, sendWorkflowMessage, updateFeedback } from '@/service/share'
+import { sendCompletionMessage, sendWorkflowMessage, updateFeedback,sendMsgByFeedback } from '@/service/share'
 import type { Feedbacktype } from '@/app/components/app/chat/type'
 import Loading from '@/app/components/base/loading'
 import type { PromptConfig } from '@/models/debug'
@@ -98,6 +98,11 @@ const Result: FC<IResultProps> = ({
   const handleFeedback = async (feedback: Feedbacktype) => {
     await updateFeedback({ url: `/messages/${messageId}/feedbacks`, body: { rating: feedback.rating } }, isInstalledApp, installedAppInfo?.id)
     setFeedback(feedback)
+    if (feedback.rating == "dislike") {
+      // 打印feedback
+      console.log(feedback)
+      sendMsgByFeedback({ url: `/messages/${messageId}/sendMsgByFeedback`, body: { rating: feedback.rating } }, isInstalledApp, installedAppInfo?.id)
+    }
   }
 
   const logError = (message: string) => {

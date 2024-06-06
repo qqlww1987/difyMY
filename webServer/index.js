@@ -18202,24 +18202,38 @@ const _export_sfc = (sfc, props) => {
 };
 const _sfc_main$5 = {};
 const _hoisted_1$4 = {
+  t: "1714113113132",
+  class: "icon",
+  viewBox: "0 0 1024 1024",
+  version: "1.1",
   xmlns: "http://www.w3.org/2000/svg",
-  fill: "none",
-  viewBox: "0 0 24 24",
-  "data-license": "isc-gnc",
-  "stroke-width": "1.5",
-  stroke: "currentColor",
-  class: "w-5 mr-2"
+  "p-id": "41067",
+  "xmlns:xlink": "http://www.w3.org/1999/xlink",
+  width: "20",
+  height: "20"
 };
 const _hoisted_2$4 = /* @__PURE__ */ createBaseVNode("path", {
-  "stroke-linecap": "round",
-  "stroke-linejoin": "round",
-  d: "M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25zm.75-12h9v9h-9v-9z"
+  d: "M755.022595 722.911167a390.129159 390.129159 0 0 1-123.92338 285.023773 442.911339 442.911339 0 0 1-119.104137 16.064142A452.779312 452.779312 0 0 1 59.904229 571.908234a436.026707 436.026707 0 0 1 13.080802-107.400263 388.293257 388.293257 0 0 1 291.908405-131.725963 390.129159 390.129159 0 0 1 390.129159 390.129159z",
+  fill: "#FFD000",
+  "p-id": "41068"
 }, null, -1);
-const _hoisted_3$4 = [
-  _hoisted_2$4
+const _hoisted_3$4 = /* @__PURE__ */ createBaseVNode("path", {
+  d: "M511.995078 1023.769594a452.090848 452.090848 0 1 1 452.090848-451.86136 452.549824 452.549824 0 0 1-452.090848 451.86136z m0-835.105887a383.244526 383.244526 0 1 0 383.244526 383.244527 383.703502 383.703502 0 0 0-383.244526-383.244527z",
+  fill: "#000000",
+  "p-id": "41069"
+}, null, -1);
+const _hoisted_4$1 = /* @__PURE__ */ createBaseVNode("path", {
+  d: "M762.366203 235.479206a33.964186 33.964186 0 0 1-17.211581-4.589755 34.423161 34.423161 0 0 1-12.392338-47.044986L828.917647 17.236365a34.423161 34.423161 0 1 1 59.666813 34.423161l-96.384851 166.6081a33.734698 33.734698 0 0 1-29.833406 17.21158zM261.623953 235.479206a34.193673 34.193673 0 0 1-29.833406-17.21158L135.635184 51.659526A34.423161 34.423161 0 0 1 195.301996 17.236365l96.155363 166.6081a34.193673 34.193673 0 0 1-12.621825 47.044986 32.816747 32.816747 0 0 1-17.211581 4.589755zM511.995078 795.429293a34.423161 34.423161 0 0 1-34.423161-34.423161V465.884898a34.423161 34.423161 0 0 1 68.846322 0v295.121234a34.423161 34.423161 0 0 1-34.423161 34.423161z",
+  fill: "#000000",
+  "p-id": "41070"
+}, null, -1);
+const _hoisted_5$1 = [
+  _hoisted_2$4,
+  _hoisted_3$4,
+  _hoisted_4$1
 ];
 function _sfc_render$4(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$4, _hoisted_3$4);
+  return openBlock(), createElementBlock("svg", _hoisted_1$4, _hoisted_5$1);
 }
 const __unplugin_components_1 = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4]]);
 const _sfc_main$4 = {};
@@ -71597,11 +71611,7 @@ const util = {
   },
   autoScrollToBottom(element) {
     var _a7;
-    (_a7 = element == null ? void 0 : element.scrollTo) == null ? void 0 : _a7.call(element, {
-      behavior: "smooth",
-      block: "nearest"
-      /*, top: element.scrollHeight */
-    });
+    (_a7 = element == null ? void 0 : element.scrollTo) == null ? void 0 : _a7.call(element, { behavior: "smooth", block: "nearest", top: element.scrollHeight });
   },
   markedParser(value) {
     return marked.parse(value);
@@ -71818,7 +71828,7 @@ class ChatApi2 {
     let timoutTask;
     try {
       timoutTask = setTimeout(() => this.abort(), this.requestConfig.timeout);
-      let response = await fetch(url || this.apiUrl, {
+      let response = await this.post(url || this.apiUrl, {
         body: this.getRequestDataJson(data),
         ...this.requestConfig
       });
@@ -71849,6 +71859,10 @@ class ChatApi2 {
       clearTimeout(timoutTask);
     }
   }
+  post(url, requestInit) {
+    const response = fetch(url || this.apiUrl, requestInit);
+    return response;
+  }
   /**
    * sse解析器
    * @param {进度} onProgress 
@@ -71862,6 +71876,7 @@ class ChatApi2 {
       }
       const { event, answer, message, conversation_id, task_id } = this.responseDataParser(sseEvent, !notOnline);
       this.callBackResult.serverConversationId = conversation_id;
+      this.callBackResult.serverTaskId = task_id;
       if (event === "message") {
         this.callBackResult.text = answer;
         onProgress == null ? void 0 : onProgress(this.callBackResult);
@@ -71944,6 +71959,41 @@ class ChatApi2 {
   buildHistory(histories, promptMessages) {
     histories && histories.forEach((history2) => {
       promptMessages.push({ role: history2["role"], content: history2["content"] });
+    });
+  }
+}
+class StopChatApi {
+  constructor(option) {
+    this.url = `${ONLINE_CHAT_API}/:${option.taskId}/stop`;
+    this.requestInit = {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${ONLINE_CHAT_APIKEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ user: "abc-123" })
+    };
+  }
+  stop() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        setTimeout(() => {
+          var _a7;
+          (_a7 = this.abortController) == null ? void 0 : _a7.abort();
+          this.abortController = void 0;
+        }, 4 * 1e3);
+        const response = await fetch(this.url, this.requestInit);
+        if (response.ok) {
+          const result = await response.json();
+          console.log("stop:" + JSON.stringify(result));
+          resolve(result);
+          return;
+        }
+        reject({ result: "error", msg: response.status + "-" + response.statusText });
+      } catch (error2) {
+        console.error(error2);
+        reject({ result: "error", msg: error2 });
+      }
     });
   }
 }
@@ -74293,29 +74343,24 @@ class ChatApi {
 const historyCount = 3;
 const chatUtil = {
   async sendApiRequest(prompt, options, onProgress, onDone, onError) {
-    if (this.inProgress) {
-      return;
-    }
-    let { conversationId, abortController, history: history2, serverConversationId } = options || {};
+    var _a7;
+    (_a7 = this.abortController) == null ? void 0 : _a7.abort();
+    let { qaId, abortController, history: history2, serverConversationId } = options || {};
     let question = chatUtil.processQuestion(prompt);
-    this.inProgress = true;
     if (!abortController)
-      abortController = new AbortController();
+      this.abortController = abortController = new AbortController();
     let err;
     let responseResult = {
       type: "addResponse",
       value: "",
-      conversationId,
+      qaId,
       done: false,
-      //currentMessageId: this.currentMessageId, 
       autoScroll: true,
-      responseInMarkdown: true,
-      serverConversationId
-      //history: []
+      responseInMarkdown: true
     };
     try {
       await chatUtil.sendMessage(question, {
-        messageId: conversationId,
+        messageId: qaId,
         serverConversationId,
         abortSignal: abortController.signal,
         stream: true,
@@ -74323,7 +74368,7 @@ const chatUtil = {
         history: history2,
         onProgress: (message) => {
           try {
-            responseResult.serverConversationId = message.serverConversationId;
+            responseResult.serverMessage = message;
             responseResult.value = message.text;
             onProgress == null ? void 0 : onProgress(responseResult);
           } catch (error2) {
@@ -74332,15 +74377,14 @@ const chatUtil = {
           }
         },
         onDone: (message) => {
-          this.inProgress = false;
           try {
+            responseResult.serverMessage = message;
             responseResult.value = message.text;
             responseResult.done = true;
             onDone == null ? void 0 : onDone(responseResult);
           } catch (error2) {
             console.error(error2);
           }
-          this.inProgress = false;
         }
       });
       return;
@@ -74348,7 +74392,7 @@ const chatUtil = {
       err = error2;
       console.error(error2);
     }
-    this.inProgress = false;
+    this.abortController = null;
     onError == null ? void 0 : onError(err ?? "没有api");
     responseResult.done = true;
     onDone == null ? void 0 : onDone(responseResult);
@@ -74460,6 +74504,13 @@ const chatUtil = {
     onError == null ? void 0 : onError(err ?? "没有api");
     responseResult.done = true;
     onDone == null ? void 0 : onDone(responseResult);
+  },
+  stopConversation(options) {
+    const { taskId } = options || {};
+    if (!taskId)
+      return;
+    const stop = new StopChatApi(options);
+    return stop.stop();
   }
 };
 const _sfc_main$3 = {};
@@ -75402,9 +75453,8 @@ const _sfc_main$1 = {
       questionInputDisabled: false,
       showStopButton: false,
       questionInputButtonsVisible: true,
-      questionInputButtonsMoreVisible: false,
-      serverConversationId: ""
-      //和服务器通讯的对话结果id，又服务器返回，用于定位这次对话的标识，可以不用传历史。新聊天的时候记得清空它
+      questionInputButtonsMoreVisible: false
+      //serverConversationId: "" //和服务器通讯的对话结果id，又服务器返回，用于定位这次对话的标识，可以不用传历史。新聊天的时候记得清空它
     };
   },
   computed: {
@@ -75429,27 +75479,36 @@ const _sfc_main$1 = {
   methods: {
     onClearClick() {
       this.qaData.list = [];
-      this.serverConversationId = "", this.currentViewType = viewType.introduction;
-      util.postMessageToCodeEditor({
-        type: "clearConversation"
-      });
+      this.serverConversationId = "";
+      this.currentViewType = viewType.introduction;
     },
-    onStopClick(e) {
-      var _a7;
-      e.preventDefault();
-      (_a7 = this.abortController) == null ? void 0 : _a7.abort();
-      this.showInProgress({ inProgress: false });
-      let existData = this.qaData.list.find((f) => f.conversationId === this.conversationId);
+    async onStopClick(e) {
+      var _a7, _b2;
+      e == null ? void 0 : e.preventDefault();
+      if (!this.isInProgress) {
+        return;
+      }
+      await chatUtil.stopConversation({ taskId: ((_a7 = this.lastServerMessage) == null ? void 0 : _a7.serverTaskId) ?? "" });
+      try {
+        (_b2 = this.abortController) == null ? void 0 : _b2.abort();
+      } catch (error2) {
+        console.log(error2);
+      }
+      await this.showInProgress({ inProgress: false });
+      let existData = this.qaData.list.find((f) => f.qaId === this.qaId);
       if (!existData && this.qaData.list.length > 0) {
         existData = this.qaData.list[this.qaData.list.length - 1];
       }
-      this.addResponse({
-        value: existData.answer,
-        done: true,
-        id: (existData == null ? void 0 : existData.id) ?? this.conversationId,
-        autoScroll: true,
-        responseInMarkdown: true
-      });
+      if (existData) {
+        this.addResponse({
+          value: existData.answer,
+          done: true,
+          id: (existData == null ? void 0 : existData.id) ?? this.qaId,
+          autoScroll: true,
+          responseInMarkdown: true,
+          isStop: true
+        });
+      }
     },
     onResendClick(message) {
       var _a7;
@@ -75477,48 +75536,51 @@ const _sfc_main$1 = {
         if ((input || "").length === 0) {
           return;
         }
-        this.conversationId = v4();
-        await this.addFreeTextQuestion4Local({ value: input, conversationId: this.conversationId });
+        this.qaId = v4();
+        this.addFreeTextQuestion4Local({ value: input, qaId: this.qaId }).catch((error2) => {
+          console.error(error2);
+        });
       } catch (error2) {
         console.error(error2);
       }
     },
+    //本地模式
     async addFreeTextQuestion4Local(message, withHistory = true) {
-      var _a7;
-      let history2 = withHistory && chatUtil.buildHistories(this.qaData.list);
-      this.showInProgress({ showStopButton: true, inProgress: true });
+      var _a7, _b2;
+      await this.showInProgress({ showStopButton: true, inProgress: true });
       this.addQuestion(message);
       (_a7 = this.abortController) == null ? void 0 : _a7.abort();
       this.abortController = new AbortController();
-      await chatUtil.sendApiRequest(
-        message.value,
-        {
-          conversationId: this.conversationId,
-          serverConversationId: this.serverConversationId,
-          abortController: this.abortController,
-          history: history2 || []
-        },
-        (progress) => {
-          this.addResponse(progress);
-        },
-        (done) => {
-          this.addResponse(done);
-          this.isInProgress = false;
-        }
-      );
+      let history2 = withHistory && chatUtil.buildHistories(this.qaData.list);
+      await chatUtil.sendApiRequest(message.value, {
+        qaId: this.qaId,
+        serverConversationId: (_b2 = this.lastServerMessage) == null ? void 0 : _b2.serverConversationId,
+        abortController: this.abortController,
+        history: history2 || []
+      }, (progress) => {
+        this.addResponse(progress);
+      }, (done) => {
+        this.addResponse(done);
+        this.isInProgress = false;
+      });
     },
-    showInProgress(message) {
-      this.showStopButton = message.showStopButton ? true : false;
-      this.isInProgress = message.inProgress;
-      this.questionInputDisabled = message.inProgress;
-      this.questionInputButtonsVisible = !message.inProgress;
-      if (!message.inProgress) {
-        this.conversationId = "";
+    async showInProgress(message) {
+      try {
+        this.showStopButton = message.showStopButton ? true : false;
+        this.isInProgress = message.inProgress;
+        this.questionInputDisabled = message.inProgress;
+        this.questionInputButtonsVisible = !message.inProgress;
+        if (!message.inProgress) {
+          this.qaId = "";
+        }
+        console.log("showInProgress:" + message.inProgress);
+      } catch (error2) {
+        console.log(error2);
       }
     },
     addQuestion(message) {
       this.currentViewType = viewType.qa;
-      this.conversationId = message.conversationId ?? v4();
+      this.qaId = message.qaId ?? v4();
       let { prompt, language, filePath, value, isMarked } = message;
       let question = value;
       let marked2 = false;
@@ -75535,11 +75597,11 @@ const _sfc_main$1 = {
       this.qaData.list.push({
         question,
         originQuestion: value,
-        conversationId: this.conversationId,
+        qaId: this.qaId,
         answer: "",
         error: "",
         originAnswer: "",
-        answer: " ",
+        answer: "",
         done: false
       });
       setTimeout(() => {
@@ -75550,28 +75612,27 @@ const _sfc_main$1 = {
       this.addResponseCore(message);
     },
     addResponseCore(message) {
-      const conversationId = message.conversationId ?? this.conversationId;
+      const qaId = message.qaId ?? this.qaId;
       const list2 = this.qaElementList;
-      let existingMessageData = this.qaData.list.find((f) => f.conversationId === conversationId);
-      if (!existingMessageData) {
+      this.lastServerMessage = message.serverMessage;
+      let existQA = this.qaData.list.find((f) => f.qaId === qaId);
+      if (!existQA) {
         return;
       }
-      this.serverConversationId = message.serverConversationId;
-      existingMessageData.originAnswer += message.value;
+      existQA.originAnswer += message.value;
       let updatedValue = "";
       if (!message.responseInMarkdown) {
-        updatedValue = "```\r\n" + util.unEscapeHtml(existingMessageData.originAnswer) + " \r\n ```";
+        updatedValue = "```\r\n" + util.unEscapeHtml(existQA.originAnswer) + " \r\n ```";
       } else {
-        updatedValue = existingMessageData.originAnswer.split("```").length % 2 === 1 ? existingMessageData.originAnswer : existingMessageData.originAnswer + "\n\n```\n\n";
+        updatedValue = existQA.originAnswer.split("```").length % 2 === 1 ? existQA.originAnswer : existQA.originAnswer + "\n\n```\n\n";
       }
       const markedResponse = util.markedParser(updatedValue);
-      existingMessageData.answer = markedResponse;
+      existQA.answer = markedResponse;
       if (message.done) {
-        existingMessageData.done = true;
-        this.conversationId = "";
+        existQA.done = true;
+        this.qaId = "";
         this.message = null;
-        this.showInProgress({ inProgress: false });
-        setTimeout(() => {
+        const buildCodeButton = () => {
           var _a7;
           const preCodeList = list2.children[list2.children.length - 1].querySelectorAll("pre > code");
           preCodeList.forEach((preCode) => {
@@ -75611,15 +75672,21 @@ const _sfc_main$1 = {
           });
           util.autoScrollToBottom(list2);
           (_a7 = this.questionInputRef) == null ? void 0 : _a7.focus();
-        }, 100);
+        };
+        if (!message.isStop) {
+          buildCodeButton();
+          this.showInProgress({ inProgress: false });
+        } else {
+          setTimeout(buildCodeButton, 100);
+        }
       }
       if (message.autoScroll && (message.done || markedResponse.endsWith("\n"))) {
         util.autoScrollToBottom(list2);
       }
     },
     addError(message) {
-      const conversationId = message.conversationId ?? this.conversationId;
-      let exist = this.qaData.list.find((f) => f.conversationId === conversationId);
+      const qaId = message.qaId ?? this.qaId;
+      let exist = this.qaData.list.find((f) => f.qaId === qaId);
       if (!exist) {
         return;
       }
@@ -75735,7 +75802,8 @@ const _sfc_main$1 = {
             this.onAskButtonClick();
           break;
         case "chat_code":
-          this.conversationId = v4();
+          await this.onStopClick();
+          this.qaId = v4();
           this.addFreeTextQuestion4Local(data, false);
           break;
         case "selectedText":
@@ -75982,12 +76050,12 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
           createBaseVNode("div", _hoisted_14, [
             message.answer ? (openBlock(), createElementBlock("div", _hoisted_15, [
               createBaseVNode("h2", _hoisted_16, [
-                createVNode(_component_IconAiSvg),
-                createTextVNode("AI ")
+                createVNode(_component_IconAiSvg, { style: { "margin-right": "0.5rem" } }),
+                createTextVNode("TooneCode ")
               ]),
               createBaseVNode("div", {
                 class: normalizeClass({ "result-streaming": message.done !== true }),
-                onId: message.conversationId,
+                onId: message.qaId,
                 innerHTML: message.answer
               }, null, 42, _hoisted_17),
               _hoisted_18

@@ -162,7 +162,7 @@ const CreateAppModal = ({ show, onSuccess, onClose }: CreateAppDialogProps) => {
             </div>
           </TooltipPlus>
           {/* guorq 这里先屏蔽工作流 */}
-          {/* <TooltipPlus
+          <TooltipPlus
 
             hideArrow
             popupContent={
@@ -186,7 +186,7 @@ const CreateAppModal = ({ show, onSuccess, onClose }: CreateAppDialogProps) => {
               <div className='h-5 text-[13px] font-medium leading-[18px]'>{t('app.types.workflow')}</div>
               <span className='absolute top-[-3px] right-[-3px] px-1 rounded-[5px] bg-white border border-black/8 text-gray-500 text-[10px] leading-[18px] font-medium'>BETA</span>
             </div>
-          </TooltipPlus> */}
+          </TooltipPlus>
         </div>
       </div>
       {showChatBotType && (

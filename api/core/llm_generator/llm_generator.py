@@ -80,7 +80,7 @@ class LLMGenerator:
                 prompt_messages=prompt_messages,
                 model_parameters={
                     "max_tokens": 256,
-                    "temperature": 0
+                    "temperature": 0.3
                 },
                 stream=False
             )
@@ -152,6 +152,7 @@ class LLMGenerator:
         prompt = GENERATOR_QA_PROMPT.format(language=document_language)
 
         model_manager = ModelManager()
+        # 这里如果需要使用其他模型，这里如果用在线的搞不定，需要进行本地部署 by guorq
         model_instance = model_manager.get_default_model_instance(
             tenant_id=tenant_id,
             model_type=ModelType.LLM,
@@ -166,7 +167,8 @@ class LLMGenerator:
             prompt_messages=prompt_messages,
             model_parameters={
                 'temperature': 0.01,
-                "max_tokens": 2000
+                # 这个是和模型有关的在线的可能不靠谱
+                "max_tokens": 1499
             },
             stream=False
         )

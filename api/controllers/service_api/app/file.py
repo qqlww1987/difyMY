@@ -22,11 +22,9 @@ class FileApi(Resource):
     def post(self, app_model: App, end_user: EndUser):
 
         file = request.files['file']
-
         # check file
         if 'file' not in request.files:
             raise NoFileUploadedError()
-
         if not file.mimetype:
             raise UnsupportedFileTypeError()
 
@@ -39,8 +37,9 @@ class FileApi(Resource):
             raise FileTooLargeError(file_too_large_error.description)
         except services.errors.file.UnsupportedFileTypeError:
             raise UnsupportedFileTypeError()
-
-        return upload_file, 201
+        # guorq 这个为什么201呢
+        return upload_file, 200
+        # return upload_file, 201
 
 
 api.add_resource(FileApi, '/files/upload')

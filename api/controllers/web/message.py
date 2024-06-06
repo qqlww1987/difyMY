@@ -192,7 +192,26 @@ class MessageSuggestedQuestionApi(WebApiResource):
         return {'data': questions}
 
 
+class SendMsgFeedbackApi(WebApiResource):
+    def post(self, app_model, end_user, message_id):
+        message_id = str(message_id)
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('rating', type=str, choices=['like', 'dislike', None], location='json')
+        args = parser.parse_args()
+
+        try:
+            MessageService.sendMsg_feedback(app_model, message_id, end_user, args['rating'])
+        except services.errors.message.MessageNotExistsError:
+            raise NotFound("Message Not Exists.")
+
+        return {'result': 'success'}
+
 api.add_resource(MessageListApi, '/messages')
 api.add_resource(MessageFeedbackApi, '/messages/<uuid:message_id>/feedbacks')
 api.add_resource(MessageMoreLikeThisApi, '/messages/<uuid:message_id>/more-like-this')
 api.add_resource(MessageSuggestedQuestionApi, '/messages/<uuid:message_id>/suggested-questions')
+
+# guorq 真正的在webAPI 调用
+api.add_resource(SendMsgFeedbackApi, '/messages/<uuid:message_id>/sendMsgByFeedback')
+

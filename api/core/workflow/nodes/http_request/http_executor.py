@@ -2,9 +2,8 @@ import json
 import os
 from copy import deepcopy
 from random import randint
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union,List, Tuple
 from urllib.parse import urlencode
-
 import httpx
 import requests
 
@@ -102,7 +101,21 @@ class HttpExecutorResponse:
         else:
             return f'{(self.size / 1024 / 1024):.2f} MB'
 
+class FileVariableSelector(VariableSelector):
+    def __init__(self, variable: str, file_path: str) -> None:
+        super().__init__(variable=variable)
+        self.file_path = file_path
 
+    @property
+    def value_selector(self) -> Tuple[str, int]:
+        return (self.variable, self._value_type_to_int(ValueType.BINARY))
+
+    def get_variable_value(self, variable_pool: VariablePool, target_value_type: ValueType) -> Union[str, bytes]:
+        if target_value_type == ValueType.STRING:
+            return self.file_path
+        elif target_value_type == ValueType.BINARY:
+            with open(self.file_path, 'rb') as f:
+                return f.read()
 class HttpExecutor:
     server_url: str
     method: str

@@ -41,7 +41,7 @@ class FileApi(Resource):
     @marshal_with(file_fields)
     @cloud_edition_billing_resource_check(resource='documents')
     def post(self):
-
+        print(3222222)
         # get file from request
         file = request.files['file']
 

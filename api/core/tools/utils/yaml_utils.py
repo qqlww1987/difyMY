@@ -24,11 +24,12 @@ def load_yaml_file(file_path: str, ignore_error: bool = False) -> dict:
             except Exception as e:
                 raise YAMLError(f'Failed to load YAML file {file_path}: {e}')
     except FileNotFoundError as e:
-        logging.debug(f'Failed to load YAML file {file_path}: {e}')
+        # from guorq 这里如果瞎搞日志就没了太坑了
+        # logging.debug(f'Failed to load YAML file {file_path}: {e}')
         return {}
     except Exception as e:
         if ignore_error:
-            logging.warning(f'Failed to load YAML file {file_path}: {e}')
+            # logging.warning(f'Failed to load YAML file {file_path}: {e}')
             return {}
         else:
             raise e

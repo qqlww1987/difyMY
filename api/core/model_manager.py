@@ -67,6 +67,7 @@ class ModelInstance:
             raise Exception("Model type instance is not LargeLanguageModel")
 
         self.model_type_instance = cast(LargeLanguageModel, self.model_type_instance)
+        print(f"Invoke {self.credentials}")
         return self.model_type_instance.invoke(
             model=self.model,
             credentials=self.credentials,

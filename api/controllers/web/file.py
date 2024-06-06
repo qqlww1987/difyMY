@@ -15,7 +15,6 @@ class FileApi(WebApiResource):
     def post(self, app_model, end_user):
         # get file from request
         file = request.files['file']
-
         # check file
         if 'file' not in request.files:
             raise NoFileUploadedError()

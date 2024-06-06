@@ -51,6 +51,7 @@ class PromptMessageContentType(Enum):
     """
     TEXT = 'text'
     IMAGE = 'image'
+    ATTACHMENT='attachment'
 
 
 class PromptMessageContent(BaseModel):

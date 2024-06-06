@@ -75,6 +75,7 @@ class WorkflowService:
 
         if workflow:
             # validate unique hash
+            print(workflow.unique_hash)
             if workflow.unique_hash != unique_hash:
                 raise WorkflowHashNotEqualError()
 

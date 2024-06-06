@@ -269,8 +269,14 @@ if you are not sure about the structure.
         :return: llm response
         """
         # transform assistant message to prompt message
+        print(response)
         assistant_prompt_message = AssistantPromptMessage(
-            content=response.output.choices[0].message.content,
+            # 如果response不为空并且response.output不为空
+            # 则将response.output.choices[0].message.content赋值给assistant_prompt_message.content
+            # 否则将response.output.choices[0].message赋值给assistant_prompt_message.content
+            content=response.output.choices[0].message.content if response.output and  response.output.choices else "",
+            # content=response.output?.choices[0].message.content,
+            # content=response.output.choices[0].message.content,
         )
 
         # transform usage
@@ -454,6 +460,7 @@ if you are not sure about the structure.
         :return: tongyi messages
         """
         tongyi_messages = []
+        print(f'prompt_messages {prompt_messages}')
         for prompt_message in prompt_messages:
             if isinstance(prompt_message, SystemPromptMessage):
                 tongyi_messages.append({
@@ -479,6 +486,9 @@ if you are not sure about the structure.
                             message_content = cast(ImagePromptMessageContent, message_content)
 
                             image_url = message_content.data
+                            print(f'message_content {message_content}')
+                            # print(f'image_url)
+                            # 格式化打印message_content
                             if message_content.data.startswith("data:"):
                                 # convert image base64 data to file in /tmp
                                 image_url = self._save_base64_image_to_file(message_content.data)
@@ -487,7 +497,20 @@ if you are not sure about the structure.
                                 "image": image_url
                             }
                             sub_messages.append(sub_message_dict)
+                        elif message_content.type == PromptMessageContentType.ATTACHMENT:
+                            message_content = cast(TextPromptMessageContent, message_content)
+                            # 这个是获取对应的文件地址
+                            file_Url = message_content.data
+                            if message_content.data.startswith("data:"):
+                                    # convert image base64 data to file in /tmp
+                                file_Url = self._save_base64_image_to_file(message_content.data)
 
+                            sub_message_dict = {
+                                "text": message_content.data
+                            }
+                            sub_messages.append(sub_message_dict)
+                       
+               
                     # resort sub_messages to ensure text is always at last
                     sub_messages = sorted(sub_messages, key=lambda x: 'text' in x)
 

@@ -1,3 +1,4 @@
+import logging.handlers
 import os
 
 if not os.environ.get("DEBUG") or os.environ.get("DEBUG").lower() != 'true':
@@ -83,15 +84,8 @@ def create_app() -> Flask:
 
     log_handlers = None
     log_file = app.config.get('LOG_FILE')
-    # If log_file is not set, use the default log file
-    if not log_file:
-        log_file = "./logs/dify.log"
-    print(f'Logging to {log_file}')
-    
     if log_file:
         log_dir = os.path.dirname(log_file)
-        print("运行了吧")
-        logging.log
         os.makedirs(log_dir, exist_ok=True)
         log_handlers = [
             RotatingFileHandler(
@@ -101,19 +95,26 @@ def create_app() -> Flask:
             ),
             logging.StreamHandler(sys.stdout)
         ]
-
     logging.basicConfig(
         level=app.config.get('LOG_LEVEL'),
         format=app.config.get('LOG_FORMAT'),
         datefmt=app.config.get('LOG_DATEFORMAT'),
         handlers=log_handlers
     )
-
+    # logging.getLogger().setLevel(logging.INFO)
+    # logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+    # logging.getLogger().addHandler(RotatingFileHandler(
+    #             filename=log_file,
+    #             maxBytes=1024 * 1024 * 1024,
+    #             backupCount=5
+    #         ))
+    # formatter = logging.Formatter(app.config.get('LOG_FORMAT'))
     initialize_extensions(app)
     register_blueprints(app)
     register_commands(app)
-
+   
     return app
+
 
 
 def initialize_extensions(app):

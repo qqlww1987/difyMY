@@ -24,6 +24,7 @@ import {
   sendChatMessage,
   stopChatMessageResponding,
   updateFeedback,
+  sendMsgByFeedback,
 } from '@/service/share'
 import { addFileInfos, sortAgentSorts } from '@/app/components/tools/utils'
 import type { AppMeta, ConversationItem, SiteInfo } from '@/models/share'
@@ -688,6 +689,11 @@ const Main: FC<IMainProps> = ({
     })
     setChatList(newChatList)
     notify({ type: 'success', message: t('common.api.success') })
+    if (feedback.rating == "dislike") {
+      // 打印feedback
+      console.log(feedback)
+      sendMsgByFeedback({ url: `/messages/${messageId}/sendMsgByFeedback`, body: { rating: feedback.rating } }, isInstalledApp, installedAppInfo?.id)
+    }
   }
 
   const handleReload = () => {

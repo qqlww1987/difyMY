@@ -43,7 +43,7 @@ DEFAULTS = {
     'QDRANT_GRPC_ENABLED': 'False',
     'QDRANT_GRPC_PORT': '6334',
     'CELERY_BACKEND': 'database',
-    'LOG_LEVEL': 'INFO',
+    'LOG_LEVEL': 'DEBUG',
     'LOG_FILE': '',
     'LOG_FORMAT': '%(asctime)s.%(msecs)03d %(levelname)s [%(threadName)s] [%(filename)s:%(lineno)d] - %(message)s',
     'LOG_DATEFORMAT': '%Y-%m-%d %H:%M:%S',

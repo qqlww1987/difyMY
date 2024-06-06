@@ -28,6 +28,7 @@ import {
   renameConversation,
   unpinConversation,
   updateFeedback,
+  sendMsgByFeedback,
 } from '@/service/share'
 import type { InstalledApp } from '@/models/explore'
 import type {
@@ -347,6 +348,11 @@ export const useChatWithHistory = (installedAppInfo?: InstalledApp) => {
   const handleFeedback = useCallback(async (messageId: string, feedback: Feedback) => {
     await updateFeedback({ url: `/messages/${messageId}/feedbacks`, body: { rating: feedback.rating } }, isInstalledApp, appId)
     notify({ type: 'success', message: t('common.api.success') })
+    if (feedback.rating == "dislike") {
+      // 打印feedback
+      console.log(feedback)
+      sendMsgByFeedback({ url: `/messages/${messageId}/sendMsgByFeedback`, body: { rating: feedback.rating } }, isInstalledApp, installedAppInfo?.id)
+    }
   }, [isInstalledApp, appId, t, notify])
 
   return {

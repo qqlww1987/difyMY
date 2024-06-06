@@ -30,6 +30,7 @@ import {
   stopChatMessageResponding,
   unpinConversation,
   updateFeedback,
+  sendMsgByFeedback,
 } from '@/service/share'
 import type { AppMeta, ConversationItem, SiteInfo } from '@/models/share'
 
@@ -777,6 +778,7 @@ const Main: FC<IMainProps> = ({
 
   const handleFeedback = useCallback(async (messageId: string, feedback: Feedbacktype) => {
     await updateFeedback({ url: `/messages/${messageId}/feedbacks`, body: { rating: feedback.rating } }, isInstalledApp, installedAppInfo?.id)
+    
     const newChatList = chatList.map((item) => {
       if (item.id === messageId) {
         return {
@@ -788,6 +790,12 @@ const Main: FC<IMainProps> = ({
     })
     setChatList(newChatList)
     notify({ type: 'success', message: t('common.api.success') })
+    // 判断feedback.rating
+    if (feedback.rating == "dislike") {
+      // 打印feedback
+      console.log(feedback)
+      sendMsgByFeedback({ url: `/messages/${messageId}/sendMsgByFeedback`, body: { rating: feedback.rating } }, isInstalledApp, installedAppInfo?.id)
+    }
   }, [isInstalledApp, installedAppInfo?.id, chatList, t, notify, setChatList])
 
   const handleListChanged = useCallback((list: ConversationItem[]) => {

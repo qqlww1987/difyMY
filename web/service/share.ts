@@ -140,9 +140,13 @@ export const fetchAppMeta = async (isInstalledApp: boolean, installedAppId = '')
 }
 
 export const updateFeedback = async ({ url, body }: { url: string; body: Feedbacktype }, isInstalledApp: boolean, installedAppId = '') => {
+  // guorq 这里进行对应的点踩控制发送信息到机器人
   return (getAction('post', isInstalledApp))(getUrl(url, isInstalledApp, installedAppId), { body })
 }
-
+export const sendMsgByFeedback = async ({ url, body }: { url: string; body: Feedbacktype }, isInstalledApp: boolean, installedAppId = '') => {
+  // guorq 这里进行对应的点踩控制发送信息到机器人
+  return (getAction('post', isInstalledApp))(getUrl(url, isInstalledApp, installedAppId), { body })
+}
 export const fetchMoreLikeThis = async (messageId: string, isInstalledApp: boolean, installedAppId = '') => {
   return (getAction('get', isInstalledApp))(getUrl(`/messages/${messageId}/more-like-this`, isInstalledApp, installedAppId), {
     params: {

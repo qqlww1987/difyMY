@@ -186,7 +186,8 @@ class WeaviateVector(BaseVector):
             query_obj = query_obj.with_where(kwargs.get("where_filter"))
         result = (
             query_obj.with_near_vector(vector)
-            .with_limit(kwargs.get("top_k", 4))
+            .with_limit(100)
+            # .with_limit(kwargs.get("top_k", 4))
             .with_additional(["vector", "distance"])
             .do()
         )

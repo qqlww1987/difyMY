@@ -33,13 +33,15 @@ class FileService:
     def upload_file(file: FileStorage, user: Union[Account, EndUser], only_image: bool = False) -> UploadFile:
         extension = file.filename.split('.')[-1]
         etl_type = current_app.config['ETL_TYPE']
+        print(etl_type)
+        print(extension)
         allowed_extensions = UNSTRUSTURED_ALLOWED_EXTENSIONS + IMAGE_EXTENSIONS if etl_type == 'Unstructured' \
             else ALLOWED_EXTENSIONS + IMAGE_EXTENSIONS
         if extension.lower() not in allowed_extensions:
             raise UnsupportedFileTypeError()
         elif only_image and extension.lower() not in IMAGE_EXTENSIONS:
             raise UnsupportedFileTypeError()
-
+        
         # read file content
         file_content = file.read()
 
@@ -57,18 +59,17 @@ class FileService:
 
         # user uuid as file name
         file_uuid = str(uuid.uuid4())
-
+        print(2222222)
         if isinstance(user, Account):
             current_tenant_id = user.current_tenant_id
         else:
             # end_user
             current_tenant_id = user.tenant_id
-
+        
         file_key = 'upload_files/' + current_tenant_id + '/' + file_uuid + '.' + extension
 
         # save file to storage
         storage.save(file_key, file_content)
-
         # save file to db
         config = current_app.config
         upload_file = UploadFile(
@@ -88,7 +89,7 @@ class FileService:
 
         db.session.add(upload_file)
         db.session.commit()
-
+        print("upload_file")
         return upload_file
 
     @staticmethod

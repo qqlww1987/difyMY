@@ -20,7 +20,8 @@ from services.errors.message import (
     SuggestedQuestionsAfterAnswerDisabledError,
 )
 from services.workflow_service import WorkflowService
-
+from controllers.console.app.sendToRobot import SendToRobotInfo
+import asyncio
 
 class MessageService:
     @classmethod
@@ -125,7 +126,19 @@ class MessageService:
             limit=limit,
             has_more=has_more
         )
+    @classmethod
+    def sendMsg_feedback(cls, app_model: App, message_id: str, user: Optional[Union[Account, EndUser]],
+                        rating: Optional[str]):
+        if not user:
+            raise ValueError('user cannot be None')
 
+        message = cls.get_message(
+            app_model=app_model,
+            user=user,
+            message_id=message_id
+        )
+        if rating == 'dislike':
+            SendToRobotInfo.SendMsg(message)
     @classmethod
     def create_feedback(cls, app_model: App, message_id: str, user: Optional[Union[Account, EndUser]],
                         rating: Optional[str]) -> MessageFeedback:
@@ -156,10 +169,12 @@ class MessageService:
                 from_end_user_id=(user.id if isinstance(user, EndUser) else None),
                 from_account_id=(user.id if isinstance(user, Account) else None),
             )
+    
             db.session.add(feedback)
-
+          
         db.session.commit()
-
+        # if rating == 'dislike':
+        #     SendToRobotInfo.SendMsg(message)
         return feedback
 
     @classmethod

@@ -91,8 +91,12 @@ class DraftWorkflowApi(Resource):
                 unique_hash=args.get('hash'),
                 account=current_user
             )
-        except WorkflowHashNotEqualError:
-            raise DraftWorkflowNotSync()
+        except Exception as e:
+            # 打印异常
+            raise e
+            
+        # except WorkflowHashNotEqualError:
+        #     raise DraftWorkflowNotSync()
 
         return {
             "result": "success",

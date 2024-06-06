@@ -14,7 +14,7 @@ import Loading from '@/app/components/base/loading'
 import Toast from '@/app/components/base/toast'
 import AudioBtn from '@/app/components/base/audio-btn'
 import type { Feedbacktype } from '@/app/components/app/chat/type'
-import { fetchMoreLikeThis, updateFeedback } from '@/service/share'
+import { fetchMoreLikeThis, updateFeedback, sendMsgByFeedback} from '@/service/share'
 import { Clipboard, File02 } from '@/app/components/base/icons/src/vender/line/files'
 import { Bookmark } from '@/app/components/base/icons/src/vender/line/general'
 import { Stars02 } from '@/app/components/base/icons/src/vender/line/weather'
@@ -125,6 +125,11 @@ const GenerationItem: FC<IGenerationItemProps> = ({
   const handleFeedback = async (childFeedback: Feedbacktype) => {
     await updateFeedback({ url: `/messages/${childMessageId}/feedbacks`, body: { rating: childFeedback.rating } }, isInstalledApp, installedAppId)
     setChildFeedback(childFeedback)
+    if (childFeedback.rating == "dislike") {
+      // 打印feedback
+      console.log(feedback)
+      sendMsgByFeedback({ url: `/messages/${messageId}/sendMsgByFeedback`, body: { rating: childFeedback.rating } }, isInstalledApp, installedAppId)
+    }
   }
 
   const [isShowReplyModal, setIsShowReplyModal] = useState(false)

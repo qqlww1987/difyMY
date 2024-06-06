@@ -106,6 +106,7 @@ class RecommendedAppService:
         """
         domain = current_app.config.get('HOSTED_FETCH_APP_TEMPLATES_REMOTE_DOMAIN', 'https://tmpl.dify.ai')
         url = f'{domain}/apps?language={language}'
+        print("123"+url)
         response = requests.get(url, timeout=(3, 10))
         if response.status_code != 200:
             raise ValueError(f'fetch recommended apps failed, status code: {response.status_code}')

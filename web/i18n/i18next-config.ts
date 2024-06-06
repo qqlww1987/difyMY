@@ -39,7 +39,7 @@ const resources = LanguagesSupported.reduce((acc: any, lang: string) => {
 
 i18n.use(initReactI18next)
   .init({
-    lng: undefined,
+    lng: 'zh-Hans',
     fallbackLng: 'en-US',
     resources,
   })

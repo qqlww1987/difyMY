@@ -9,9 +9,11 @@ import IfElseDefault from './nodes/if-else/default'
 import CodeDefault from './nodes/code/default'
 import TemplateTransformDefault from './nodes/template-transform/default'
 import HttpRequestDefault from './nodes/http/default'
+import ParameterExtractorDefault from './nodes/parameter-extractor/default'
 import ToolDefault from './nodes/tool/default'
 import VariableAssignerDefault from './nodes/variable-assigner/default'
 import EndNodeDefault from './nodes/end/default'
+import IterationDefault from './nodes/iteration/default'
 
 type NodesExtraData = {
   author: string
@@ -24,7 +26,7 @@ type NodesExtraData = {
 }
 export const NODES_EXTRA_DATA: Record<BlockEnum, NodesExtraData> = {
   [BlockEnum.Start]: {
-    author: 'Toone',
+    author: 'Dify',
     about: '',
     availablePrevNodes: [],
     availableNextNodes: [],
@@ -33,7 +35,7 @@ export const NODES_EXTRA_DATA: Record<BlockEnum, NodesExtraData> = {
     checkValid: StartNodeDefault.checkValid,
   },
   [BlockEnum.End]: {
-    author: 'Toone',
+    author: 'Dify',
     about: '',
     availablePrevNodes: [],
     availableNextNodes: [],
@@ -42,7 +44,7 @@ export const NODES_EXTRA_DATA: Record<BlockEnum, NodesExtraData> = {
     checkValid: EndNodeDefault.checkValid,
   },
   [BlockEnum.Answer]: {
-    author: 'Toone',
+    author: 'Dify',
     about: '',
     availablePrevNodes: [],
     availableNextNodes: [],
@@ -51,7 +53,7 @@ export const NODES_EXTRA_DATA: Record<BlockEnum, NodesExtraData> = {
     checkValid: AnswerDefault.checkValid,
   },
   [BlockEnum.LLM]: {
-    author: 'Toone',
+    author: 'Dify',
     about: '',
     availablePrevNodes: [],
     availableNextNodes: [],
@@ -60,7 +62,7 @@ export const NODES_EXTRA_DATA: Record<BlockEnum, NodesExtraData> = {
     checkValid: LLMDefault.checkValid,
   },
   [BlockEnum.KnowledgeRetrieval]: {
-    author: 'Toone',
+    author: 'Dify',
     about: '',
     availablePrevNodes: [],
     availableNextNodes: [],
@@ -69,7 +71,7 @@ export const NODES_EXTRA_DATA: Record<BlockEnum, NodesExtraData> = {
     checkValid: KnowledgeRetrievalDefault.checkValid,
   },
   [BlockEnum.IfElse]: {
-    author: 'Toone',
+    author: 'Dify',
     about: '',
     availablePrevNodes: [],
     availableNextNodes: [],
@@ -77,8 +79,17 @@ export const NODES_EXTRA_DATA: Record<BlockEnum, NodesExtraData> = {
     getAvailableNextNodes: IfElseDefault.getAvailableNextNodes,
     checkValid: IfElseDefault.checkValid,
   },
+  [BlockEnum.Iteration]: {
+    author: 'Dify',
+    about: '',
+    availablePrevNodes: [],
+    availableNextNodes: [],
+    getAvailablePrevNodes: IterationDefault.getAvailablePrevNodes,
+    getAvailableNextNodes: IterationDefault.getAvailableNextNodes,
+    checkValid: IterationDefault.checkValid,
+  },
   [BlockEnum.Code]: {
-    author: 'Toone',
+    author: 'Dify',
     about: '',
     availablePrevNodes: [],
     availableNextNodes: [],
@@ -87,7 +98,7 @@ export const NODES_EXTRA_DATA: Record<BlockEnum, NodesExtraData> = {
     checkValid: CodeDefault.checkValid,
   },
   [BlockEnum.TemplateTransform]: {
-    author: 'Toone',
+    author: 'Dify',
     about: '',
     availablePrevNodes: [],
     availableNextNodes: [],
@@ -96,7 +107,7 @@ export const NODES_EXTRA_DATA: Record<BlockEnum, NodesExtraData> = {
     checkValid: TemplateTransformDefault.checkValid,
   },
   [BlockEnum.QuestionClassifier]: {
-    author: 'Toone',
+    author: 'Dify',
     about: '',
     availablePrevNodes: [],
     availableNextNodes: [],
@@ -105,7 +116,7 @@ export const NODES_EXTRA_DATA: Record<BlockEnum, NodesExtraData> = {
     checkValid: QuestionClassifierDefault.checkValid,
   },
   [BlockEnum.HttpRequest]: {
-    author: 'Toone',
+    author: 'Dify',
     about: '',
     availablePrevNodes: [],
     availableNextNodes: [],
@@ -114,7 +125,7 @@ export const NODES_EXTRA_DATA: Record<BlockEnum, NodesExtraData> = {
     checkValid: HttpRequestDefault.checkValid,
   },
   [BlockEnum.VariableAssigner]: {
-    author: 'Toone',
+    author: 'Dify',
     about: '',
     availablePrevNodes: [],
     availableNextNodes: [],
@@ -122,8 +133,26 @@ export const NODES_EXTRA_DATA: Record<BlockEnum, NodesExtraData> = {
     getAvailableNextNodes: VariableAssignerDefault.getAvailableNextNodes,
     checkValid: VariableAssignerDefault.checkValid,
   },
+  [BlockEnum.VariableAggregator]: {
+    author: 'Dify',
+    about: '',
+    availablePrevNodes: [],
+    availableNextNodes: [],
+    getAvailablePrevNodes: VariableAssignerDefault.getAvailablePrevNodes,
+    getAvailableNextNodes: VariableAssignerDefault.getAvailableNextNodes,
+    checkValid: VariableAssignerDefault.checkValid,
+  },
+  [BlockEnum.ParameterExtractor]: {
+    author: 'Dify',
+    about: '',
+    availablePrevNodes: [],
+    availableNextNodes: [],
+    getAvailablePrevNodes: ParameterExtractorDefault.getAvailablePrevNodes,
+    getAvailableNextNodes: ParameterExtractorDefault.getAvailableNextNodes,
+    checkValid: ParameterExtractorDefault.checkValid,
+  },
   [BlockEnum.Tool]: {
-    author: 'Toone',
+    author: 'Dify',
     about: '',
     availablePrevNodes: [],
     availableNextNodes: [],
@@ -177,6 +206,12 @@ export const NODES_INITIAL_DATA = {
     desc: '',
     ...IfElseDefault.defaultValue,
   },
+  [BlockEnum.Iteration]: {
+    type: BlockEnum.Iteration,
+    title: '',
+    desc: '',
+    ...IterationDefault.defaultValue,
+  },
   [BlockEnum.Code]: {
     type: BlockEnum.Code,
     title: '',
@@ -210,8 +245,23 @@ export const NODES_INITIAL_DATA = {
     variables: [],
     ...HttpRequestDefault.defaultValue,
   },
+  [BlockEnum.ParameterExtractor]: {
+    type: BlockEnum.ParameterExtractor,
+    title: '',
+    desc: '',
+    variables: [],
+    ...ParameterExtractorDefault.defaultValue,
+  },
   [BlockEnum.VariableAssigner]: {
     type: BlockEnum.VariableAssigner,
+    title: '',
+    desc: '',
+    variables: [],
+    output_type: '',
+    ...VariableAssignerDefault.defaultValue,
+  },
+  [BlockEnum.VariableAggregator]: {
+    type: BlockEnum.VariableAggregator,
     title: '',
     desc: '',
     variables: [],
@@ -236,6 +286,14 @@ export const AUTO_LAYOUT_OFFSET = {
   x: -42,
   y: 243,
 }
+export const ITERATION_NODE_Z_INDEX = 1
+export const ITERATION_CHILDREN_Z_INDEX = 1002
+export const ITERATION_PADDING = {
+  top: 85,
+  right: 16,
+  bottom: 20,
+  left: 16,
+}
 
 export const RETRIEVAL_OUTPUT_STRUCT = `{
   "content": "",
@@ -259,7 +317,8 @@ export const RETRIEVAL_OUTPUT_STRUCT = `{
 
 export const SUPPORT_OUTPUT_VARS_NODE = [
   BlockEnum.Start, BlockEnum.LLM, BlockEnum.KnowledgeRetrieval, BlockEnum.Code, BlockEnum.TemplateTransform,
-  BlockEnum.HttpRequest, BlockEnum.Tool, BlockEnum.VariableAssigner, BlockEnum.QuestionClassifier,
+  BlockEnum.HttpRequest, BlockEnum.Tool, BlockEnum.VariableAssigner, BlockEnum.VariableAggregator, BlockEnum.QuestionClassifier,
+  BlockEnum.ParameterExtractor, BlockEnum.Iteration,
 ]
 
 export const LLM_OUTPUT_STRUCT: Var[] = [
@@ -317,6 +376,17 @@ export const TOOL_OUTPUT_STRUCT: Var[] = [
   {
     variable: 'files',
     type: VarType.arrayFile,
+  },
+]
+
+export const PARAMETER_EXTRACTOR_COMMON_STRUCT: Var[] = [
+  {
+    variable: '__is_success',
+    type: VarType.number,
+  },
+  {
+    variable: '__reason',
+    type: VarType.string,
   },
 ]
 

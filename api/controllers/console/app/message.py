@@ -29,7 +29,7 @@ from services.annotation_service import AppAnnotationService
 from services.errors.conversation import ConversationNotExistsError
 from services.errors.message import MessageNotExistsError, SuggestedQuestionsAfterAnswerDisabledError
 from services.message_service import MessageService
-
+from .sendToRobot import SendToRobotInfo
 
 class ChatMessageListApi(Resource):
     message_infinite_scroll_pagination_fields = {
@@ -134,6 +134,10 @@ class MessageFeedbackApi(Resource):
                 from_source='admin',
                 from_account_id=current_user.id
             )
+            # 如果踩了不赞同就发送信息过去
+            if feedback.rating == 'dislike':
+                # print(889999)
+                SendToRobotInfo.SendMsg(message)
             db.session.add(feedback)
 
         db.session.commit()
@@ -232,7 +236,7 @@ class MessageApi(Resource):
 
         return message
 
-
+# guorq 救命呀这里处理
 api.add_resource(MessageSuggestedQuestionApi, '/apps/<uuid:app_id>/chat-messages/<uuid:message_id>/suggested-questions')
 api.add_resource(ChatMessageListApi, '/apps/<uuid:app_id>/chat-messages', endpoint='console_chat_messages')
 api.add_resource(MessageFeedbackApi, '/apps/<uuid:app_id>/feedbacks')

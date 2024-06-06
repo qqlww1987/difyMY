@@ -112,6 +112,21 @@ class MessageFeedbackApi(Resource):
 
         return {'result': 'success'}
 
+class SendMsgFeedbackApi(Resource):
+    @validate_app_token(fetch_user_arg=FetchUserArg(fetch_from=WhereisUserArg.JSON, required=True))
+    def post(self, app_model: App, end_user: EndUser, message_id):
+        message_id = str(message_id)
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('rating', type=str, choices=['like', 'dislike', None], location='json')
+        args = parser.parse_args()
+
+        try:
+            MessageService.sendMsg_feedback(app_model, message_id, end_user, args['rating'])
+        except services.errors.message.MessageNotExistsError:
+            raise NotFound("Message Not Exists.")
+
+        return {'result': 'success'}
 
 class MessageSuggestedApi(Resource):
     @validate_app_token(fetch_user_arg=FetchUserArg(fetch_from=WhereisUserArg.QUERY, required=True))
@@ -142,3 +157,6 @@ class MessageSuggestedApi(Resource):
 api.add_resource(MessageListApi, '/messages')
 api.add_resource(MessageFeedbackApi, '/messages/<uuid:message_id>/feedbacks')
 api.add_resource(MessageSuggestedApi, '/messages/<uuid:message_id>/suggested')
+
+# guorq
+api.add_resource(SendMsgFeedbackApi, '/messages/<uuid:message_id>/sendMsgByFeedback')

@@ -56,7 +56,8 @@ class LargeLanguageModel(AIModel):
         # validate and filter model parameters
         if model_parameters is None:
             model_parameters = {}
-
+        print(f"credentials: {credentials}")
+        print(f"model_parameters: {model_parameters}")
         model_parameters = self._validate_and_filter_model_parameters(model, model_parameters, credentials)
 
         self.started_at = time.perf_counter()
@@ -107,7 +108,7 @@ class LargeLanguageModel(AIModel):
                 user=user,
                 callbacks=callbacks
             )
-
+            print(e)
             raise self._transform_invoke_error(e)
 
         if stream and isinstance(result, Generator):
