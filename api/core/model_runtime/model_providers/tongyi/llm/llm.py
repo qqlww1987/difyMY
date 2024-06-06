@@ -460,7 +460,7 @@ if you are not sure about the structure.
         :return: tongyi messages
         """
         tongyi_messages = []
-        print(f'prompt_messages {prompt_messages}')
+        # print(f'prompt_messages {prompt_messages}')
         for prompt_message in prompt_messages:
             if isinstance(prompt_message, SystemPromptMessage):
                 tongyi_messages.append({

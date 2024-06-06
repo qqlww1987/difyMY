@@ -17,7 +17,7 @@
             "args": [
                 "run",
                 "--no-debugger",
-                "--no-reload",
+                "--no-reload"
 
             ],
             "envFile": "/home/qqlww/mydify/dify/api/.env",
