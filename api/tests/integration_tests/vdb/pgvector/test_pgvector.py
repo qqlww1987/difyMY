@@ -7,7 +7,11 @@ from tests.integration_tests.vdb.test_vector_store import (
 )
 
 
+<<<<<<< HEAD
 class TestPGVector(AbstractVectorTest):
+=======
+class PGVectorTest(AbstractVectorTest):
+>>>>>>> da5f2e168aa3491fff453f84b3393f4a4467be68
     def __init__(self):
         super().__init__()
         self.vector = PGVector(
@@ -27,4 +31,8 @@ class TestPGVector(AbstractVectorTest):
 
 
 def test_pgvector(setup_mock_redis):
+<<<<<<< HEAD
     TestPGVector().run_all_tests()
+=======
+    PGVectorTest().run_all_tests()
+>>>>>>> da5f2e168aa3491fff453f84b3393f4a4467be68

@@ -14,8 +14,3 @@ class StabilityToolProvider(BuiltinToolProviderController, BaseStabilityAuthoriz
         This method is responsible for validating the credentials.
         """
         self.sd_validate_credentials(credentials)
-
-    def _get_tool_labels(self) -> list[ToolLabelEnum]:
-        return [
-            ToolLabelEnum.IMAGE
-        ]

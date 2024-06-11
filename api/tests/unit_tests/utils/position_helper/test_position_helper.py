@@ -2,7 +2,11 @@ from textwrap import dedent
 
 import pytest
 
+<<<<<<< HEAD
 from core.utils.position_helper import get_position_map
+=======
+from core.helper.position_helper import get_position_map
+>>>>>>> da5f2e168aa3491fff453f84b3393f4a4467be68
 
 
 @pytest.fixture

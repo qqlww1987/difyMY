@@ -1,0 +1,223 @@
+var hotSearch = null;
+$(function(){	
+	$(document).bind("keydown", function(event){
+		var obj = event.srcElement||event.target;
+		if("searchWord"==$(obj).attr("data-id") ){
+			if(document.getElementById("cmt_comboDiv")){
+				if(event.keyCode==40){
+					if($("#cmt_comboDiv").find("li.selected").length>0){
+						var oldSelected = $("#cmt_comboDiv").find("li.selected").eq(0);
+						if($("#cmt_comboDiv").find("li").last().text()!=oldSelected.text()){						
+							var newSelected = oldSelected.next();
+							newSelected.addClass("selected");
+							oldSelected.removeClass("selected");
+							obj.value=newSelected.find("span").eq(0).text();
+						}else{
+							var newSelected = $("#cmt_comboDiv").find("li").first();
+							newSelected.addClass("selected");
+							oldSelected.removeClass("selected");
+							obj.value=newSelected.find("span").eq(0).text();
+						}
+					}else{
+						$("#cmt_comboDiv").find("li").eq(0).addClass("selected");
+						obj.value=$("#cmt_comboDiv").find("li").eq(0).find("span").eq(0).text();
+					}
+					event.stopPropagation();
+				}else if(event.keyCode==38){
+					if($("#cmt_comboDiv").find("li.selected").length>0){
+						var oldSelected = $("#cmt_comboDiv").find("li.selected").eq(0);
+						if($("#cmt_comboDiv").find("li").first().text()!=oldSelected.text()){
+							var newSelected = oldSelected.prev();
+							newSelected.addClass("selected");
+							oldSelected.removeClass("selected");
+							obj.value=newSelected.find("span").eq(0).text();
+						}else{
+							var newSelected = $("#cmt_comboDiv").find("li").last();
+							newSelected.addClass("selected");
+							oldSelected.removeClass("selected");
+							obj.value=newSelected.find("span").eq(0).text();					
+						}
+					}else{
+						$("#cmt_comboDiv").find("li").last().addClass("selected");
+					}
+					event.stopPropagation();
+				}
+			}
+		}
+	})
+
+	// 获取最热搜索关键字
+
+/*	var detailTypes = new Array();
+	$(".search-tab a").each(function(i){
+		detailTypes[i] = $(this).text();
+	});
+	$.ajax({
+	    timeout: 5000,
+	    async: true, // 异步
+	    type: 'GET',
+	    cache: false,
+	    url: "/base/common/searchKeyHistory/getHotSearch.json",
+	    dataType: 'JSON',
+	    traditional: true,
+	    data: {
+	        "detailTypes": detailTypes,
+	        size : 120
+	    },
+	    success: function(data) {
+			//console.log(data);
+	        hotSearch = data;
+	        var priceHotSearch = hotSearch.信息价;
+	        if (priceHotSearch != null && priceHotSearch.length > 0) {
+	        	var appendHtml = "";
+	        	for(var i = 0; i < priceHotSearch.length; i++) {
+	        		appendHtml += "<a class=\"hotSearchKey\" href=\"#\">"+priceHotSearch[i]+"</a>";
+	        	}
+	          	$("#hotSearch .fc9").after(appendHtml);
+	        }
+	    },
+	    error: function(xhr, status, msg) {
+	        //alert(xhr.status + ":" + msg);
+	    }
+	});*/
+	
+	$(".keysList").on("click", ".hotSearchKey", function(){ // 搜索热词事件代理
+		$(this).parents(".searchTab").find(".sInput").val($(this).text());
+		$(this).parents(".searchTab").find("input[type='submit']").click();
+	});
+	
+	 //搜索输入框绑定事件 
+    $(".searchTab .sInput").on("keyup",intelligentSense);
+      
+	//当未输入搜索内容时点击搜索框则显示历史搜索
+	$(".searchTab .sInput").on("click",historyIntelligentSense);
+	
+	
+	//顶部搜索框下拉提示
+	function intelligentSense(event){
+		var obj = event.srcElement||event.target;
+		if($.trim(obj.value)=="" || event.keyCode==38 || event.keyCode==40){
+			if($.trim(obj.value)==""){
+				$("#cmt_comboDiv").remove();	
+			}
+			return;
+		}
+		
+		if(event.keyCode!=13){
+			var params = {"keyword":obj.value};		
+		    var searchType = $(".searchType li.on").attr("data-code");
+			var url="";
+			if("marketPrice"==searchType){	
+			   url="/price/product/search/getIndex.json";
+			}else if("document"==searchType){
+			   url="/shareData/searchIndex/getIndex.json";
+			}else if("de"==searchType){
+			  url="/ecSql/searchIndex/getIndex.json";
+			}/*else if("供应商"==searchType){
+			  url="/supplier/searchIndex/getIndex.json";
+			}*/else if("govPrice"==searchType){	//信息价
+			  url="/price/searchIndex/getIndex.json";
+			}
+			if(url){
+				$.ajax({
+					type: "POST",
+				   	url: url,
+				   	data: params,
+				   	timeout:5000,
+				   	async : true, //异步
+				   	dataType: "json",
+				   	success: function(json){
+				   		$("#cmt_comboDiv").remove();		   		
+				     	if(json && json.item && json.item.length>0){	     	
+					     	var content = "<ul>";
+					     	for(var i=0;i<json.item.length;i++){
+					     		content += "<li>";
+					     	//	if(json.searchType=="code"){
+					     	//		content += "<span>"+json.item[i].code+"</span> ";
+					     	//	}
+				     			content += "<span>"+json.item[i].keyword+"</span>";
+							//if("文库"!=searchType && "定额"!=searchType && "供应商"!=searchType){
+							//	content += "<span>("+json.item[i].cnt+")</span>";	
+							//}	     		
+					     		content += "</li>";
+					     	}		     	
+					     	content += "</ul>";				   
+						 	createComboBoxCore(obj,"auto","auto",content,-1,0);					 	
+						 	setIntelligentSenseEvent(obj);			 	
+					 	}
+				   	}
+				});	
+			}		 
+		}		
+	}
+
+	function setIntelligentSenseEvent(obj){	
+		$("#cmt_comboDiv li").mouseover(function(){
+			$(this).addClass("selected"); 
+		}).mouseout(function(){
+			$(this).removeClass("selected"); 
+		}).click(function(){
+			obj.value = $(this).find("span").eq(0).text();
+			obj.focus();		
+			$("#cmt_comboDiv").remove();		
+		});	
+	}
+
+
+	//顶部搜索框下拉历史
+	function historyIntelligentSense(event){
+		var obj = event.srcElement||event.target;
+		if(!!obj.value || $.trim(obj.value)!="")
+			return;
+		
+	   var searchType = $(".searchType li.on").attr("data-code");	
+		var url="";
+		if("marketPrice"==searchType){	
+		   url="/price/product/search/getSearchCookieInfo.json";
+		}else if("govPrice"==searchType){	//信息价
+		  url="/price/gov/getSearchCookieInfo.json";
+		}	
+		
+		if(url=="")	return;		
+		 $.ajax({
+			type: "POST",
+			url: url,
+			dataType: "json",
+			success: function(json){
+				$("#cmt_comboDiv").remove();		   		
+				if(json && json.length>0 && json[0] != ""){	     	
+					var content = "<ul>";
+					for(var i=0;i<json.length;i++){
+						content += "<li>";			
+						content += "<span style='color:#006ca7;'>"+json[i]+"</span>";
+					//if("文库"!=searchType && "定额"!=searchType && "供应商"!=searchType){
+					//	content += "<span>("+json.item[i].cnt+")</span>";	
+					//}	     		
+						content += "</li>";
+					}		     	
+					content += "</ul>";
+			   
+					createComboBoxCore(obj,"auto","auto",content,-1,0);
+					
+					setHistoryIntelligentSenseEvent(obj);			 	
+				}
+			}
+		});	
+
+	}
+
+	function setHistoryIntelligentSenseEvent(obj){	
+		$("#cmt_comboDiv li").mouseover(function(){
+			$(this).addClass("selected"); 
+		}).mouseout(function(){
+			$(this).removeClass("selected"); 
+		}).click(function(){
+			obj.value = $(this).find("span").eq(0).text();
+			obj.focus();		
+			$("#cmt_comboDiv").remove();		
+		});	
+	}
+
+
+});
+

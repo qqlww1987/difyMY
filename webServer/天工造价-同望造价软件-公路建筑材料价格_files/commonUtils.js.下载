@@ -1,0 +1,213 @@
+
+
+//弹出下拉框
+function createComboBoxCore(srcObj,comboWidth,comboHeight,divContent, marginLeft, marginTop){
+	//excute when the pop-up div is not exist or the source element of this div is not the current event source element
+	if($("#cmt_comboDiv").length==0||$("#cmt_comboDiv").data("srcObj")!=srcObj){
+		//remove the pop-up combo div when it is always exist
+		if($("#cmt_comboDiv").length>0){
+			$("#cmt_comboDiv").remove();
+		}
+		
+		//create pop-up combo div element
+		$(srcObj).after($("<div id='cmt_comboDiv' class='cmt_comboDiv' ></div>"));
+				
+		//save the source element to data cache of cmt_comboDiv
+		$("#cmt_comboDiv").data("srcObj",srcObj);
+		//resize the pop-up combo div
+		if(comboWidth!=null){
+			$("#cmt_comboDiv").css("width",comboWidth);
+		}
+		if(comboHeight!=null){
+			$("#cmt_comboDiv").css("height",comboHeight);
+		}
+		
+		if(!marginLeft) marginLeft=0;
+		if(!marginTop) marginTop=0;
+		
+		//reposition the pop-up combo div		
+		//$("#cmt_comboDiv").css("left",$(srcObj).offset().left + marginLeft);
+	    //$("#cmt_comboDiv").css("top", $(srcObj).offset().top+$(srcObj).outerHeight() + marginTop);
+	    
+	    $(document).bind("click",removeComboBox);
+	    
+	    $("#cmt_comboDiv").html(divContent);
+}
+}
+
+
+function removeComboBox(event){
+	if($("#cmt_comboDiv").length){		
+		var el =getEventElement(event);
+		if( !$(el).parents("#cmt_comboDiv").length && el!=$("#cmt_comboDiv").data("srcObj")  &&  $(el).attr("id")!="cmt_comboDiv" ){
+			//clear document added click event before remove the combobox
+			$(document).unbind("click",removeComboBox);
+			$("#cmt_comboDiv").remove();	
+		}
+	}
+};
+
+
+
+function removeComboBox(){
+	$("#cmt_comboDiv").remove();	
+}
+
+
+function getEventElement(event){
+	var e = getEvent(event);
+	return e.srcElement||e.target;
+}
+
+function getEvent(event){
+	return window.event||event;   
+}
+
+
+
+
+//同步ajax
+function ajaxNonAsync(url, dataType){
+	dataType = dataType ? dataType : "json";
+	
+	var json;
+	$.ajaxSetup({ 
+		  async: false 
+	});
+	$.ajax({
+	   type: "GET",
+	   url: url,
+	   dataType: dataType,
+	   success: function(json1){	 
+		  json = json1;   
+	   }
+	});
+	
+	return json;
+}
+
+
+
+
+
+function getNowtime(){
+	var d = new Date();
+	var ret=d.getFullYear()+"-";
+	ret+=("00"+(d.getMonth()+1)).slice(-2)+"-";
+	ret+=("00"+d.getDate()).slice(-2)+" ";
+	ret+=("00"+d.getHours()).slice(-2)+":";
+	ret+=("00"+d.getMinutes()).slice(-2)+":";
+	ret+=("00"+d.getSeconds()).slice(-2);
+	return ret;
+}
+
+
+
+
+
+
+//检查上传图片的后缀名
+function checkPicFileExt(fileName){
+	var extArray = new Array("JPG", "GIF", "BMP", "PNG");   
+	return checkFileExtCore(fileName, extArray);
+}
+
+
+/*检查上文件后缀名
+	fileName 文件名
+	extArray 合法的后缀名
+*/
+function checkFileExtCore(fileName, extArray){
+	var extName = fileName.substring(fileName.lastIndexOf(".")+1).toUpperCase();
+	var bl = false;
+	for (var i = 0; i < extArray.length; i++){
+        if (extArray[i] == extName){ 
+        	bl = true;
+            break;
+        }
+    } 
+    return bl;
+}
+
+
+//以easyui的弹出窗口作为锁屏
+function showProcess(fadeIn){
+	if(fadeIn==null){
+		fadeIn = 0;
+	}	
+	$.blockUI({
+         message:"<table height='90%' width='100%'><tr><td height='100%' align='center' valign='middle' style='font-size:12px;'>正在处理,请稍后...</td></tr></table>",
+         overlayCSS: { backgroundColor: 'gray' },
+         css: {
+         //border: 'none',
+         borderColor: '#FEF9D4',
+         padding: '15px',
+         backgroundColor: '#F0F7FD',
+         //width:"200px",
+         //height:"100px",
+         //color: 'Red',  
+         fadeIn:  fadeIn,
+         opacity: 0.8
+        }
+     });
+}
+
+//解除锁屏
+function cancelProcess(){
+	$.unblockUI();	
+}
+
+
+
+
+
+
+//检查上传图片的后缀名
+function checkPicFileExt(fileName){
+	var extArray = new Array("JPG", "GIF", "BMP", "PNG");   
+	return checkFileExtCore(fileName, extArray);
+}
+
+
+/*检查上文件后缀名
+	fileName 文件名
+	extArray 合法的后缀名
+*/
+function checkFileExtCore(fileName, extArray){
+	var extName = fileName.substring(fileName.lastIndexOf(".")+1).toUpperCase();
+	var bl = false;
+	for (var i = 0; i < extArray.length; i++){
+        if (extArray[i] == extName){ 
+        	bl = true;
+            break;
+        }
+    } 
+    return bl;
+}
+
+
+/*
+	装json对象中的所有值'null'的属性改为''
+*/
+function replaceNullProperties4JsonObj(json){
+	if(json){	
+		for(var i in json){
+			if(json[i]=='null' || json[i]==null || json[i]=='undefined' || json[i]==undefined || $.trim(json[i])==""){
+				json[i] = "";
+			}
+		}
+	}
+	return json;
+}
+
+/*
+	装json对象集合中的所有值'null'的属性改为''
+*/
+function replaceNullProperties4JsonList(jsonList){
+	if(jsonList){	
+		for(var i=0;i<jsonList.length;i++){
+			jsonList[i] = replaceNullProperties4JsonObj(jsonList[i]);
+		}
+	}
+	return jsonList;
+}

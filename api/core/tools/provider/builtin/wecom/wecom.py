@@ -6,9 +6,3 @@ from core.tools.provider.builtin_tool_provider import BuiltinToolProviderControl
 class WecomProvider(BuiltinToolProviderController):
     def _validate_credentials(self, credentials: dict) -> None:
         WecomGroupBotTool()
-        pass
-
-    def _get_tool_labels(self) -> list[ToolLabelEnum]:
-        return [
-            ToolLabelEnum.SOCIAL
-        ]

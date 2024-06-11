@@ -57,7 +57,3 @@ class ChartProvider(BuiltinToolProviderController):
         except Exception as e:
             raise ToolProviderCredentialValidationError(str(e))
         
-    def _get_tool_labels(self) -> list[ToolLabelEnum]:
-        return [
-            ToolLabelEnum.DESIGN, ToolLabelEnum.PRODUCTIVITY, ToolLabelEnum.UTILITIES
-        ]

@@ -23,7 +23,3 @@ class FirecrawlProvider(BuiltinToolProviderController):
         except Exception as e:
             raise ToolProviderCredentialValidationError(str(e))
         
-    def _get_tool_labels(self) -> list[ToolLabelEnum]:
-        return [
-            ToolLabelEnum.SEARCH, ToolLabelEnum.UTILITIES
-        ]

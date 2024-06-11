@@ -6,6 +6,24 @@ from pydantic import BaseModel, Field
 from core.tools.entities.common_entities import I18nObject
 
 
+class ToolLabelEnum(Enum):
+    SEARCH = 'search'
+    IMAGE = 'image'
+    VIDEOS = 'videos'
+    WEATHER = 'weather'
+    FINANCE = 'finance'
+    DESIGN = 'design'
+    TRAVEL = 'travel'
+    SOCIAL = 'social'
+    NEWS = 'news'
+    MEDICAL = 'medical'
+    PRODUCTIVITY = 'productivity'
+    EDUCATION = 'education'
+    BUSINESS = 'business'
+    ENTERTAINMENT = 'entertainment'
+    UTILITIES = 'utilities'
+    OTHER = 'other'
+
 class ToolProviderType(Enum):
     """
         Enum class for tool provider
@@ -98,8 +116,9 @@ class ToolParameterOption(BaseModel):
     value: str = Field(..., description="The value of the option")
     label: I18nObject = Field(..., description="The label of the option")
 
+
 class ToolParameter(BaseModel):
-    class ToolParameterType(Enum):
+    class ToolParameterType(str, Enum):
         STRING = "string"
         NUMBER = "number"
         BOOLEAN = "boolean"
@@ -159,6 +178,7 @@ class ToolProviderIdentity(BaseModel):
     label: I18nObject = Field(..., description="The label of the tool")
     # guorq 增加属性是否可以使用,这样可以过滤哪些鬼东西可以使用
     isUse:bool=Field( description="can used in assistant",default=False)
+    tags: Optional[list[ToolLabelEnum]] = Field(default=[], description="The tags of the tool", )
 
 class ToolDescription(BaseModel):
     human: I18nObject = Field(..., description="The description presented to the user")

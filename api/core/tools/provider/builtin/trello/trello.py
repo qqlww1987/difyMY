@@ -34,7 +34,3 @@ class TrelloProvider(BuiltinToolProviderController):
             # Handle other exceptions, such as connection errors
             raise ToolProviderCredentialValidationError("Error validating Trello credentials")
         
-    def _get_tool_labels(self) -> list[ToolLabelEnum]:
-        return [
-            ToolLabelEnum.PRODUCTIVITY
-        ]

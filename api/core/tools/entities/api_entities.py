@@ -61,7 +61,7 @@ class UserToolProvider(BaseModel):
             'allow_delete': self.allow_delete,
             'tools': tools,
             'labels': self.labels,
- }
+        }
 
 class UserToolProviderCredentials(BaseModel):
     credentials: dict[str, ToolProviderCredentials]
