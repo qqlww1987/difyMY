@@ -93,6 +93,17 @@ class DraftWorkflowApi(Resource):
             )
         except WorkflowHashNotEqualError:
             raise DraftWorkflowNotSync()
+
+        try:
+            workflow = workflow_service.sync_draft_workflow(
+                app_model=app_model,
+                graph=args.get('graph'),
+                features=args.get('features'),
+                unique_hash=args.get('hash'),
+                account=current_user
+            )
+        except WorkflowHashNotEqualError:
+            raise DraftWorkflowNotSync()
         return {
             "result": "success",
             "hash": workflow.unique_hash,

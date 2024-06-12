@@ -122,7 +122,6 @@ class ModelInstance:
         self.model_type_instance = cast(LargeLanguageModel, self.model_type_instance)
         return self._round_robin_invoke(
             function=self.model_type_instance.invoke,
-
             model=self.model,
             credentials=self.credentials,
             prompt_messages=prompt_messages,
@@ -329,7 +328,7 @@ class ModelInstance:
             except Exception as e:
                 raise e
 
-    def get_tts_voices(self, language: str) -> list:
+    def get_tts_voices(self, language: Optional[str] = None) -> list:
         """
         Invoke large language tts model voices
 

@@ -134,15 +134,12 @@ services:
       PGVECTOR_USER: postgres
       PGVECTOR_PASSWORD: difyai123456
       PGVECTOR_DATABASE: dify
-<<<<<<< HEAD
-=======
       # tidb vector configurations
       TIDB_VECTOR_HOST: tidb
       TIDB_VECTOR_PORT: 4000
       TIDB_VECTOR_USER: xxx.root
       TIDB_VECTOR_PASSWORD: xxxxxx
       TIDB_VECTOR_DATABASE: dify
->>>>>>> da5f2e168aa3491fff453f84b3393f4a4467be68
       # Mail configuration, support: resend, smtp
       MAIL_TYPE: ''
       # default send from email address, if not specified
@@ -278,18 +275,11 @@ services:
       # default send from email address, if not specified
       MAIL_DEFAULT_SEND_FROM: 'YOUR EMAIL FROM (eg: no-reply <no-reply@dify.ai>)'
       SMTP_SERVER: ''
-<<<<<<< HEAD
-      SMTP_PORT: 587
-      SMTP_USERNAME: ''
-      SMTP_PASSWORD: ''
-      SMTP_USE_TLS: 'true'
-=======
       SMTP_PORT: 465
       SMTP_USERNAME: ''
       SMTP_PASSWORD: ''
       SMTP_USE_TLS: 'true'
       SMTP_OPPORTUNISTIC_TLS: 'false'
->>>>>>> da5f2e168aa3491fff453f84b3393f4a4467be68
       # the api-key for resend (https://resend.com)
       RESEND_API_KEY: ''
       RESEND_API_URL: https://api.resend.com
@@ -305,15 +295,12 @@ services:
       PGVECTOR_USER: postgres
       PGVECTOR_PASSWORD: difyai123456
       PGVECTOR_DATABASE: dify
-<<<<<<< HEAD
-=======
       # tidb vector configurations
       TIDB_VECTOR_HOST: tidb
       TIDB_VECTOR_PORT: 4000
       TIDB_VECTOR_USER: xxx.root
       TIDB_VECTOR_PASSWORD: xxxxxx
       TIDB_VECTOR_DATABASE: dify
->>>>>>> da5f2e168aa3491fff453f84b3393f4a4467be68
       # Notion import configuration, support public and internal
       NOTION_INTEGRATION_TYPE: public
       NOTION_CLIENT_SECRET: you-client-secret

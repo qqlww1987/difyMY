@@ -39,13 +39,6 @@ class SystemFeatureModel(BaseModel):
     sso_enforced_for_web_protocol: str = ''
 
 
-class SystemFeatureModel(BaseModel):
-    sso_enforced_for_signin: bool = False
-    sso_enforced_for_signin_protocol: str = ''
-    sso_enforced_for_web: bool = False
-    sso_enforced_for_web_protocol: str = ''
-
-
 class FeatureService:
 
     @classmethod

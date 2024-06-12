@@ -365,9 +365,6 @@ class Config:
         self.WORKFLOW_MAX_EXECUTION_TIME = int(get_env('WORKFLOW_MAX_EXECUTION_TIME'))
         self.WORKFLOW_CALL_MAX_DEPTH = int(get_env('WORKFLOW_CALL_MAX_DEPTH'))
 
-        self.WORKFLOW_MAX_EXECUTION_STEPS = int(get_env('WORKFLOW_MAX_EXECUTION_STEPS'))
-        self.WORKFLOW_MAX_EXECUTION_TIME = int(get_env('WORKFLOW_MAX_EXECUTION_TIME'))
-
         # Moderation in app Configurations.
         self.OUTPUT_MODERATION_BUFFER_SIZE = int(get_env('OUTPUT_MODERATION_BUFFER_SIZE'))
 

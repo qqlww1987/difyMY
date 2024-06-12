@@ -8,7 +8,6 @@ from core.model_runtime.model_providers.__base.ai_model import AIModel
 from core.tools.utils.yaml_utils import load_yaml_file
 
 
-
 class ModelProvider(ABC):
     provider_schema: ProviderEntity = None
     model_instance_map: dict[str, AIModel] = {}
