@@ -185,11 +185,14 @@ class MilvusVector(BaseVector):
         # Set search parameters.
         results = self._client.search(collection_name=self._collection_name,
                                       data=[query_vector],
-                                      limit=kwargs.get('top_k', 4),
+                                      limit=100,
+                                    #   limit=kwargs.get('top_k', 4),
                                       output_fields=[Field.CONTENT_KEY.value, Field.METADATA_KEY.value],
                                       )
         # Organize results.
         docs = []
+        limit=kwargs.get('top_k', 4)
+       
         for result in results[0]:
             metadata = result['entity'].get(Field.METADATA_KEY.value)
             metadata['score'] = result['distance']
@@ -198,6 +201,10 @@ class MilvusVector(BaseVector):
                 doc = Document(page_content=result['entity'].get(Field.CONTENT_KEY.value),
                                metadata=metadata)
                 docs.append(doc)
+        # docs按照属性metadata的score进行降序排序
+        docs.sort(key=lambda x: x.metadata['score'], reverse=True)
+        # 并取最高的limit条记录
+        docs = docs[:limit]
         return docs
 
     def search_by_full_text(self, query: str, **kwargs: Any) -> list[Document]:
