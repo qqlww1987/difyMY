@@ -39,6 +39,7 @@ import { userInputsFormToPromptVariables } from '@/utils/model-config'
 import type { InstalledApp } from '@/models/explore'
 import { AlertTriangle } from '@/app/components/base/icons/src/vender/solid/alertsAndFeedback'
 import LogoHeader from '@/app/components/base/logo/logo-embeded-chat-header'
+import LogoTooneHeader from '@/app/components/base/logo/logo-embeded-chat-tooneheader'
 import LogoAvatar from '@/app/components/base/logo/logo-embeded-chat-avatar'
 import type { VisionFile, VisionSettings } from '@/types/app'
 import { Resolution, TransferMethod } from '@/types/app'
@@ -719,7 +720,10 @@ const Main: FC<IMainProps> = ({
   const difyIcon = (
     <LogoHeader />
   )
-
+  
+  const ToonIcon = (
+    <LogoTooneHeader />
+  )
   if (appUnavailable)
     return <AppUnavailable isUnknwonReason={isUnknwonReason} />
 
@@ -735,6 +739,7 @@ const Main: FC<IMainProps> = ({
         title={siteInfo.title}
         icon=''
         customerIcon={difyIcon}
+        middleIcon={ToonIcon}
         icon_background={siteInfo.icon_background || ''}
         isEmbedScene={true}
         isMobile={isMobile}

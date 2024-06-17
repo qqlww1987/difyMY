@@ -12,6 +12,7 @@ import Tooltip from '@/app/components/base/tooltip'
 export type IHeaderProps = {
   title: string
   customerIcon?: React.ReactNode
+  middleIcon?: React.ReactNode
   icon: string
   icon_background: string
   isMobile?: boolean
@@ -23,6 +24,7 @@ const Header: FC<IHeaderProps> = ({
   title,
   isMobile,
   customerIcon,
+  middleIcon,
   icon,
   icon_background,
   isEmbedScene = false,
@@ -47,8 +49,13 @@ const Header: FC<IHeaderProps> = ({
             className={'text-sm font-bold text-white'}
           >
             {title}
+         
           </div>
         </div>
+        <div className="flex   w-16 h-8 items-center justify-center'">
+          {middleIcon }
+        </div>
+
         <Tooltip
           selector={'embed-scene-restart-button'}
           htmlContent={t('share.chat.resetChat')}
