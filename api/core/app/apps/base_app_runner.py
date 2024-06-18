@@ -220,7 +220,7 @@ class AppRunner:
             index = 0
             for token in text:
                 chunk = LLMResultChunk(
-                    model=app_generate_entity.model_config.model,
+                    model=app_generate_entity.model_conf.model,
                     prompt_messages=prompt_messages,
                     delta=LLMResultChunkDelta(
                         index=index,
@@ -239,7 +239,7 @@ class AppRunner:
         queue_manager.publish(
             QueueMessageEndEvent(
                 llm_result=LLMResult(
-                    model=app_generate_entity.model_config.model,
+                    model=app_generate_entity.model_conf.model,
                     prompt_messages=prompt_messages,
                     message=AssistantPromptMessage(content=text),
                     usage=usage if usage else LLMUsage.empty_usage()

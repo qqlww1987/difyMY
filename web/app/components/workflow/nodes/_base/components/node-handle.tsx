@@ -118,8 +118,7 @@ export const NodeSourceHandle = memo(({
   const { handleNodeAdd } = useNodesInteractions()
   const { getNodesReadOnly } = useNodesReadOnly()
   const { availableNextBlocks } = useAvailableBlocks(data.type, data.isInIteration)
-  const isUnConnectable = !availableNextBlocks.length || ((connectingNodePayload?.nodeType === BlockEnum.VariableAssigner || connectingNodePayload?.nodeType === BlockEnum.VariableAggregator) && connectingNodePayload?.handleType === 'target')
-  const isConnectable = !isUnConnectable
+  const isConnectable = !!availableNextBlocks.length
 
   const connected = data._connectedSourceHandleIds?.includes(handleId)
   const handleOpenChange = useCallback((v: boolean) => {

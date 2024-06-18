@@ -34,7 +34,7 @@ export type INavSelectorProps = {
 const NavSelector = ({ curNav, navs, createText, isApp, onCreate, onLoadmore }: INavSelectorProps) => {
   const { t } = useTranslation()
   const router = useRouter()
-  const { isCurrentWorkspaceManager } = useAppContext()
+  const { isCurrentWorkspaceEditor } = useAppContext()
   const setAppDetail = useAppStore(state => state.setAppDetail)
 
   const handleScroll = useCallback(debounce((e) => {
@@ -73,6 +73,8 @@ const NavSelector = ({ curNav, navs, createText, isApp, onCreate, onLoadmore }: 
                   navs.map(nav => (
                     <Menu.Item key={nav.id}>
                       <div className='flex items-center w-full px-3 py-[6px] text-gray-700 text-[14px] rounded-lg font-normal hover:bg-gray-100 cursor-pointer truncate' onClick={() => {
+                        if (curNav?.id === nav.id)
+                          return
                         setAppDetail()
                         router.push(nav.link)
                       }} title={nav.name}>
@@ -120,7 +122,7 @@ const NavSelector = ({ curNav, navs, createText, isApp, onCreate, onLoadmore }: 
                   </div>
                 </Menu.Button>
               )}
-              {isApp && isCurrentWorkspaceManager && (
+              {isApp && isCurrentWorkspaceEditor && (
                 <Menu as="div" className="relative w-full h-full">
                   {({ open }) => (
                     <>

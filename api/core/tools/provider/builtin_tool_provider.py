@@ -176,6 +176,22 @@ class BuiltinToolProviderController(ToolProviderController):
         """
         return self.identity.tags or []
 
+    @property
+    def tool_labels(self) -> list[str]:
+        """
+            returns the labels of the provider
+
+            :return: labels of the provider
+        """
+        label_enums = self._get_tool_labels()
+        return [default_tool_label_dict[label].name for label in label_enums]
+
+    def _get_tool_labels(self) -> list[ToolLabelEnum]:
+        """
+            returns the labels of the provider
+        """
+        return self.identity.tags or []
+
     def validate_parameters(self, tool_id: int, tool_name: str, tool_parameters: dict[str, Any]) -> None:
         """
             validate the parameters of the tool and set the default value if needed

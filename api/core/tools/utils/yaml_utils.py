@@ -4,6 +4,7 @@ import os
 import yaml
 from yaml import YAMLError
 
+logger = logging.getLogger(__name__)
 
 def load_yaml_file(file_path: str, ignore_error: bool = False) -> dict:
     """

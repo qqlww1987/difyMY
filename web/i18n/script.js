@@ -3,11 +3,9 @@ const fs = require('node:fs')
 const path = require('node:path')
 const transpile = require('typescript').transpile
 
-
-
-// const targetLanguage = 'en-US'
 const targetLanguage = 'zh-Hans'
-const languages = ['zh-Hans', 'fr-FR', 'ja-JP', 'pt-BR', 'uk-UA', 'vi-VN']
+const data = require('./languages.json')
+const languages = data.languages.filter(language => language.supported).map(language => language.value)
 
 async function getKeysFromLanuage(language) {
   return new Promise((resolve, reject) => {

@@ -62,7 +62,7 @@ const Main: FC<IMainProps> = ({
   * app info
   */
   const [appUnavailable, setAppUnavailable] = useState<boolean>(false)
-  const [isUnknwonReason, setIsUnknwonReason] = useState<boolean>(false)
+  const [isUnknownReason, setIsUnknwonReason] = useState<boolean>(false)
   const [appId, setAppId] = useState<string>('')
   const [isPublicVersion, setIsPublicVersion] = useState<boolean>(true)
   const [siteInfo, setSiteInfo] = useState<SiteInfo | null>()
@@ -725,7 +725,7 @@ const Main: FC<IMainProps> = ({
     <LogoTooneHeader />
   )
   if (appUnavailable)
-    return <AppUnavailable isUnknwonReason={isUnknwonReason} />
+    return <AppUnavailable isUnknownReason={isUnknownReason} />
 
   if (!appId || !siteInfo || !promptConfig) {
     return <div className='flex h-screen w-full'>
@@ -811,6 +811,7 @@ const Main: FC<IMainProps> = ({
                     answerIcon={<LogoAvatar className='relative shrink-0' />}
                     visionConfig={visionConfig}
                     allToolIcons={appMeta?.tool_icons || {}}
+                    customDisclaimer={siteInfo.custom_disclaimer}
                   />
                 </div>
               </div>)
