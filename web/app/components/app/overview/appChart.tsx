@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 import { formatNumber } from '@/utils/format'
 import Basic from '@/app/components/app-sidebar/basic'
 import Loading from '@/app/components/base/loading'
-import type { AppDailyConversationsResponse, AppDailyEndUsersResponse, AppTokenCostsResponse } from '@/models/app'
+import type { AppDailyConversationsResponse, AppDailyEndUsersResponse, AppTokenCostsResponse,AppFrequentKeywordsResponse } from '@/models/app'
 import { getAppDailyConversations, getAppDailyEndUsers, getAppStatistics, getAppTokenCosts, getWorkflowDailyConversations } from '@/service/apps'
 const valueFormatter = (v: string | number) => v
 
@@ -89,7 +89,7 @@ export type IChartProps = {
   unit?: string
   yMax?: number
   chartType: IChartType
-  chartData: AppDailyConversationsResponse | AppDailyEndUsersResponse | AppTokenCostsResponse | { data: Array<{ date: string; count: number }> }
+  chartData: AppDailyConversationsResponse | AppDailyEndUsersResponse |AppFrequentKeywordsResponse| AppTokenCostsResponse | { data: Array<{ date: string; count: number }> }
 }
 
 const Chart: React.FC<IChartProps> = ({

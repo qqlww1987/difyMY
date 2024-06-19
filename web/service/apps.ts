@@ -1,6 +1,6 @@
 import type { Fetcher } from 'swr'
 import { del, get, post, put } from './base'
-import type { ApikeysListResponse, AppDailyConversationsResponse, AppDailyEndUsersResponse, AppDetailResponse, AppListResponse, AppStatisticsResponse, AppTemplatesResponse, AppTokenCostsResponse, AppVoicesListResponse, CreateApiKeyResponse, GenerationIntroductionResponse, UpdateAppModelConfigResponse, UpdateAppSiteCodeResponse, UpdateOpenAIKeyResponse, ValidateOpenAIKeyResponse, WorkflowDailyConversationsResponse } from '@/models/app'
+import type { ApikeysListResponse, AppDailyConversationsResponse, AppDailyEndUsersResponse, AppDetailResponse, AppListResponse, AppStatisticsResponse, AppTemplatesResponse, AppTokenCostsResponse, AppFrequentKeywordsResponse,AppVoicesListResponse, CreateApiKeyResponse, GenerationIntroductionResponse, UpdateAppModelConfigResponse, UpdateAppSiteCodeResponse, UpdateOpenAIKeyResponse, ValidateOpenAIKeyResponse, WorkflowDailyConversationsResponse } from '@/models/app'
 import type { CommonResponse } from '@/models/common'
 import type { AppMode, ModelConfig } from '@/types/app'
 
@@ -83,6 +83,10 @@ export const getAppDailyEndUsers: Fetcher<AppDailyEndUsersResponse, { url: strin
 
 export const getAppTokenCosts: Fetcher<AppTokenCostsResponse, { url: string; params: Record<string, any> }> = ({ url, params }) => {
   return get<AppTokenCostsResponse>(url, { params })
+}
+// guorq
+export const getAppFrequentKeywords: Fetcher<AppFrequentKeywordsResponse, { url: string; params: Record<string, any> }> = ({ url, params }) => {
+  return get<AppFrequentKeywordsResponse>(url, { params })
 }
 
 export const updateAppModelConfig: Fetcher<UpdateAppModelConfigResponse, { url: string; body: Record<string, any> }> = ({ url, body }) => {

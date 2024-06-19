@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
-
+import jieba
+from collections import Counter
 import pytz
 from flask import jsonify
 from flask_login import current_user
@@ -447,6 +448,78 @@ WHERE app_id = :app_id'''
         return jsonify({
             'data': response_data
         })
+        
+class FrequentKeywordsStatistic(Resource):
+    
+    @setup_required
+    @login_required
+    @account_initialization_required
+    @get_app_model
+    def get(self, app_model):
+        account = current_user
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('start', type=datetime_string('%Y-%m-%d %H:%M'), location='args')
+        parser.add_argument('end', type=datetime_string('%Y-%m-%d %H:%M'), location='args')
+        args = parser.parse_args()
+
+        sql_query = '''
+                SELECT date(DATE_TRUNC('day', created_at AT TIME ZONE 'UTC' AT TIME ZONE :tz )) AS date, query
+                    FROM messages where app_id = :app_id 
+                '''
+        arg_dict = {'tz': account.timezone, 'app_id': app_model.id}
+
+        timezone = pytz.timezone(account.timezone)
+        utc_timezone = pytz.utc
+
+        if args['start']:
+            start_datetime = datetime.strptime(args['start'], '%Y-%m-%d %H:%M')
+            start_datetime = start_datetime.replace(second=0)
+
+            start_datetime_timezone = timezone.localize(start_datetime)
+            start_datetime_utc = start_datetime_timezone.astimezone(utc_timezone)
+
+            sql_query += ' and created_at >= :start'
+            arg_dict['start'] = start_datetime_utc
+
+        if args['end']:
+            end_datetime = datetime.strptime(args['end'], '%Y-%m-%d %H:%M')
+            end_datetime = end_datetime.replace(second=0)
+
+            end_datetime_timezone = timezone.localize(end_datetime)
+            end_datetime_utc = end_datetime_timezone.astimezone(utc_timezone)
+
+            sql_query += ' and created_at < :end'
+            arg_dict['end'] = end_datetime_utc
+
+        sql_query += ' GROUP BY date,messages.query order by date'
+        
+        # 方法1提取关键字
+        all_keywords = {}
+        with db.engine.begin() as conn:
+            rs = conn.execute(db.text(sql_query), arg_dict)            
+            for i in rs:
+                words = jieba.cut(i.query, cut_all=False)
+                date=i.date.strftime('%Y-%m-%d')
+                # 统计词频
+                word_counts = Counter(words)
+                for word, count in word_counts.items():
+                    if word in all_keywords:
+                            all_keywords[word]['count'] += count
+                            all_keywords[word]['dates'].add(date)
+                    else:
+                        all_keywords[word] = {'count': count, 'dates': {date}}
+            
+            N = 10
+            top_keywords = sorted(all_keywords.items(), key=lambda x: x[1]['count'], reverse=True)[:10]
+
+            result = [
+                {'word': keyword, 'count': info['count'], 'dates': list(info['dates'])}
+                for keyword, info in top_keywords
+            ]
+        return jsonify({
+            'data': result
+        })
 
 
 api.add_resource(DailyConversationStatistic, '/apps/<uuid:app_id>/statistics/daily-conversations')
@@ -456,3 +529,4 @@ api.add_resource(AverageSessionInteractionStatistic, '/apps/<uuid:app_id>/statis
 api.add_resource(UserSatisfactionRateStatistic, '/apps/<uuid:app_id>/statistics/user-satisfaction-rate')
 api.add_resource(AverageResponseTimeStatistic, '/apps/<uuid:app_id>/statistics/average-response-time')
 api.add_resource(TokensPerSecondStatistic, '/apps/<uuid:app_id>/statistics/tokens-per-second')
+api.add_resource(FrequentKeywordsStatistic, '/apps/<uuid:app_id>/statistics/frequent-keywords')

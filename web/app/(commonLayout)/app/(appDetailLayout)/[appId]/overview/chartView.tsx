@@ -5,6 +5,9 @@ import quarterOfYear from 'dayjs/plugin/quarterOfYear'
 import { useTranslation } from 'react-i18next'
 import type { PeriodParams } from '@/app/components/app/overview/appChart'
 import { AvgResponseTime, AvgSessionInteractions, AvgUserInteractions, ConversationsChart, CostChart, EndUsersChart, TokenPerSecond, UserSatisfactionRate, WorkflowCostChart, WorkflowDailyTerminalsChart, WorkflowMessagesChart } from '@/app/components/app/overview/appChart'
+import {FrequentKeywords}from '@/app/components/app/overview/appChartNew'
+import {FrequentKeywordsNew}from '@/app/components/app/overview/appScatterChart'
+
 import type { Item } from '@/app/components/base/select'
 import { SimpleSelect } from '@/app/components/base/select'
 import { TIME_PERIOD_LIST } from '@/app/components/app/log/filter'
@@ -76,9 +79,16 @@ export default function ChartView({ appId }: IChartViewProps) {
       {!isWorkflow && (
         <div className='grid gap-6 grid-cols-1 xl:grid-cols-2 w-full mb-6'>
           <UserSatisfactionRate period={period} id={appId} />
+          <FrequentKeywords period={period} id={appId}  />
+          {/* <FrequentKeywordsNew period={period} id={appId}  /> */}
           <CostChart period={period} id={appId} />
         </div>
       )}
+      {/* {!isWorkflow && (
+        <div className='grid gap-6 grid-cols-1 xl:grid-cols-2 w-full mb-6'>
+          <FrequentKeywords period={period} id={appId}  />
+        </div>
+      )} */}
       {isWorkflow && (
         <div className='grid gap-6 grid-cols-1 xl:grid-cols-2 w-full mb-6'>
           <WorkflowMessagesChart period={period} id={appId} />
