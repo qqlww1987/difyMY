@@ -139,7 +139,7 @@ const BarChart: React.FC<BarChartProps> = ({ data,style,basicInfo ,className,cha
       <div className='mb-4 flex-1'>
         <Basic
           isExtraInLine={CHART_TYPE_CONFIG[chartType].showTokens}
-          name={'热度显示'}
+          name={'高频词汇'}
           type={!CHART_TYPE_CONFIG[chartType].showTokens
             ? ''
             : <span>{t('appOverview.analysis.tokenUsage.consumed')} Tokens<span className='text-sm'>
