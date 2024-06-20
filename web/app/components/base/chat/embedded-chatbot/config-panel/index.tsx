@@ -120,7 +120,10 @@ const ConfigPanel = () => {
               <Button
                 className={cn('px-4 py-0 h-9', inputsForms.length && !isMobile && 'ml-[136px]')}
                 type='primary'
-                onClick={handleStartChat}
+                onClick={() => {
+                  debugger
+                  handleStartChat()
+                }}
               >
                 <MessageDotsCircle className='mr-2 w-4 h-4 text-white' />
                 {t('share.chat.startChat')}

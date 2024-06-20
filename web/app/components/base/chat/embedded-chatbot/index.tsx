@@ -18,6 +18,7 @@ import LogoHeader from '@/app/components/base/logo/logo-embeded-chat-header'
 import Header from '@/app/components/base/chat/embedded-chatbot/header'
 import ConfigPanel from '@/app/components/base/chat/embedded-chatbot/config-panel'
 import ChatWrapper from '@/app/components/base/chat/embedded-chatbot/chat-wrapper'
+import LogoTooneHeader from '@/app/components/base/logo/logo-embeded-chat-tooneheader'
 
 const Chatbot = () => {
   const {
@@ -28,6 +29,7 @@ const Chatbot = () => {
     appPrevChatList,
     showConfigPanelBeforeChat,
     appChatListDataLoading,
+    handleStartChat,
     handleNewConversation,
   } = useEmbeddedChatbotContext()
 
@@ -36,13 +38,17 @@ const Chatbot = () => {
   const site = appData?.site
 
   const difyIcon = <LogoHeader />
-
+ 
+  const ToonIcon = (
+    <LogoTooneHeader />
+  )
   useEffect(() => {
     if (site) {
-      if (customConfig)
+
+      // if (customConfig)
         document.title = `${site.title}`
-      else
-        document.title = `${site.title} - Powered by Dify`
+      // else
+      //   document.title = `${site.title} - Powered by Toone`
     }
   }, [site, customConfig])
 
@@ -63,10 +69,15 @@ const Chatbot = () => {
         isMobile={isMobile}
         title={site?.title || ''}
         customerIcon={isDify() ? difyIcon : ''}
-        onCreateNewChat={handleNewConversation}
-      />
+        onCreateNewChat={handleNewConversation} 
+        onStartNewChat={handleStartChat}
+        middleIcon={ToonIcon}
+        icon={''} icon_background={''}      />
       <div className='flex bg-white overflow-hidden'>
         <div className={cn('h-[100vh] grow flex flex-col overflow-y-auto', isMobile && '!h-[calc(100vh_-_3rem)]')}>
+          {/* guorq 屏蔽这款的显示 */}
+          {/* 打印appChatListDataLoading */}
+
           {showConfigPanelBeforeChat && !appChatListDataLoading && !appPrevChatList.length && (
             <div className={cn('flex w-full items-center justify-center h-full tablet:px-4', isMobile && 'px-4')}>
               <ConfigPanel />
@@ -86,8 +97,8 @@ const Chatbot = () => {
 
 const EmbeddedChatbotWrapper = () => {
   const media = useBreakpoints()
-  const isMobile = media === MediaType.mobile
-
+  // const isMobile = media === MediaType.mobile
+  const isMobile =true
   const {
     appInfoError,
     appInfoLoading,

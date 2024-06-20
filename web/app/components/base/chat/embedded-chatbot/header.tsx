@@ -9,17 +9,25 @@ export type IHeaderProps = {
   isMobile?: boolean
   customerIcon?: React.ReactNode
   title: string
+  middleIcon?: React.ReactNode
+  icon: string
+  icon_background: string
   // icon: string
   // icon_background: string
   onCreateNewChat?: () => void
+  onStartNewChat?: () => void
 }
 const Header: FC<IHeaderProps> = ({
   isMobile,
   customerIcon,
   title,
+  middleIcon,
+  icon,
+  icon_background,
   // icon,
   // icon_background,
   onCreateNewChat,
+  onStartNewChat,
 }) => {
   const { t } = useTranslation()
   if (!isMobile)
@@ -39,6 +47,9 @@ const Header: FC<IHeaderProps> = ({
         >
           {title}
         </div>
+      </div>
+      <div className="flex   w-16 h-8 items-center justify-center'">
+          {middleIcon }
       </div>
       <Tooltip
         selector={'embed-scene-restart-button'}

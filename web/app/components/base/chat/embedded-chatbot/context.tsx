@@ -55,6 +55,7 @@ export const EmbeddedChatbotContext = createContext<EmbeddedChatbotContextValue>
   handleStartChat: () => {},
   handleChangeConversation: () => {},
   handleNewConversationCompleted: () => {},
+
   chatShouldReloadKey: '',
   isMobile: false,
   isInstalledApp: false,

@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
 } from 'react'
+
 import { useTranslation } from 'react-i18next'
 import useSWR from 'swr'
 import { useLocalStorageState } from 'ahooks'
@@ -58,7 +59,7 @@ export const useEmbeddedChatbot = () => {
       })
     }
   }, [appId, conversationIdInfo, setConversationIdInfo])
-  const [showConfigPanelBeforeChat, setShowConfigPanelBeforeChat] = useState(true)
+  const [showConfigPanelBeforeChat, setShowConfigPanelBeforeChat] = useState(false)
 
   const [newConversationId, setNewConversationId] = useState('')
   const chatShouldReloadKey = useMemo(() => {
@@ -232,19 +233,21 @@ export const useEmbeddedChatbot = () => {
   const handleNewConversation = useCallback(() => {
     currentChatInstanceRef.current.handleStop()
     setNewConversationId('')
-
+    console.log(999999)
+    debugger
     if (showNewConversationItemInList) {
       handleChangeConversation('')
     }
     else if (currentConversationId) {
       handleConversationIdInfoChange('')
       setShowConfigPanelBeforeChat(true)
+      // 清空appChatListData
       setShowNewConversationItemInList(true)
       handleNewConversationInputsChange({})
     }
   }, [handleChangeConversation, currentConversationId, handleConversationIdInfoChange, setShowConfigPanelBeforeChat, setShowNewConversationItemInList, showNewConversationItemInList, handleNewConversationInputsChange])
-
   const handleNewConversationCompleted = useCallback((newConversationId: string) => {
+
     setNewConversationId(newConversationId)
     handleConversationIdInfoChange(newConversationId)
     setShowNewConversationItemInList(false)

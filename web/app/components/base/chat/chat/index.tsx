@@ -164,7 +164,8 @@ const Chat: FC<ChatProps> = ({
   }, [])
 
   const hasTryToAsk = config?.suggested_questions_after_answer?.enabled && !!suggestedQuestions?.length && onSend
-
+  // const customerService=true
+  // const customerService = config?.appId==='7d1844af-6da1-41b5-9110-f73b8ebd1e40'
   return (
     <ChatContextProvider
       config={config}
@@ -232,6 +233,7 @@ const Chat: FC<ChatProps> = ({
             ref={chatFooterInnerRef}
             className={`${chatFooterInnerClassName}`}
           >
+            
             {
               !noStopResponding && isResponding && (
                 <div className='flex justify-center mb-2'>
@@ -243,13 +245,20 @@ const Chat: FC<ChatProps> = ({
               )
             }
             {
-              hasTryToAsk && (
+              hasTryToAsk &&  (
                 <TryToAsk
                   suggestedQuestions={suggestedQuestions}
                   onSend={onSend}
                 />
               )
             }
+            {/* {customerService &&(
+               <div className='shrink-0 flex items-left px-3 text-gray-500 '>
+      
+                <a className='text-lg text-red-500 font-medium ' href='https://www.tgcost.com/home/customer/service.html' target='_blank' rel='noopener noreferrer'>{t('人工服务')}</a>
+
+             </div>)
+            } */}
             {
               !noChatInput && (
                 <ChatInput
