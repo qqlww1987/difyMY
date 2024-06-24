@@ -83,6 +83,7 @@ const Answer: FC<AnswerProps> = ({
     <div className='flex mb-2 last:mb-0'>
       <div className='shrink-0 relative w-10 h-10'>
         {
+          // answerIcon
           answerIcon || (
             <div className='flex items-center justify-center w-full h-full rounded-full bg-[#d5f5f6] border-[0.5px] border-black/5 text-xl'>
               🤖
@@ -160,14 +161,15 @@ const Answer: FC<AnswerProps> = ({
                 />
               )
             }
-            {
+            {/* guorq 不在显示对应的标注作者 */}
+            {/* {
               annotation?.id && annotation.authorName && (
                 <EditTitle
                   className='mt-1'
                   title={t('appAnnotation.editBy', { author: annotation.authorName })}
                 />
               )
-            }
+            } */}
             <SuggestedQuestions item={item} />
             {
               !!citation?.length && !responding && (

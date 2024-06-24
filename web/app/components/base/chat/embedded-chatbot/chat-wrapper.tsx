@@ -15,7 +15,7 @@ import {
   stopChatMessageResponding,
 } from '@/service/share'
 import LogoAvatar from '@/app/components/base/logo/logo-embeded-chat-avatar'
-
+import LogoTooneAvatar from '@/app/components/base/logo/logo-embeded-chat-toone'
 const ChatWrapper = () => {
   const {
     appParams,
@@ -126,7 +126,9 @@ const ChatWrapper = () => {
       allToolIcons={appMeta?.tool_icons || {}}
       onFeedback={handleFeedback}
       suggestedQuestions={suggestedQuestions}
-      answerIcon={isDify() ? <LogoAvatar className='relative shrink-0' /> : null}
+      answerIcon={<LogoTooneAvatar className='relative shrink-0' /> }
+      // LogoTooneAvatar
+      // answerIcon={isDify() ? <LogoAvatar className='relative shrink-0' /> : null}
       hideProcessDetail
     />
   )
