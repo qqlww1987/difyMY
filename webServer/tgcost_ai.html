@@ -3,7 +3,7 @@
 <head>  
     <meta charset="UTF-8">  
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>嵌入Chatbot页面</title>  
+    <title>天工造价 · AI客服</title>  
     <style>  
         .container {  
             display: flex;  
@@ -39,8 +39,8 @@
   
         .overlay-button {    
             position: absolute;    
-            bottom: 54px; /* 距底部距离 */    
-            right: 14px; /* 距右边距离 */    
+            bottom: 66px; /* 距底部距离 */    
+            right: 30px; /* 距右边距离 */    
             z-index: 1000; /* 确保按钮在iframe之上 */    
             /* 使用rgba设置蓝色背景并带有透明度，例如：rgb(0, 0, 255)是蓝色，alpha为0.5表示50%的透明度 */  
             background-color: rgba(37, 100, 235, 0.5); /* 蓝色背景带有50%的透明度 */  
@@ -50,10 +50,23 @@
             border-radius: 5px;    
             cursor: pointer;    
         }
+		 /* 添加新的样式来放置logo */
+        .logo {
+            position: fixed; /* 固定位置 */
+            top: 20px; /* 距离顶部 */
+            left: 20px; /* 距离左侧 */
+            z-index: 1000; /* 确保logo在其他元素之上 */
+            width: 100px; /* 设置logo的宽度 */
+            height: auto; /* 高度自适应 */
+        }
     </style>  
 </head>  
 <body>  
     <div class="container">  
+		 <!-- 添加logo div -->
+        <div class="logo">
+            <img src="https://www.tgcost.com/skin/default/images/logo/logo_tgcost.png" alt="Logo">
+        </div>
         <div class="iframe-wrapper">  
             <iframe src="http://ai.t.vtoone.com/chatbot/oFCb4WJbvQFb0qjX" allowtransparency="true"></iframe>  
             <!-- 注意：按钮不是iframe的子元素，而是iframe-wrapper或container的子元素 -->  

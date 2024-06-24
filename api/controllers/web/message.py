@@ -114,8 +114,8 @@ class MessageFeedbackApi(WebApiResource):
             message_id=message_id
         )
             MessageService.create_feedback(app_model, message_id, end_user, args['rating'])
-            if args['rating'] == 'dislike':
-                SendToRobotInfo.SendMsg(message)
+            # if args['rating'] == 'dislike':
+            #     SendToRobotInfo.SendMsg(message)
         except services.errors.message.MessageNotExistsError:
             raise NotFound("Message Not Exists.")
 

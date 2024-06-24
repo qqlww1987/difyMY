@@ -24,6 +24,7 @@ import {
   fetchConversations,
   generationConversationName,
   updateFeedback,
+  sendMsgByFeedback,
 } from '@/service/share'
 import type {
   // AppData,
@@ -256,7 +257,13 @@ export const useEmbeddedChatbot = () => {
 
   const handleFeedback = useCallback(async (messageId: string, feedback: Feedback) => {
     await updateFeedback({ url: `/messages/${messageId}/feedbacks`, body: { rating: feedback.rating } }, isInstalledApp, appId)
+    // guorq
     notify({ type: 'success', message: t('common.api.success') })
+    if (feedback.rating == "dislike") {
+      // 打印feedback
+      console.log(feedback)
+      sendMsgByFeedback({ url: `/messages/${messageId}/sendMsgByFeedback`, body: { rating: feedback.rating } }, isInstalledApp, appId)
+    }
   }, [isInstalledApp, appId, t, notify])
 
   return {
