@@ -27,7 +27,7 @@ class SendToRobotInfo:
                     else:
                         raise Exception(f"Request failed with status code {response.status}")
         async def SendToRobot(api_key, prefix_code):
-            url = 'http://ai2.t.vtoone.com/api/v1/chat-messages'
+            url = 'http://ai.t.vtoone.com/api/v1/chat-messages'
         # url = 'http://10.1.30.43:5001/v1/completion-messages'
             headers = {
                 'Authorization': f'Bearer {api_key}',

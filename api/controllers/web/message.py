@@ -30,7 +30,7 @@ from services.errors.app import MoreLikeThisDisabledError
 from services.errors.conversation import ConversationNotExistsError
 from services.errors.message import MessageNotExistsError, SuggestedQuestionsAfterAnswerDisabledError
 from services.message_service import MessageService
-
+from controllers.console.app.sendToRobot import SendToRobotInfo
 
 class MessageListApi(WebApiResource):
     feedback_fields = {
@@ -105,9 +105,17 @@ class MessageFeedbackApi(WebApiResource):
         parser = reqparse.RequestParser()
         parser.add_argument('rating', type=str, choices=['like', 'dislike', None], location='json')
         args = parser.parse_args()
-
+        print("dsdsdsdsdsdsd")
         try:
+
+            message = MessageService.get_message(
+            app_model=app_model,
+            user=end_user,
+            message_id=message_id
+        )
             MessageService.create_feedback(app_model, message_id, end_user, args['rating'])
+            if args['rating'] == 'dislike':
+                SendToRobotInfo.SendMsg(message)
         except services.errors.message.MessageNotExistsError:
             raise NotFound("Message Not Exists.")
 
