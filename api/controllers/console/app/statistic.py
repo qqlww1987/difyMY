@@ -457,6 +457,17 @@ class FrequentKeywordsStatistic(Resource):
     @get_app_model
     def get(self, app_model):
         account = current_user
+        def remove_punctuation(text):
+        # 定义一个集合，包含要删除的标点符号
+            punctuation = set(',.!?;:"，。！？；：“”‘’（）《》【】{}【】)')
+            # 使用列表推导式，将文本中的标点符号替换为空字符串
+            text = ''.join([c for c in text if c not in punctuation])
+            # 删除空格
+            text = text.replace(' ', '')
+            # 删除“的”等助词
+            text = ''.join([c for c in text if c not in ['的', '了', '在', '是', '我', '你', '他', '她', '它', '我们', '你们', '他们', '她们', '它们', '自己', '这里', '那里', '哪里', '这个', '那个', '这些', '那些', '这里', '那里', '哪里', '这个', '那个', '这些', '那些']])
+
+            return text
 
         parser = reqparse.RequestParser()
         parser.add_argument('start', type=datetime_string('%Y-%m-%d %H:%M'), location='args')
@@ -499,7 +510,8 @@ class FrequentKeywordsStatistic(Resource):
         with db.engine.begin() as conn:
             rs = conn.execute(db.text(sql_query), arg_dict)            
             for i in rs:
-                words = jieba.cut(i.query, cut_all=False)
+                queryText= remove_punctuation(i.query)
+                words = jieba.cut(queryText, cut_all=False)
                 date=i.date.strftime('%Y-%m-%d')
                 # 统计词频
                 word_counts = Counter(words)
