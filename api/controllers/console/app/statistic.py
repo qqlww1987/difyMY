@@ -1,5 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
+import os
 import jieba
 from collections import Counter
 import pytz
@@ -459,14 +460,22 @@ class FrequentKeywordsStatistic(Resource):
         account = current_user
         def remove_punctuation(text):
         # 定义一个集合，包含要删除的标点符号
-            punctuation = set(',.!?;:"，。！？；：“”‘’（）《》【】{}【】)')
-            # 使用列表推导式，将文本中的标点符号替换为空字符串
-            text = ''.join([c for c in text if c not in punctuation])
+            # punctuation = set(',.!?;:"，。！？；：“”‘’（）《》【】{}【】)')
+            # # 使用列表推导式，将文本中的标点符号替换为空字符串
+            # text = ''.join([c for c in text if c not in punctuation])
             # 删除空格
             text = text.replace(' ', '')
-            # 删除“的”等助词
-            text = ''.join([c for c in text if c not in ['的', '了', '在', '是', '我', '你', '他', '她', '它', '我们', '你们', '他们', '她们', '它们', '自己', '这里', '那里', '哪里', '这个', '那个', '这些', '那些', '这里', '那里', '哪里', '这个', '那个', '这些', '那些']])
+            current_file_path = os.path.abspath(__file__)
+            parent_dir = os.path.dirname(current_file_path)
+            robotsendingPath = os.path.join(parent_dir, "setting",'stopwords.txt')
+              #停用词文本C:\Users\Administrator\hit_stopwords.txt
+            stop = open(robotsendingPath, 'r+', encoding='utf-8')
+            #用‘\n’去分隔读取，返回一个一维数组
+            stopword = stop.read().split("\n")
 
+            # 删除“的”等助词
+            # text = ''.join([c for c in text if c not in ['的', '了', '在', '是', '我', '你', '他', '她', '它', '我们', '你们', '他们', '她们', '它们', '自己', '这里', '那里', '哪里', '这个', '那个', '这些', '那些', '这里', '那里', '哪里', '这个', '那个', '这些', '那些']])
+            text = ''.join([c for c in text if c not in stopword])
             return text
 
         parser = reqparse.RequestParser()
@@ -511,11 +520,14 @@ class FrequentKeywordsStatistic(Resource):
             rs = conn.execute(db.text(sql_query), arg_dict)            
             for i in rs:
                 queryText= remove_punctuation(i.query)
+
                 words = jieba.cut(queryText, cut_all=False)
+                
                 date=i.date.strftime('%Y-%m-%d')
                 # 统计词频
                 word_counts = Counter(words)
                 for word, count in word_counts.items():
+                    
                     if word in all_keywords:
                             all_keywords[word]['count'] += count
                             all_keywords[word]['dates'].add(date)

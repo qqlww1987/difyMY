@@ -46,7 +46,9 @@ class XinferenceTextEmbeddingModel(TextEmbeddingModel):
 
         if server_url.endswith('/'):
             server_url = server_url[:-1]
-
+        # 格式化打印texts
+        
+        
         try:
             handle = RESTfulEmbeddingModelHandle(model_uid, server_url, auth_headers={})
             embeddings = handle.create_embedding(input=texts)
