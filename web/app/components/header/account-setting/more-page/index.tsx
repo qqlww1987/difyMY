@@ -17,8 +17,10 @@ import { NUM_INFINITE } from '@/app/components/billing/config'
 import { LanguagesSupported } from '@/i18n/language'
 import { ToastContext } from '@/app/components/base/toast'
 import { removeWorkspaceNew } from '@/service/common'
+import Confirm from '@/app/components/base/confirm'
 import { useWorkspacesContext } from '@/context/workspace-context'
 dayjs.extend(relativeTime)
+
 
 const MorePage = () => {
   const { t } = useTranslation()
@@ -31,13 +33,15 @@ const MorePage = () => {
   const { plan, enableBilling } = useProviderContext()
   const isNotUnlimitedMemberPlan = enableBilling && plan.type !== Plan.team && plan.type !== Plan.enterprise
   const isMemberFull = enableBilling && isNotUnlimitedMemberPlan && accounts.length >= plan.total.teamMembers
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const removeWorkspace = async () => {
     try {
         if (owner==false)
         {
-            notify({ type: 'error', message: t('您不是工作空间管理员，无法删除工作空间') })
+            notify({ type: 'error', message: t('您不是工作空间所有者，无法删除工作空间') })
             return
         }
+
         var tenant_id= currentWorkspace.id 
         console.log(tenant_id)
         await removeWorkspaceNew({ url: '/enterprise/workspaceRemove', body: { tenant_id:tenant_id} })
@@ -82,14 +86,23 @@ const MorePage = () => {
             `shrink-0 flex items-center py-[7px] px-3 border-[0.5px] border-gray-200
             text-[13px] font-medium text-primary-600 bg-white
             shadow-xs rounded-lg ${(isCurrentWorkspaceManager && !isMemberFull) ? 'cursor-pointer' : 'grayscale opacity-50 cursor-default'}`
-          }  onClick={() => removeWorkspace()}>
+          }  onClick={() => setShowConfirmDelete(true)}>
             <UserPlusIcon className='w-4 h-4 mr-2 ' />
             {t('删除工作空间')}
           </div>
         </div>
      
       </div>
-      
+       {showConfirmDelete && (
+        <Confirm
+          title={t('app.deleteWorkSpaceTitle')}
+          content={t('app.deleteWorkSpaceConfirmContent')}
+          isShow={showConfirmDelete}
+          onClose={() => setShowConfirmDelete(false)}
+          onConfirm={removeWorkspace}
+          onCancel={() => setShowConfirmDelete(false)}
+        />
+      )}
     </>
   )
 }
