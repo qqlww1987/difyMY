@@ -592,10 +592,10 @@ class FrequentKeywordsStatistic(Resource):
                                 if df['query'].iloc[j] in keyword_similarity_count:
                                     del keyword_similarity_count[df['query'].iloc[j]]
                             else:
-                                keyword_similarity_count[merged_query]['count'] += 2
+                                keyword_similarity_count[merged_query]['count'] += 1
                                 keyword_similarity_count[merged_query]['dates'].extend([df['date'].iloc[i], df['date'].iloc[j]])
                         else:
-                            keyword_similarity_count[merged_query] = {'count': 2, 'dates': [df['date'].iloc[i], df['date'].iloc[j]]}
+                            keyword_similarity_count[merged_query] = {'count': 1, 'dates': [df['date'].iloc[i], df['date'].iloc[j]]}
         resultslist = sorted(keyword_similarity_count.items(), key=lambda x: x[1]['count'], reverse=True)[:top_n_similar_queries]
         # keyword_similarity_countList = sorted(keyword_similarity_count.items(), key=lambda x: x[1], reverse=True)[:top_n_similar_queries]
         # 打印结果
