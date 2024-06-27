@@ -500,10 +500,10 @@ class FrequentKeywordsStatistic(Resource):
         args = parser.parse_args()
 
         sql_query = '''
-                SELECT date(DATE_TRUNC('day', created_at AT TIME ZONE 'UTC' AT TIME ZONE :tz )) AS date,query, query_embedding
+                SELECT created_at AS date,query, query_embedding
                     FROM messages where app_id = :app_id 
                 '''
-        arg_dict = {'tz': account.timezone, 'app_id': app_model.id}
+        arg_dict = { 'app_id': app_model.id}
 
         timezone = pytz.timezone(account.timezone)
         utc_timezone = pytz.utc
@@ -559,49 +559,42 @@ class FrequentKeywordsStatistic(Resource):
 
         # # 获取前 top_n_similar_queries 个相似查询
         # top_similar_queries = sorted(top_similar_queries, key=lambda x: x[2], reverse=True)[:top_n_similar_queries]
-
-        # 计算每个关键词的相似查询对的数量
         keyword_similarity_count = {}
         calculated_pairs = set()
-        keyword_similarity_count = defaultdict(int)
+        calculated_j = []
 
-
-        # 找到相似度大于阈值的查询对
         for i in range(len(df)):
+            if i in calculated_j:
+                continue
+            keyword_similarity_count[i] = {'merged_query': df['query'].iloc[i], 'count': 1, 'dates': []}
             for j in range(i + 1, len(df)):
-                if (i, j) not in calculated_pairs and (j, i) not in calculated_pairs:
-                    calculated_pairs.add((i, j))
-                    sim = query_similarity[i][j]
-                    if sim > similarity_threshold:
-                        query1 = df['query'].iloc[i]
-                        query2 = df['query'].iloc[j]
-                        
-                        # 找到最短的查询作为合并后的键
-                        merged_query = min(query1, query2, key=len)
-                        
-                        # 如果已经存在更短的键,则将计数累加到更短的键上,并删除原有的键
-                        if merged_query in keyword_similarity_count:
-                            if len(merged_query) < len(df['query'].iloc[i]):
-                                keyword_similarity_count[merged_query]['count'] += 1
-                                keyword_similarity_count[merged_query]['dates'].append(df['date'].iloc[i])
-                                if df['query'].iloc[i] in keyword_similarity_count:
-                                    del keyword_similarity_count[df['query'].iloc[i]]
-                            elif len(merged_query) < len(df['query'].iloc[j]):
-                                keyword_similarity_count[merged_query]['count'] += 1
-                                keyword_similarity_count[merged_query]['dates'].append(df['date'].iloc[j])
-                                if df['query'].iloc[j] in keyword_similarity_count:
-                                    del keyword_similarity_count[df['query'].iloc[j]]
-                            else:
-                                keyword_similarity_count[merged_query]['count'] += 1
-                                keyword_similarity_count[merged_query]['dates'].extend([df['date'].iloc[i], df['date'].iloc[j]])
-                        else:
-                            keyword_similarity_count[merged_query] = {'count': 1, 'dates': [df['date'].iloc[i], df['date'].iloc[j]]}
-        resultslist = sorted(keyword_similarity_count.items(), key=lambda x: x[1]['count'], reverse=True)[:top_n_similar_queries]
-        # keyword_similarity_countList = sorted(keyword_similarity_count.items(), key=lambda x: x[1], reverse=True)[:top_n_similar_queries]
-        # 打印结果
+             
+                if (i, j) in calculated_pairs or (j, i) in calculated_pairs:
+                    continue
+                calculated_pairs.add((i, j))
+               
+                sim = query_similarity[i][j]
+                if sim > similarity_threshold:
+                    # 这里把匹配的记录下
+                    calculated_j.append(j)
+                    query1 = df['query'].iloc[i]
+                    query2 = df['query'].iloc[j]
+                    merged_query = min(query1, query2, key=len)
+                    if len(merged_query) < len(keyword_similarity_count[i]['merged_query']):
+                        # if keyword_similarity_count[i]['merged_query'] in keyword_similarity_count:
+                        #     del keyword_similarity_count[keyword_similarity_count[i]['merged_query']]
+                        keyword_similarity_count[i]['merged_query'] = merged_query
+                        keyword_similarity_count[i]['count'] += 1
+                        keyword_similarity_count[i]['dates'].append(df['date'].iloc[j])
+                    else:
+                        keyword_similarity_count[i]['count'] += 1
+                        keyword_similarity_count[i]['dates'].append(df['date'].iloc[j])
+
+        # 按 count 降序排序并选取前 top_n_similar_queries 
+        resultsList = sorted(keyword_similarity_count.items(), key=lambda x: x[1]['count'], reverse=True)[:top_n_similar_queries]
         results = []
-        for keyword, info in resultslist:
-            results.append({'word': keyword, 'count': info['count'], 'dates': info['dates']})
+        for keyword, info in resultsList:
+            results.append({'word': info['merged_query'], 'count': info['count'], 'dates': info['dates']})
         # with db.engine.begin() as conn:
         #     rs = conn.execute(db.text(sql_query), arg_dict) 
         #     df = pd.DataFrame(rs.fetchall())
