@@ -1,56 +1,62 @@
-<!DOCTYPE html>  
-<html lang="zh-CN">  
-<head>  
-    <meta charset="UTF-8">  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>天工造价 · AI客服</title>  
-    <style>  
-        .container {  
-            display: flex;  
-            justify-content: center;  
-            align-items: center;  
-            height: 98vh;  
-            margin: 0;  
-            padding: 0;  
-            box-sizing: border-box;  
-            position: relative; /* 添加相对定位 */					
-			overflow-y: none; /* 显示滚动条 */
-			scrollbar-width: none; /* 对于 Firefox 隐藏滚动条 */
-        }  
-		.container::-webkit-scrollbar {
-			display: none; /* 对于 Chrome, Safari 和 Opera 隐藏滚动条 */
-		}
-  
-        .iframe-wrapper {  
-            width: 600px;  
-            height: 100%; /* 设置一个固定或相对的高度 */  
-            overflow: hidden;  
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);  
-            position: relative; /* 也可以添加相对定位，但不是必需的 */ 
-			border-radius: 10px; /* 添加圆角 */
-        }  
-  
-        iframe {  
-            border: none;  
-            width: 100%;  
-            height: 100%;
-			border-radius: 10px; /* 添加圆角 */
-        }  
-  
-        .overlay-button {    
-            position: absolute;    
-            bottom: 66px; /* 距底部距离 */    
-            right: 30px; /* 距右边距离 */    
-            z-index: 1000; /* 确保按钮在iframe之上 */    
-            /* 使用rgba设置蓝色背景并带有透明度，例如：rgb(0, 0, 255)是蓝色，alpha为0.5表示50%的透明度 */  
-            background-color: rgba(37, 100, 235, 0.5); /* 蓝色背景带有50%的透明度 */  
-            color: #fff;    
-            border: none;    
-            padding: 5px 10px;    
-            border-radius: 5px;    
-            cursor: pointer;    
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天工造价 · AI客服</title>
+    <style>
+        html {
+            overflow-y: hidden;
         }
-		 /* 添加新的样式来放置logo */
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 98vh;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            position: relative; /* 添加相对定位 */
+            overflow-y: none; /* 显示滚动条 */
+            scrollbar-width: none; /* 对于 Firefox 隐藏滚动条 */
+        }
+
+        .container::-webkit-scrollbar {
+            display: none; /* 对于 Chrome, Safari 和 Opera 隐藏滚动条 */
+        }
+
+        .iframe-wrapper {
+            width: 600px;
+            height: 100%; /* 设置一个固定或相对的高度 */
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            position: relative; /* 也可以添加相对定位，但不是必需的 */
+            border-radius: 10px; /* 添加圆角 */
+        }
+
+        iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px; /* 添加圆角 */
+        }
+
+        .overlay-button {
+            position: absolute;
+            bottom: 66px; /* 距底部距离 */
+            right: 30px; /* 距右边距离 */
+            z-index: 1000; /* 确保按钮在iframe之上 */
+            /* 使用rgba设置蓝色背景并带有透明度，例如：rgb(0, 0, 255)是蓝色，alpha为0.5表示50%的透明度 */
+            background-color: rgba(37, 100, 235, 0.5); /* 蓝色背景带有50%的透明度 */
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* 添加新的样式来放置logo */
         .logo {
             position: fixed; /* 固定位置 */
             top: 20px; /* 距离顶部 */
@@ -59,25 +65,31 @@
             width: 100px; /* 设置logo的宽度 */
             height: auto; /* 高度自适应 */
         }
-    </style>  
-</head>  
-<body>  
-    <div class="container">  
-		 <!-- 添加logo div -->
-        <div class="logo">
-            <img src="https://www.tgcost.com/skin/default/images/logo/logo_tgcost.png" alt="Logo">
-        </div>
-        <div class="iframe-wrapper">  
-            <iframe src="http://ai.t.vtoone.com/chatbot/oFCb4WJbvQFb0qjX" allowtransparency="true"></iframe>  
-            <!-- 注意：按钮不是iframe的子元素，而是iframe-wrapper或container的子元素 -->  
-            <button class="overlay-button" onclick="goToService()">转人工服务</button>  
-        </div>  
-    </div>  
-  
-    <script>  
-        function goToService() {  
-            window.location.href = 'https://www.bangwo8.com/osp2016/im/pc/index.php?vendorID=709246&uid=&customSource=%E5%A4%A9%E5%B7%A5%E9%80%A0%E4%BB%B7';  
-        }  
-    </script>  
-</body>  
+
+        @media screen and (max-width: 1050px) {
+            .container > .hide-on-small {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 添加logo div -->
+    <div class="logo hide-on-small">
+        <img src="https://www.tgcost.com/skin/default/images/logo/logo_tgcost.png" alt="Logo">
+    </div>
+    <div class="iframe-wrapper">
+        <iframe src="http://ai.t.vtoone.com/chatbot/oFCb4WJbvQFb0qjX" allowtransparency="true"></iframe>
+        <!-- 注意：按钮不是iframe的子元素，而是iframe-wrapper或container的子元素 -->
+        <button class="overlay-button" onclick="goToService()">转人工服务</button>
+    </div>
+</div>
+
+<script>
+    function goToService() {
+        window.location.href = 'https://www.bangwo8.com/osp2016/im/pc/index.php?vendorID=709246&uid=&customSource=%E5%A4%A9%E5%B7%A5%E9%80%A0%E4%BB%B7';
+    }
+</script>
+</body>
 </html>
