@@ -1,13 +1,17 @@
 from datetime import datetime
 from decimal import Decimal
-import os
+import ast
 import jieba
 from collections import Counter
 import pytz
+from sqlalchemy import text
 from flask import jsonify
 from flask_login import current_user
 from flask_restful import Resource, reqparse
-
+from core.rag.datasource.entity.embedding import Embeddings
+from core.embedding.cached_embedding import CacheEmbedding
+from core.model_manager import ModelManager
+from core.model_runtime.entities.model_entities import ModelType
 from controllers.console import api
 from controllers.console.app.wraps import get_app_model
 from controllers.console.setup import setup_required
@@ -16,7 +20,16 @@ from extensions.ext_database import db
 from libs.helper import datetime_string
 from libs.login import login_required
 from models.model import AppMode
+from sklearn.cluster import KMeans
+from sklearn.metrics.pairwise import cosine_similarity
+import pandas as pd
+import numpy as np
+from flask import request, url_for, current_app
+from collections import defaultdict
+from models.model import App, AppMode, AppModelConfig, Conversation, EndUser, Message, MessageFile
+import numpy as np
 
+from scipy.cluster.hierarchy import linkage, fcluster
 
 class DailyConversationStatistic(Resource):
 
@@ -458,40 +471,43 @@ class FrequentKeywordsStatistic(Resource):
     @get_app_model
     def get(self, app_model):
         account = current_user
-        def remove_punctuation(text):
-        # 定义一个集合，包含要删除的标点符号
-            # punctuation = set(',.!?;:"，。！？；：“”‘’（）《》【】{}【】)')
-            # # 使用列表推导式，将文本中的标点符号替换为空字符串
-            # text = ''.join([c for c in text if c not in punctuation])
-            # 删除空格
-            text = text.replace(' ', '')
-            current_file_path = os.path.abspath(__file__)
-            parent_dir = os.path.dirname(current_file_path)
-            robotsendingPath = os.path.join(parent_dir, "setting",'stopwords.txt')
-              #停用词文本C:\Users\Administrator\hit_stopwords.txt
-            stop = open(robotsendingPath, 'r+', encoding='utf-8')
-            #用‘\n’去分隔读取，返回一个一维数组
-            stopword = stop.read().split("\n")
+        def _get_embeddings(tenaid:str) -> Embeddings:
+            model_manager = ModelManager()
 
-            # 删除“的”等助词
-            # text = ''.join([c for c in text if c not in ['的', '了', '在', '是', '我', '你', '他', '她', '它', '我们', '你们', '他们', '她们', '它们', '自己', '这里', '那里', '哪里', '这个', '那个', '这些', '那些', '这里', '那里', '哪里', '这个', '那个', '这些', '那些']])
-            text = ''.join([c for c in text if c not in stopword])
-            return text
+            embedding_model = model_manager.get_model_instance(
+            tenant_id=tenaid,
+            provider="xinference",
+            model_type=ModelType.TEXT_EMBEDDING,
+            model="bge-large-zh-v1.5"
 
+        )
+            return CacheEmbedding(embedding_model)
+
+        def update_embeddings(embeddings:CacheEmbedding):
+        # 你的更新逻辑
+                exists_query = text("SELECT EXISTS(SELECT 1 FROM public.messages WHERE query_embedding IS NULL)")
+
+                # 执行查询
+                result = db.session.execute(exists_query).scalar()
+                if result:
+                    updates = [(id, embeddings.embed_query(query)) for id, query in db.session.query(Message.id, Message.query).filter(Message.query_embedding == None).all()]
+                    for id, value in updates:
+                        db.session.query(Message).filter_by(id=id).update({Message.query_embedding: value})
+                    db.session.commit()
         parser = reqparse.RequestParser()
         parser.add_argument('start', type=datetime_string('%Y-%m-%d %H:%M'), location='args')
         parser.add_argument('end', type=datetime_string('%Y-%m-%d %H:%M'), location='args')
         args = parser.parse_args()
 
         sql_query = '''
-                SELECT date(DATE_TRUNC('day', created_at AT TIME ZONE 'UTC' AT TIME ZONE :tz )) AS date, query
+                SELECT date(DATE_TRUNC('day', created_at AT TIME ZONE 'UTC' AT TIME ZONE :tz )) AS date,query, query_embedding
                     FROM messages where app_id = :app_id 
                 '''
         arg_dict = {'tz': account.timezone, 'app_id': app_model.id}
 
         timezone = pytz.timezone(account.timezone)
         utc_timezone = pytz.utc
-
+        embeddings= _get_embeddings(current_app.config['EMBEDDINGTENANT_ID'])
         if args['start']:
             start_datetime = datetime.strptime(args['start'], '%Y-%m-%d %H:%M')
             start_datetime = start_datetime.replace(second=0)
@@ -512,40 +528,215 @@ class FrequentKeywordsStatistic(Resource):
             sql_query += ' and created_at < :end'
             arg_dict['end'] = end_datetime_utc
 
-        sql_query += ' GROUP BY date,messages.query order by date'
-        
+        sql_query += ' GROUP BY date,messages.query,messages.query_embedding order by date'
+        update_embeddings(embeddings)
         # 方法1提取关键字
+        allCount=0
         all_keywords = {}
         with db.engine.begin() as conn:
-            rs = conn.execute(db.text(sql_query), arg_dict)            
-            for i in rs:
-                queryText= remove_punctuation(i.query)
+            rs = conn.execute(db.text(sql_query), arg_dict) 
+            df = pd.DataFrame(rs.fetchall())
+            query_embedding = [np.array(x) for x in df['query_embedding']]
+            # allCount等于query_embedding的个数
+            allCount = len(query_embedding)
+        similarity_threshold = 0.8
+        top_n_similar_queries = 10
 
-                words = jieba.cut(queryText, cut_all=False)
-                
-                date=i.date.strftime('%Y-%m-%d')
-                # 统计词频
-                word_counts = Counter(words)
-                for word, count in word_counts.items():
-                    
-                    if word in all_keywords:
-                            all_keywords[word]['count'] += count
-                            all_keywords[word]['dates'].add(date)
-                    else:
-                        all_keywords[word] = {'count': count, 'dates': {date}}
+        # 计算余弦相似度
+        query_similarity = cosine_similarity(query_embedding, query_embedding)
+
+        # calculated_pairs = set()
+        # top_similar_queries = []
+
+        # # 找到相似度大于阈值的查询对
+        # for i in range(len(df)):
+        #     for j in range(i + 1, len(df)):
+        #         if (i, j) not in calculated_pairs and (j, i) not in calculated_pairs:
+        #             calculated_pairs.add((i, j))
+        #             sim = query_similarity[i][j]
+        #             if sim > similarity_threshold:
+        #                 top_similar_queries.append((i, j, sim, df['query'].iloc[i], df['query'].iloc[j], df['date'].iloc[i], df['date'].iloc[j]))
+
+        # # 获取前 top_n_similar_queries 个相似查询
+        # top_similar_queries = sorted(top_similar_queries, key=lambda x: x[2], reverse=True)[:top_n_similar_queries]
+
+        # 计算每个关键词的相似查询对的数量
+        keyword_similarity_count = {}
+        calculated_pairs = set()
+        keyword_similarity_count = defaultdict(int)
+
+
+        # 找到相似度大于阈值的查询对
+        for i in range(len(df)):
+            for j in range(i + 1, len(df)):
+                if (i, j) not in calculated_pairs and (j, i) not in calculated_pairs:
+                    calculated_pairs.add((i, j))
+                    sim = query_similarity[i][j]
+                    if sim > similarity_threshold:
+                        query1 = df['query'].iloc[i]
+                        query2 = df['query'].iloc[j]
+                        
+                        # 找到最短的查询作为合并后的键
+                        merged_query = min(query1, query2, key=len)
+                        
+                        # 如果已经存在更短的键,则将计数累加到更短的键上,并删除原有的键
+                        if merged_query in keyword_similarity_count:
+                            if len(merged_query) < len(df['query'].iloc[i]):
+                                keyword_similarity_count[merged_query]['count'] += 1
+                                keyword_similarity_count[merged_query]['dates'].append(df['date'].iloc[i])
+                                if df['query'].iloc[i] in keyword_similarity_count:
+                                    del keyword_similarity_count[df['query'].iloc[i]]
+                            elif len(merged_query) < len(df['query'].iloc[j]):
+                                keyword_similarity_count[merged_query]['count'] += 1
+                                keyword_similarity_count[merged_query]['dates'].append(df['date'].iloc[j])
+                                if df['query'].iloc[j] in keyword_similarity_count:
+                                    del keyword_similarity_count[df['query'].iloc[j]]
+                            else:
+                                keyword_similarity_count[merged_query]['count'] += 2
+                                keyword_similarity_count[merged_query]['dates'].extend([df['date'].iloc[i], df['date'].iloc[j]])
+                        else:
+                            keyword_similarity_count[merged_query] = {'count': 2, 'dates': [df['date'].iloc[i], df['date'].iloc[j]]}
+        resultslist = sorted(keyword_similarity_count.items(), key=lambda x: x[1]['count'], reverse=True)[:top_n_similar_queries]
+        # keyword_similarity_countList = sorted(keyword_similarity_count.items(), key=lambda x: x[1], reverse=True)[:top_n_similar_queries]
+        # 打印结果
+        results = []
+        for keyword, info in resultslist:
+            results.append({'word': keyword, 'count': info['count'], 'dates': info['dates']})
+        # with db.engine.begin() as conn:
+        #     rs = conn.execute(db.text(sql_query), arg_dict) 
+        #     df = pd.DataFrame(rs.fetchall())
+        #     # df['embeddingValue'] = df['query'].apply(lambda x: embeddings.embed_query(x))
+        #     query_embedding = [np.array(x) for x in df['query_embedding']]
+    
+        #     similarity_threshold = 0.7
+        #     top_n_similar_queries = 10
+        #     # 计算余弦相似度
+        #     query_similarity = cosine_similarity(query_embedding, query_embedding)
+        #      # 计算层次聚类
+        #     Z = linkage(query_similarity, method='complete')
+
+        #     # 根据聚类结果将查询分组
+        #     clusters = fcluster(Z, t=similarity_threshold, criterion='distance')
+        #     calculated_pairs = set()
+        #     # 找到每个组中相似度最大的查询
+        #     top_similar_queries = []
+        #     for i in range(len(df)):
+        #         for j in range(i + 1, len(df)):
+        #             if (i, j) not in calculated_pairs and (j, i) not in calculated_pairs:
+        #                 calculated_pairs.add((i, j))
+        #                 sim = query_similarity[i][j]
+        #                 if sim > similarity_threshold:
+        #                     top_similar_queries.append((i, j, sim, df['query'].iloc[i], df['query'].iloc[j], df['date'].iloc[i], df['date'].iloc[j]))
             
-            N = 10
-            top_keywords = sorted(all_keywords.items(), key=lambda x: x[1]['count'], reverse=True)[:10]
+        #     for cluster_id in np.unique(clusters):
+        #         cluster_indices = np.where(clusters == cluster_id)[0]
+        #         if len(cluster_indices) > 0:
+        #             max_similarity = -1
+        #             max_pair = None
+        #             for i in cluster_indices:
+        #                 for j in cluster_indices:
+        #                     if i != j:
+        #                         similarity = query_similarity[i][j]
+        #                         if similarity > max_similarity:
+        #                             max_similarity = similarity
+        #                             max_pair = (i, j)
+        #             top_similar_queries.append((*max_pair, max_similarity, df['query'].iloc[max_pair[0]], df['query'].iloc[max_pair[1]]))
 
-            result = [
-                {'word': keyword, 'count': info['count'], 'dates': list(info['dates'])}
-                for keyword, info in top_keywords
-            ]
+        #         # 获取前 top_n_similar_queries 个相似查询
+        #         top_similar_queries = sorted(top_similar_queries, key=lambda x: x[2], reverse=True)[:top_n_similar_queries]
+
+        #         # 计算每个关键词的相似查询对的数量
+        #         keyword_similarity_count = {}
+        #         for (i, j), sim in calculated_pairs.items():
+        #             keyword1 = df['query'].iloc[i]
+        #             keyword2 = df['query'].iloc[j]
+        #             if keyword1 not in keyword_similarity_count:
+        #                 keyword_similarity_count[keyword1] = 0
+        #             if keyword2 not in keyword_similarity_count:
+        #                 keyword_similarity_count[keyword2] = 0
+        #             keyword_similarity_count[keyword1] += 1
+        #             keyword_similarity_count[keyword2] += 1
+
+        #     # 找到数量最多的前10个关键词
+        #     top_10_keywords = sorted(keyword_similarity_count.items(), key=lambda x: x[1], reverse=True)[:10]
+        #       # 打印结果
+        #     for keyword, count in top_10_keywords:
+        #         print(f"{keyword}: {count}")
+        
+       
+        #     # similarity_threshold = 0.7
+        #     # top_n_similar_queries = 10
+        #     # # 找出所有相似度大于阈值的查询对
+        #     # sim_pairs =  set()
+        #     # for i in range(len(df)):
+        #     #     for j in range(i+1, len(df)):
+        #     #         if query_similarity[i][j] > similarity_threshold:
+        #     #             sim_pairs.add((i, j, query_similarity[i][j], df['query'].iloc[i], df['query'].iloc[j], df['date'].iloc[i], df['date'].iloc[j]))
+
+        #     # # 按相似度排序并取前top_n_similar_queries个
+        #     # sim_pairs = list(sim_pairs)
+        #     # sim_pairs.sort(key=lambda x: x[2], reverse=True)
+        #     # top_similar_queries = sim_pairs[:top_n_similar_queries]
+
+        #     # # 整理结果
+        #     # result = []
+        #     # for i, j, sim, q1, q2, d1, d2 in top_similar_queries:
+        #     #     result.append({
+        #     #         'query1': q1,
+        #     #         'query2': q2,
+        #     #         'similarity': sim,
+        #     #         'data1': d1,
+        #     #         'data2': d2
+        #     #     })
+
+        #     # print(result)
+        #     embedding_values = np.array(list(df['query_embedding']))
+        #     # embedding_values = np.array([x for x in df['query_embedding']])
+        #     # embedding_values = np.array(df['query_embedding']).reshape(-1, 1)
+        #     normalized_embedding_values = embedding_values / np.linalg.norm(embedding_values, axis=1, keepdims=True)
+        #     # similarity = np.dot(normalized_embedding_values, normalized_embedding_values.T)
+        #     similarity = np.einsum('ij,kj->ik', normalized_embedding_values, normalized_embedding_values)
+        #     groups = []
+        #     used_queries = set()
+        #     for i in range(len(df)):
+        #         if df['query'].iloc[i] in used_queries:
+        #             continue
+        #         group = [df['query'].iloc[i], df['date'].iloc[i]]
+        #         used_queries.add(df['query'].iloc[i])
+        #         for j in range(i+1, len(df)):
+        #             if similarity[i,j] >= 0.65:
+        #                 group.append(df['query'].iloc[j])
+        #                 group.append(df['date'].iloc[j])
+        #                 used_queries.add(df['query'].iloc[j])
+        #         groups.append(group)
+        #     # group_counts = [len(group)//2 for group in groups]
+        #     group_counts = [len(group) for group in groups]
+        #     group_counts_dict = {i: group_counts[i] for i in range(len(group_counts))}
+            
+        #     # 获取数量最多的前5个分组
+        #     top_groups = sorted(group_counts_dict.items(), key=lambda x: x[1], reverse=True)[:5]
+
+        #     top_groups_with_data = []
+        #     for group, count in top_groups:
+        #         queries = [groups[group][i] for i in range(0, len(groups[group]), 2)]
+        #         dates = [groups[group][i] for i in range(1, len(groups[group]), 2)]
+        #         top_groups_with_data.append((group, queries, dates)) 
+           
+        #     results = []
+        #     for group, queries, dates in top_groups_with_data:
+        #         # 取queries中长度最短的作为Keyword
+        #         keyword = min(queries, key=len)
+        #         # keyword = queries[0]  # 获取关键词
+        #         # 输出queries的长度
+        #         info = {'count': len(queries), 'dates': dates}
+        #         results.append({'word': keyword, 'count': info['count'], 'dates': info['dates']})
+    
         return jsonify({
-            'data': result
-        })
-
-
+                'data': results,
+                'count':allCount
+            })
+        
+   
 api.add_resource(DailyConversationStatistic, '/apps/<uuid:app_id>/statistics/daily-conversations')
 api.add_resource(DailyTerminalsStatistic, '/apps/<uuid:app_id>/statistics/daily-end-users')
 api.add_resource(DailyTokenCostStatistic, '/apps/<uuid:app_id>/statistics/token-costs')

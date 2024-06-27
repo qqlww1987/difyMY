@@ -29,7 +29,10 @@ from models.account import Account
 from models.model import App, AppMode, AppModelConfig, Conversation, EndUser, Message, MessageFile
 from services.errors.app_model_config import AppModelConfigBrokenError
 from services.errors.conversation import ConversationCompletedError, ConversationNotExistsError
-
+from core.rag.datasource.entity.embedding import Embeddings
+from core.embedding.cached_embedding import CacheEmbedding
+from core.model_manager import ModelManager
+from core.model_runtime.entities.model_entities import ModelType
 logger = logging.getLogger(__name__)
 
 
@@ -135,12 +138,23 @@ class MessageBasedAppGenerator(BaseAppGenerator):
                                conversation: Optional[Conversation] = None) \
             -> tuple[Conversation, Message]:
         """
+        
         Initialize generate records
         :param application_generate_entity: application generate entity
         :return:
         """
         app_config = application_generate_entity.app_config
+        def get_embeddings(tenant_id:str) -> Embeddings:
+            model_manager = ModelManager()
 
+            embedding_model = model_manager.get_model_instance(
+            tenant_id=tenant_id,
+            provider="xinference",
+            model_type=ModelType.TEXT_EMBEDDING,
+            model="bge-large-zh-v1.5"
+
+        )
+            return CacheEmbedding(embedding_model)
         # get from source
         end_user_id = None
         account_id = None
@@ -167,7 +181,8 @@ class MessageBasedAppGenerator(BaseAppGenerator):
 
         # get conversation introduction
         introduction = self._get_conversation_introduction(application_generate_entity)
-
+        tenant_id= app_config.tenant_id
+        embeddings= get_embeddings(tenant_id)
         if not conversation:
             conversation = Conversation(
                 app_id=app_config.app_id,
@@ -191,6 +206,11 @@ class MessageBasedAppGenerator(BaseAppGenerator):
             db.session.add(conversation)
             db.session.commit()
             db.session.refresh(conversation)
+        queryMsg=application_generate_entity.query or ""
+        # 如果queryMsg不为空或者空字符串则queryEmbedding=self.get_embedding(queryMsg)，否则queryEmbedding等于空
+        queryEmbedding = embeddings.embed_query(queryMsg) if queryMsg != "" else None
+        # queryEmbedding转换成字符串传入数据库
+        # queryEmbedding = str(queryEmbedding) if queryEmbedding is not None else None
 
         message = Message(
             app_id=app_config.app_id,
@@ -200,6 +220,7 @@ class MessageBasedAppGenerator(BaseAppGenerator):
             conversation_id=conversation.id,
             inputs=application_generate_entity.inputs,
             query=application_generate_entity.query or "",
+            query_embedding=queryEmbedding,
             message="",
             message_tokens=0,
             message_unit_price=0,
@@ -284,3 +305,5 @@ class MessageBasedAppGenerator(BaseAppGenerator):
         )
 
         return message
+  
+

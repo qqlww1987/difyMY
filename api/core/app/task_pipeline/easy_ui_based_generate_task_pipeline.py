@@ -297,7 +297,6 @@ class EasyUIBasedGenerateTaskPipeline(BasedGenerateTaskPipeline, MessageCycleMan
         self._message.currency = usage.currency
         self._message.message_metadata = json.dumps(jsonable_encoder(self._task_state.metadata)) \
             if self._task_state.metadata else None
-
         db.session.commit()
 
         message_was_created.send(

@@ -6,7 +6,7 @@ from typing import Optional
 
 from flask import current_app, request
 from flask_login import UserMixin
-from sqlalchemy import Float, text
+from sqlalchemy import Float, Numeric, text
 
 from core.file.tool_file_parser import ToolFileParser
 from core.file.upload_file_parser import UploadFileParser
@@ -657,6 +657,8 @@ class Message(db.Model):
     updated_at = db.Column(db.DateTime, nullable=False, server_default=db.text('CURRENT_TIMESTAMP(0)'))
     agent_based = db.Column(db.Boolean, nullable=False, server_default=db.text('false'))
     workflow_run_id = db.Column(StringUUID)
+    # 
+    query_embedding = db.Column(db.ARRAY(Numeric), nullable=True)
 
     @property
     def re_sign_file_url_answer(self) -> str:

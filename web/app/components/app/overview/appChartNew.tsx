@@ -16,6 +16,7 @@ import Basic from '@/app/components/app-sidebar/basic'
 import Loading from '@/app/components/base/loading'
 import type { AppFrequentKeywordsResponse } from '@/models/app'
 import { getAppFrequentKeywords } from '@/service/apps'
+import { log } from 'console'
 const valueFormatter = (v: string | number) => v
 const COLOR_TYPE_MAP = {
   green: {
@@ -65,6 +66,7 @@ interface BarChartProps {
     word: string;
     count: number;
   }>;
+  allcount:number;
   style: React.CSSProperties;
   basicInfo: { title: string; explanation: string; timePeriod: string };
   className?: string;
@@ -82,20 +84,29 @@ export type IBizChartProps = {
   id: string
 }
 
-const BarChart: React.FC<BarChartProps> = ({ data,style,basicInfo ,className,chartType }) => {
+const BarChart: React.FC<BarChartProps> = ({ data,allcount,style,basicInfo ,className,chartType }) => {
   
   const newData = data.map(item => ({
     value: item.count,
     name: item.word,
   }));
   
+  const newDataLength = newData.reduce((acc, cur) => acc + cur.value, 0);
+  console.log("前十数据为："+newDataLength)
+  const percentage = (newDataLength / allcount) * 100;
   const options: EChartsOption = {
     tooltip: {
     trigger: 'item'
+    
   },
+  
   grid: { top: 8, right: 36, bottom: 0, left: 0, containLabel: true },
   legend: {
     top: '5%',
+     // 过长显示省略号
+     formatter: function (params) {
+       return params.length > 16 ? params.slice(0, 16) + '...' : params;
+     },
     orient: 'vertical',
     left: 'left'
   },
@@ -105,6 +116,7 @@ const BarChart: React.FC<BarChartProps> = ({ data,style,basicInfo ,className,cha
       name: '最常访问',
       type: 'pie',
       bottom: 5,
+      // radius: '50%',
       radius: ['70%', '88%'],
       avoidLabelOverlap: false,
       itemStyle: {
@@ -112,14 +124,34 @@ const BarChart: React.FC<BarChartProps> = ({ data,style,basicInfo ,className,cha
         borderColor: '#fff',
         borderWidth: 2
       },
+      left: '40%', // 将饼图向右对齐
       label: {
         show: false,
+        formatter: function (params) {
+          const total = newData.reduce((acc, cur) => acc + cur.value, 0);
+            const percentage = (Number(params.value) / total * 100).toFixed(2) + '%';
+            const name=params.name.length > 10 ? params.name.slice(0, 10) + '...' : params.name;
+            return `${name}\n${(percentage)}`;
+          // return params.name.length > 10 ? params.name.slice(0, 10) + '...' : params.name;
+        },
         position: 'center'
       },
       emphasis: {
+        itemStyle: {
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: 'rgba(0, 0, 0, 0.5)'
+        },
         label: {
           show: true,
-          fontSize: 40,
+          fontSize: 12,
+          // 过长显示省略号
+          formatter: function (params) {
+            const total = newData.reduce((acc, cur) => acc + cur.value, 0);
+            const percentage = (Number(params.value) / total * 100).toFixed(2) + '%';
+            const name=params.name.length > 10 ? params.name.slice(0, 10) + '...' : params.name;
+            return `${name}\n${(percentage)}`;
+          },
           fontWeight: 'bold'
         }
       },
@@ -130,7 +162,7 @@ const BarChart: React.FC<BarChartProps> = ({ data,style,basicInfo ,className,cha
     }
   ]
   };
-  
+  console.log("整个数据为："+allcount)
   return (
     <div className={`flex flex-col w-full px-6 py-4 border-[0.5px] rounded-lg border-gray-200 shadow-xs ${className ?? ''}`}>
       <div className='mb-3'>
@@ -139,7 +171,9 @@ const BarChart: React.FC<BarChartProps> = ({ data,style,basicInfo ,className,cha
       <div className='mb-4 flex-1'>
         <Basic
           isExtraInLine={CHART_TYPE_CONFIG[chartType].showTokens}
-          name={'高频词汇'}
+          // newData的个数占比allcount
+          name={`高频问题占比 (${percentage.toFixed(2)}%)`}
+          // name={'高频问题'}
           type={!CHART_TYPE_CONFIG[chartType].showTokens
             ? ''
             : <span>{t('appOverview.analysis.tokenUsage.consumed')} Tokens<span className='text-sm'>
@@ -147,7 +181,7 @@ const BarChart: React.FC<BarChartProps> = ({ data,style,basicInfo ,className,cha
               {/* <span className='text-orange-400'>~{sum(statistics.map(item => parseFloat(get(item, 'total_price', '0')))).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 4 })}</span> */}
               <span className='text-gray-500'>)</span>
             </span></span>}
-       
+            textStyle={{ main: `!text-3xl !font-normal '!text-gray-300'` }} 
            />
       </div>
       <ReactECharts option={options} style={{ height: 160}} />
@@ -161,6 +195,8 @@ export const FrequentKeywords: FC<IBizChartProps> = ({ id, period }) => {
     return <Loading />
   const noDataFlag = !response.data || response.data.length === 0
   return <BarChart
+    
+     allcount={response.count}
     data={response.data.map(item => ({
       date: [dayjs(item.date).format('YYYY-MM-DD'), dayjs(item.date).format('HH:mm:ss')],
       word: item.word,

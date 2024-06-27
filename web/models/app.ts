@@ -96,7 +96,8 @@ export type AppTokenCostsResponse = {
 }
 
 export type AppFrequentKeywordsResponse = {
-  data: Array<{ date: string; word: string; count: number }>
+  data: Array<{ date: string; word: string; count: number }>,
+  count:number
 }
 
 export type UpdateAppModelConfigResponse = { result: string }

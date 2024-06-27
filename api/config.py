@@ -70,7 +70,7 @@ DEFAULTS = {
     'MULTIMODAL_SEND_IMAGE_FORMAT': 'base64',
     'INVITE_EXPIRY_HOURS': 72,
     'BILLING_ENABLED': 'False',
-    'CAN_REPLACE_LOGO': 'False',
+    'CAN_REPLACE_LOGO': 'True',
     'MODEL_LB_ENABLED': 'False',
     'ETL_TYPE': 'dify',
     'KEYWORD_STORE': 'jieba',
@@ -86,6 +86,7 @@ DEFAULTS = {
     'WORKFLOW_MAX_EXECUTION_STEPS': 500,
     'WORKFLOW_MAX_EXECUTION_TIME': 1200,
     'WORKFLOW_CALL_MAX_DEPTH': 5,
+    'EMBEDDINGTENANT_ID':'',
     'APP_MAX_EXECUTION_TIME': 1200,
 }
 
@@ -456,3 +457,4 @@ class Config:
         # ------------------------
         self.ENTERPRISE_ENABLED = get_bool_env('ENTERPRISE_ENABLED')
         self.CAN_REPLACE_LOGO = get_bool_env('CAN_REPLACE_LOGO')
+        self.EMBEDDINGTENANT_ID=get_env('EMBEDDINGTENANT_ID')
