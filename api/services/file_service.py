@@ -16,7 +16,7 @@ from extensions.ext_storage import storage
 from models.account import Account
 from models.model import EndUser, UploadFile
 from services.errors.file import FileTooLargeError, UnsupportedFileTypeError
-
+from bs4 import BeautifulSoup
 IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg']
 IMAGE_EXTENSIONS.extend([ext.upper() for ext in IMAGE_EXTENSIONS])
 
@@ -28,10 +28,29 @@ PREVIEW_WORDS_LIMIT = 3000
 
 
 class FileService:
-
+   
     @staticmethod
-    def upload_file(file: FileStorage, user: Union[Account, EndUser], only_image: bool = False) -> UploadFile:
+    def upload_file(file: FileStorage, user: Union[Account, EndUser], only_image: bool = False) -> tuple[UploadFile,str]:
+        def _load_as_text(textSource:str) ->tuple[bytes,str]:
+            soup = BeautifulSoup(textSource, 'html.parser')
+            metadata_tag = soup.find('metadata')
+            url_tag=None
+            url_value=""
+            if metadata_tag:
+                url_tag = metadata_tag.find('url')
+            if url_tag:
+                url_value = url_tag.string
+            else:
+                url_value=""
+            # 删除 metadata 标签
+            if metadata_tag:
+                metadata_tag.decompose()
+            text = soup.get_text()
+            text = text.strip() if text else ''
+            text=text.encode('utf-8')
+            return text,url_value
         filename = file.filename
+        url_value=''
         extension = file.filename.split('.')[-1]
         if len(filename) > 200:
             filename = filename.split('.')[0][:200] + '.' + extension
@@ -46,8 +65,11 @@ class FileService:
             raise UnsupportedFileTypeError()
         
         # read file content
+        # 这里如果是html 需要重新处理
         file_content = file.read()
-
+        if extension=="html":
+            file_content, url_value = _load_as_text(file_content)
+            # file_content=_load_as_text(file_content)
         # get file size
         file_size = len(file_content)
 
@@ -75,6 +97,12 @@ class FileService:
         storage.save(file_key, file_content)
         # save file to db
         config = current_app.config
+        json_var = {
+            'doc_metadata': {
+                'html_doc_Url': url_value
+            }
+}
+
         upload_file = UploadFile(
             tenant_id=current_tenant_id,
             storage_type=config['STORAGE_TYPE'],
@@ -87,13 +115,14 @@ class FileService:
             created_by=user.id,
             created_at=datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None),
             used=False,
-            hash=hashlib.sha3_256(file_content).hexdigest()
+            hash=hashlib.sha3_256(file_content).hexdigest(),
+            doc_metadata=json_var
         )
 
         db.session.add(upload_file)
         db.session.commit()
         print("upload_file")
-        return upload_file
+        return upload_file,url_value
 
     @staticmethod
     def upload_text(text: str, text_name: str) -> UploadFile:

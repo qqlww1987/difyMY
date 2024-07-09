@@ -8,7 +8,7 @@ from tests.integration_tests.vdb.test_vector_store import (
 class WeaviateVectorTest(AbstractVectorTest):
     def __init__(self):
         super().__init__()
-        self.attributes = ['doc_id', 'dataset_id', 'document_id', 'doc_hash']
+        self.attributes = ['doc_id', 'dataset_id', 'document_id', 'doc_hash','url']
         self.vector = WeaviateVector(
             collection_name=self.collection_name,
             config=WeaviateConfig(

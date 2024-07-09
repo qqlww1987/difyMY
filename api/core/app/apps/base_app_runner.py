@@ -304,6 +304,7 @@ class AppRunner:
         prompt_messages = []
         text = ''
         usage = None
+        urlresult=None
         for result in invoke_result:
             if not agent:
                 queue_manager.publish(
@@ -322,14 +323,29 @@ class AppRunner:
 
             if not model:
                 model = result.model
-
+            # if not urlresult:  
+                urlresult=result
             if not prompt_messages:
                 prompt_messages = result.prompt_messages
 
             if not usage and result.delta.usage:
                 usage = result.delta.usage
         if url:
-            text += "详细操作见链接：" +url
+            urlresult.delta.message.content="\n出自链接：" +url
+            
+            if not agent:
+                    queue_manager.publish(
+                    QueueLLMChunkEvent(
+                        chunk=urlresult
+                    ), PublishFrom.APPLICATION_MANAGER
+                )
+            else:
+                queue_manager.publish(
+                    QueueAgentMessageEvent(
+                        chunk=urlresult
+                    ), PublishFrom.APPLICATION_MANAGER
+                )
+            text += "\n出自链接：" +url
         if not usage:
             usage = LLMUsage.empty_usage()
 

@@ -1,7 +1,6 @@
 import threading
 import logging
-from typing import Optional, cast
-
+from typing import Tuple,Optional, cast
 from flask import Flask, current_app
 
 from core.app.app_config.entities import DatasetEntity, DatasetRetrieveConfigEntity
@@ -46,7 +45,7 @@ class DatasetRetrieval:
                  invoke_from: InvokeFrom,
                  show_retrieve_source: bool,
                  hit_callback: DatasetIndexToolCallbackHandler,
-                 memory: Optional[TokenBufferMemory] = None) -> Optional[str]:
+                 memory: Optional[TokenBufferMemory] = None) -> Tuple[Optional[str], Optional[str]]:
         """
         Retrieve dataset.
         :param app_id: app_id
@@ -125,9 +124,15 @@ class DatasetRetrieval:
                                                    retrieve_config.reranking_model.get('reranking_model_name'))
 
         document_score_list = {}
+        document_url_list = {}
+        docUrl=''
         for item in all_documents:
             if item.metadata.get('score'):
                 document_score_list[item.metadata['doc_id']] = item.metadata['score']
+            if item.metadata.get('url'):
+                    document_url_list[item.metadata['doc_id']] = item.metadata['url']
+                # 将url属性和doc_id一样插入
+                
 
         document_context_list = []
         index_node_ids = [document.metadata['doc_id'] for document in all_documents]
@@ -138,13 +143,15 @@ class DatasetRetrieval:
             DocumentSegment.enabled == True,
             DocumentSegment.index_node_id.in_(index_node_ids)
         ).all()
-
         if segments:
             index_node_id_to_position = {id: position for position, id in enumerate(index_node_ids)}
             sorted_segments = sorted(segments,
                                      key=lambda segment: index_node_id_to_position.get(segment.index_node_id,
                                                                                        float('inf')))
             for segment in sorted_segments:
+                # 判断docUrl 是否为空或者空字符
+                if  docUrl is  None or not docUrl.strip():
+                    docUrl=document_url_list.get(segment.index_node_id, None)
                 if segment.answer:
                     document_context_list.append(f'question:{segment.get_sign_content()} answer:{segment.answer}')
                 else:
@@ -171,6 +178,8 @@ class DatasetRetrieval:
                             'segment_id': segment.id,
                             'retriever_from': invoke_from.to_source(),
                             'score': document_score_list.get(segment.index_node_id, None)
+                            ,
+                            'url': document_url_list.get(segment.index_node_id, None)
                         }
 
                         if invoke_from.to_source() == 'dev':
@@ -187,8 +196,8 @@ class DatasetRetrieval:
                 if hit_callback:
                     hit_callback.return_retriever_resource_info(context_list)
 
-            return str("\n".join(document_context_list))
-        return ''
+            return str("\n".join(document_context_list)),docUrl
+        return '',docUrl
 
     def single_retrieve(self, app_id: str,
                         tenant_id: str,
@@ -256,7 +265,7 @@ class DatasetRetrieval:
                                                     query=query,
                                                     top_k=top_k, score_threshold=score_threshold,
                                                     reranking_model=reranking_model)
-                logger.info(f"Retrieval results: {results}")
+                # logger.info(f"Retrieval results: {results}")
                 self._on_query(query, [dataset_id], app_id, user_from, user_id)
                 if results:
                     self._on_retrival_end(results)

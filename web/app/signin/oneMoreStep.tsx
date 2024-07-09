@@ -155,7 +155,7 @@ const OneMoreStep = () => {
               {t('login.go')}
             </Button>
           </div>
-          <div className="block w-hull mt-2 text-xs text-gray-600">
+          {/* <div className="block w-hull mt-2 text-xs text-gray-600">
             {t('login.license.tip')}
             &nbsp;
             <Link
@@ -163,7 +163,7 @@ const OneMoreStep = () => {
               target='_blank' rel='noopener noreferrer'
               href={'https://docs.dify.ai/user-agreement/open-source'}
             >{t('login.license.link')}</Link>
-          </div>
+          </div> */}
         </div>
       </div>
     </>

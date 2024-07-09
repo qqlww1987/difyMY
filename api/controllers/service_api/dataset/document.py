@@ -186,13 +186,16 @@ class DocumentAddByFileApi(DatasetApiResource):
         if len(request.files) > 1:
             raise TooManyFilesError()
 
-        upload_file = FileService.upload_file(file, current_user)
+        upload_file,htmlDocUrl = FileService.upload_file(file, current_user)
         data_source = {
             'type': 'upload_file',
             'info_list': {
                 'file_info_list': {
                     'file_ids': [upload_file.id]
                 }
+            },
+            'doc_metadata':{
+                'html_doc_Url':htmlDocUrl
             }
         }
         args['data_source'] = data_source
@@ -249,13 +252,16 @@ class DocumentUpdateByFileApi(DatasetApiResource):
             if len(request.files) > 1:
                 raise TooManyFilesError()
 
-            upload_file = FileService.upload_file(file, current_user)
+            upload_file ,htmlDocUrl= FileService.upload_file(file, current_user)
             data_source = {
                 'type': 'upload_file',
                 'info_list': {
                     'file_info_list': {
                         'file_ids': [upload_file.id]
                     }
+                },
+                'doc_metadata':{
+                    'html_doc_Url':htmlDocUrl
                 }
             }
             args['data_source'] = data_source

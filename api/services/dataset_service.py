@@ -4,11 +4,11 @@ import logging
 import random
 import time
 import uuid
-from typing import Optional
+from typing import List, Optional
 
 from flask import current_app
 from flask_login import current_user
-from sqlalchemy import func
+from sqlalchemy import String, cast, func
 
 from core.errors.error import LLMBadRequestError, ProviderTokenNotInitError
 from core.model_manager import ModelManager
@@ -403,6 +403,27 @@ class DocumentService:
         ).first()
 
         return document
+    @staticmethod
+    def get_document_urls_by_ids(document_ids: List[str]) -> List[dict]:
+        document_urls = []
+        documents = db.session.query(Document, UploadFile).join(UploadFile, cast(Document.file_id, String) == cast(UploadFile.id, String)).filter(Document.id.in_(document_ids)).all()
+
+        # documents = db.session.query(Document, UploadFile).join(UploadFile, Document.file_id == UploadFile.id).filter(Document.id.in_(document_ids)).all()
+        for document in documents:
+        # for document_id in document_ids:
+            # document = db.session.query(Document, UploadFile).join(UploadFile).filter(Document.file_id== document_id).first()
+            # # document = db.session.query(UploadFile).filter(Document.id == document_id).first()
+            if bool(document[1].doc_metadata) and len(document[1].doc_metadata) > 0:
+                html_doc_Url_value= document[1].doc_metadata['doc_metadata']['html_doc_Url']
+                # data_source_info = json.loads(document[1].doc_metadata)
+                # html_doc_Url_value = ''
+                # if 'doc_metadata' in data_source_info:
+                #     doc_metadata = data_source_info['doc_metadata']
+                #     if 'html_doc_Url' in doc_metadata:
+                #         html_doc_Url_value = doc_metadata['html_doc_Url']
+                document_urls.append({"document_id": document[0].id, "url": html_doc_Url_value})
+        return document_urls
+
 
     @staticmethod
     def get_document_by_dataset_id(dataset_id: str) -> list[Document]:
@@ -687,6 +708,7 @@ class DocumentService:
                                                               document_data["doc_language"],
                                                               data_source_info, created_from, position,
                                                               account, file_name, batch)
+                    document.file_id=file_id
                     db.session.add(document)
                     db.session.flush()
                     document_ids.append(document.id)

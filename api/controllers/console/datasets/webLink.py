@@ -35,7 +35,7 @@ class WebLinkApi(Resource):
         if len(request.files) > 1:
             raise TooManyFilesError()
         try:
-            upload_file = FileService.upload_file(file, current_user)
+            upload_file,htmlDocUrl = FileService.upload_file(file, current_user)
         except services.errors.file.FileTooLargeError as file_too_large_error:
             raise FileTooLargeError(file_too_large_error.description)
         except services.errors.file.UnsupportedFileTypeError:

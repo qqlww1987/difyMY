@@ -156,7 +156,7 @@ class ChatAppRunner(AppRunner):
             )
 
             dataset_retrieval = DatasetRetrieval()
-            context = dataset_retrieval.retrieve(
+            context,docUrl = dataset_retrieval.retrieve(
                 app_id=app_record.id,
                 user_id=application_generate_entity.user_id,
                 tenant_id=app_record.tenant_id,
@@ -168,14 +168,17 @@ class ChatAppRunner(AppRunner):
                 hit_callback=hit_callback,
                 memory=memory
             )
-            # 聊天是在这里进行组装 guorq
-            if context:
-                if 'url' in context[0]:
-                    docUrl=context[0].get('url')
-                    logger.info(f"context: {context[0]}")
+            # # 聊天是在这里进行组装 guorq
+            # if context:
+            #     docUrl="https://www.52pojie.cn/thread-1826483-1-1.html"
+            #     # if 'url' in context[0]:
+            #     #     docUrl=context[0].get('url')
+            #     #     logger.info(f"context: {context[0]}")
         # reorganize all inputs and template to prompt messages
         # Include: prompt template, inputs, query(optional), files(optional)
         #          memory(optional), external data, dataset context(optional)
+        # if docUrl:
+        #     context+= "\n出自链接：" +docUrl
         prompt_messages, stop = self.organize_prompt_messages(
             app_record=app_record,
             model_config=application_generate_entity.model_conf,

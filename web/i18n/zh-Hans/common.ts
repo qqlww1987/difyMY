@@ -184,7 +184,7 @@ const translation = {
     sendInvite: '发送邀请',
     invitedAsRole: '邀请为{{role}}用户',
     invitationSent: '邀请已发送',
-    invitationSentTip: '邀请已发送，对方登录 Dify 后即可访问你的团队数据。',
+    invitationSentTip: '邀请已发送，对方登录后即可访问你的团队数据。',
     invitationLink: '邀请链接',
     failedinvitationEmails: '邀请以下邮箱失败',
     ok: '好的',

@@ -15,7 +15,7 @@ from core.rag.datasource.vdb.vector_type import VectorType
 from core.rag.models.document import Document
 from extensions.ext_redis import redis_client
 from models.dataset import Dataset
-
+from services.dataset_service import  DocumentService
 
 class WeaviateConfig(BaseModel):
     endpoint: str
@@ -211,12 +211,30 @@ class WeaviateVector(BaseVector):
             docs_and_scores.append((Document(page_content=text, metadata=res), score))
 
         docs = []
+        document_ids = []
         for doc, score in docs_and_scores:
             score_threshold = kwargs.get("score_threshold", .0) if kwargs.get('score_threshold', .0) else 0.0
             # check score threshold
             if score > score_threshold:
+                if not doc.metadata is None and  'document_id' in doc.metadata:
+                # 通过这个鬼要取对应的url 有的话就有没有就算了
+                    docid= doc.metadata['document_id']
+                    document_ids.append(docid)
                 doc.metadata['score'] = score
                 docs.append(doc)
+        result=None
+        if len(document_ids)>0:
+            result= DocumentService.get_document_urls_by_ids(document_ids)
+            for doc in docs:
+                if 'document_id' in doc.metadata:
+                    docid= doc.metadata['document_id']
+                    if result:
+                        for item in result:
+                            if item['document_id'] == docid:
+                                if bool(item['url']) and len(item['url']) > 0:
+                                    doc.metadata['url'] = item['url']
+                                break
+                    # document_ids.append(doc.metadata['document_id'])
 
         return docs
 
@@ -246,9 +264,26 @@ class WeaviateVector(BaseVector):
         if "errors" in result:
             raise ValueError(f"Error during query: {result['errors']}")
         docs = []
+        document_ids = []
         for res in result["data"]["Get"][collection_name]:
             text = res.pop(Field.TEXT_KEY.value)
             docs.append(Document(page_content=text, metadata=res))
+            if not res is None and  'document_id' in res:
+                # 通过这个鬼要取对应的url 有的话就有没有就算了
+                    docid= res['document_id']
+                    document_ids.append(docid)
+            #     document_ids = [doc.metadata['document_id'] for doc in docs]
+        if len(document_ids)>0:
+                result= DocumentService.get_document_urls_by_ids(document_ids)
+                for doc in docs:
+                    if 'document_id' in doc.metadata:
+                        docid= doc.metadata['document_id']
+                        if result:
+                            for item in result:
+                                if item['document_id'] == docid:
+                                    if bool(item['url']) and len(item['url']) > 0:
+                                        doc.metadata['url'] = item['url']
+                                    break   
         return docs
 
     def _default_schema(self, index_name: str) -> dict:

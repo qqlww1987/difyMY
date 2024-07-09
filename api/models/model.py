@@ -1118,6 +1118,7 @@ class UploadFile(db.Model):
     used_by = db.Column(StringUUID, nullable=True)
     used_at = db.Column(db.DateTime, nullable=True)
     hash = db.Column(db.String(255), nullable=True)
+    doc_metadata = db.Column(db.JSON, nullable=True)
 
 
 class ApiRequest(db.Model):

@@ -195,7 +195,7 @@ class WebappLogoWorkspaceApi(Resource):
             raise UnsupportedFileTypeError()
 
         try:
-            upload_file = FileService.upload_file(file, current_user, True)
+            upload_file,htmlDocUrl = FileService.upload_file(file, current_user, True)
 
         except services.errors.file.FileTooLargeError as file_too_large_error:
             raise FileTooLargeError(file_too_large_error.description)
