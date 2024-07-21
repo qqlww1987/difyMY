@@ -1064,6 +1064,7 @@ class DocumentService:
 
     @classmethod
     def process_rule_args_validate(cls, args: dict):
+        print(args)
         if 'process_rule' not in args or not args['process_rule']:
             raise ValueError("Process rule is required")
 

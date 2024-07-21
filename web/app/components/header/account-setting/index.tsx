@@ -129,18 +129,18 @@ export default function AccountSetting({
           activeIcon: <User01Solid className={iconClassName} />,
         },
         // guorq 在那还是屏蔽
-        // {
-        //   key: 'integrations',
-        //   name: t('common.settings.integrations'),
-        //   icon: <AtSign className={iconClassName} />,
-        //   activeIcon: <AtSign className={iconClassName} />,
-        // },
-        // {
-        //   key: 'language',
-        //   name: t('common.settings.language'),
-        //   icon: <Globe01 className={iconClassName} />,
-        //   activeIcon: <Globe01 className={iconClassName} />,
-        // },
+        {
+          key: 'integrations',
+          name: t('common.settings.integrations'),
+          icon: <AtSign className={iconClassName} />,
+          activeIcon: <AtSign className={iconClassName} />,
+        },
+        {
+          key: 'language',
+          name: t('common.settings.language'),
+          icon: <Globe01 className={iconClassName} />,
+          activeIcon: <Globe01 className={iconClassName} />,
+        },
       ],
     },
   ]
@@ -218,7 +218,7 @@ export default function AccountSetting({
             {activeMenu === 'billing' && <BillingPage />}
             {/* {activeMenu === 'integrations' && <IntegrationsPage />} */}
             {/* 屏蔽多语言 guorq */}
-            {/* {activeMenu === 'language' && <LanguagePage />} */}
+            {activeMenu === 'language' && <LanguagePage />}
             {activeMenu === 'provider' && <ModelProviderPage />}
             {activeMenu === 'data-source' && <DataSourcePage />}
             {activeMenu === 'api-based-extension' && <ApiBasedExtensionPage />}
