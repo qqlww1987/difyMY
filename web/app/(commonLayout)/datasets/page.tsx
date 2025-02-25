@@ -1,13 +1,11 @@
 import Container from './Container'
 
 const AppList = async () => {
-  return (
-    <Container />
-  )
+  return <Container />
 }
 
 export const metadata = {
-  title: 'Datasets - Toone',
+  title: 'Datasets - Dify',
 }
 
 export default AppList

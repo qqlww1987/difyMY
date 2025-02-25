@@ -14,7 +14,7 @@ const translation = {
     permissionsAllMember: 'Todos os membros da equipe',
     indexMethod: 'Método de indexação',
     indexMethodHighQuality: 'Alta qualidade',
-    indexMethodHighQualityTip: 'Chame a interface de incorporação da OpenAI para processamento, fornecendo maior precisão quando os usuários consultam.',
+    indexMethodHighQualityTip: 'Invocar o modelo de Embedding para processamento para fornecer maior precisão nas consultas dos usuários.',
     indexMethodEconomy: 'Econômico',
     indexMethodEconomyTip: 'Use motores de vetor offline, índices de palavras-chave, etc. para reduzir a precisão sem gastar tokens.',
     embeddingModel: 'Modelo de incorporação',
@@ -27,6 +27,14 @@ const translation = {
       longDescription: ' sobre o método de recuperação, você pode alterar isso a qualquer momento nas configurações do conhecimento.',
     },
     save: 'Salvar',
+    permissionsInvitedMembers: 'Membros parciais da equipe',
+    me: '(Você)',
+    retrievalSettings: 'Configurações de recuperação',
+    externalKnowledgeID: 'ID de conhecimento externo',
+    externalKnowledgeAPI: 'API de conhecimento externo',
+    indexMethodChangeToEconomyDisabledTip: 'Não disponível para rebaixamento de HQ para ECO',
+    helpText: 'Aprenda a escrever uma boa descrição do conjunto de dados.',
+    upgradeHighQualityTip: 'Depois de atualizar para o modo de alta qualidade, reverter para o modo econômico não está disponível',
   },
 }
 

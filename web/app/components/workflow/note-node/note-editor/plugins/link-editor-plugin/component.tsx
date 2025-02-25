@@ -13,15 +13,15 @@ import {
 } from '@floating-ui/react'
 import { useTranslation } from 'react-i18next'
 import { useClickAway } from 'ahooks'
-import cn from 'classnames'
+import {
+  RiEditLine,
+  RiExternalLinkLine,
+  RiLinkUnlinkM,
+} from '@remixicon/react'
 import { useStore } from '../../store'
 import { useLink } from './hooks'
+import cn from '@/utils/classnames'
 import Button from '@/app/components/base/button'
-import {
-  Edit03,
-  LinkBroken01,
-  LinkExternal01,
-} from '@/app/components/base/icons/src/vender/line/general'
 
 type LinkEditorComponentProps = {
   containerElement: HTMLDivElement | null
@@ -69,9 +69,9 @@ const LinkEditorComponent = ({
           <FloatingPortal root={containerElement}>
             <div
               className={cn(
-                'nodrag nopan inline-flex items-center w-max rounded-md border-[0.5px] border-black/5 bg-white z-10',
+                'nodrag nopan inline-flex items-center w-max rounded-md border-[0.5px] border-components-actionbar-border bg-components-actionbar-bg z-10',
                 !linkOperatorShow && 'p-1 shadow-md',
-                linkOperatorShow && 'p-0.5 shadow-sm text-xs text-gray-500 font-medium',
+                linkOperatorShow && 'p-0.5 shadow-sm system-xs-medium text-text-tertiary',
               )}
               style={floatingStyles}
               ref={refs.setFloating}
@@ -80,18 +80,15 @@ const LinkEditorComponent = ({
                 !linkOperatorShow && (
                   <>
                     <input
-                      className='mr-0.5 p-1 w-[196px] h-6 rounded-sm text-[13px] appearance-none outline-none'
+                      className='mr-0.5 p-1 w-[196px] h-6 rounded-sm text-[13px] appearance-none outline-none bg-transparent text-components-input-text-filled'
                       value={url}
                       onChange={e => setUrl(e.target.value)}
                       placeholder={t('workflow.nodes.note.editor.enterUrl') || ''}
                       autoFocus
                     />
                     <Button
-                      type='primary'
-                      className={cn(
-                        'py-0 px-2 h-6 text-xs',
-                        !url && 'cursor-not-allowed',
-                      )}
+                      variant='primary'
+                      size='small'
                       disabled={!url}
                       onClick={() => handleSaveLink(url)}
                     >
@@ -104,38 +101,38 @@ const LinkEditorComponent = ({
                 linkOperatorShow && (
                   <>
                     <a
-                      className='flex items-center px-2 h-6 rounded-md hover:bg-gray-50'
+                      className='flex items-center px-2 h-6 rounded-md hover:bg-state-base-hover'
                       href={escape(url)}
                       target='_blank'
                       rel='noreferrer'
                     >
-                      <LinkExternal01 className='mr-1 w-3 h-3' />
+                      <RiExternalLinkLine className='mr-1 w-3 h-3' />
                       <div className='mr-1'>
                         {t('workflow.nodes.note.editor.openLink')}
                       </div>
                       <div
                         title={escape(url)}
-                        className='text-primary-600 max-w-[140px] truncate'
+                        className='text-text-accent max-w-[140px] truncate'
                       >
                         {escape(url)}
                       </div>
                     </a>
-                    <div className='mx-1 w-[1px] h-3.5 bg-gray-100'></div>
+                    <div className='mx-1 w-[1px] h-3.5 bg-divider-regular'></div>
                     <div
-                      className='flex items-center mr-0.5 px-2 h-6 rounded-md cursor-pointer hover:bg-gray-50'
+                      className='flex items-center mr-0.5 px-2 h-6 rounded-md cursor-pointer hover:bg-state-base-hover'
                       onClick={(e) => {
                         e.stopPropagation()
                         setLinkOperatorShow(false)
                       }}
                     >
-                      <Edit03 className='mr-1 w-3 h-3' />
+                      <RiEditLine className='mr-1 w-3 h-3' />
                       {t('common.operation.edit')}
                     </div>
                     <div
-                      className='flex items-center px-2 h-6 rounded-md cursor-pointer hover:bg-gray-50'
+                      className='flex items-center px-2 h-6 rounded-md cursor-pointer hover:bg-state-base-hover'
                       onClick={handleUnlink}
                     >
-                      <LinkBroken01 className='mr-1 w-3 h-3' />
+                      <RiLinkUnlinkM className='mr-1 w-3 h-3' />
                       {t('workflow.nodes.note.editor.unlink')}
                     </div>
                   </>

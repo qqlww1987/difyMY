@@ -1,7 +1,7 @@
 model: nousresearch/nous-hermes-llama2-13b
 label:
-  zh_Hans: nousresearch/nous-hermes-llama2-13b
-  en_US: nousresearch/nous-hermes-llama2-13b
+  zh_Hans: Nous Hermes Llama2 13B
+  en_US: Nous Hermes Llama2 13B
 model_type: llm
 features:
   - agent-thought
@@ -34,3 +34,8 @@ parameter_rules:
     min: -2
     max: 2
     default: 0
+pricing:
+  input: '0.0017'
+  output: '0.0017'
+  unit: '0.0001'
+  currency: USD

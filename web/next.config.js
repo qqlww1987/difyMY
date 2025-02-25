@@ -15,9 +15,7 @@ const withMDX = require('@next/mdx')({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config, { dev, isServer }) => {
-    // productionBrowserSourceMaps: true,
     config.plugins.push(codeInspectorPlugin({ bundler: 'webpack' }))
-    // config.devtool = 'source-map'
     return config
   },
   productionBrowserSourceMaps: false, // enable browser source map generation during the production build
@@ -36,6 +34,7 @@ const nextConfig = {
     // https://nextjs.org/docs/api-reference/next.config.js/ignoring-typescript-errors
     ignoreBuildErrors: true,
   },
+  reactStrictMode: true,
   async redirects() {
     return [
       {

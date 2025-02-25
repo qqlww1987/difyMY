@@ -1,5 +1,5 @@
 from flask import Flask, request
-from flask_restful import Api, Resource
+from flask_restful import Api, Resource  # type: ignore
 
 app = Flask(__name__)
 api = Api(app)
@@ -9,6 +9,7 @@ todos_data = {
     "global": ["Buy groceries", "Finish project"],
     "user1": ["Go for a run", "Read a book"],
 }
+
 
 class TodosResource(Resource):
     def get(self, username):
@@ -32,7 +33,8 @@ class TodosResource(Resource):
 
         return {"error": "Invalid todo index"}, 400
 
-api.add_resource(TodosResource, '/todos/<string:username>')
 
-if __name__ == '__main__':
+api.add_resource(TodosResource, "/todos/<string:username>")
+
+if __name__ == "__main__":
     app.run(port=5003, debug=True)

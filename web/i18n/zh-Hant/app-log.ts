@@ -4,8 +4,9 @@ const translation = {
   dateTimeFormat: 'YYYY-MM-DD HH:mm',
   table: {
     header: {
-      time: '時間',
-      endUser: '使用者',
+      updatedTime: '更新時間',
+      time: '創建時間',
+      endUser: '使用者或賬戶',
       input: '輸入',
       output: '輸出',
       summary: '標題',
@@ -16,7 +17,7 @@ const translation = {
       status: '狀態',
       runtime: '執行時間',
       tokens: 'TOKENS',
-      user: '使用者',
+      user: '使用者或賬戶',
       version: '版本',
     },
     pagination: {
@@ -51,6 +52,7 @@ const translation = {
     },
     variables: '變數',
     uploadImages: '上傳的圖片',
+    modelParams: '模型參數',
   },
   filter: {
     period: {
@@ -69,12 +71,17 @@ const translation = {
       annotated: '已標註改進（{{count}} 項）',
       not_annotated: '未標註',
     },
+    sortBy: '排序方式：',
+    descending: '降序',
+    ascending: '升序',
   },
   workflowTitle: '日誌',
   workflowSubtitle: '日誌記錄了應用的執行情況',
   runDetail: {
     title: '對話日誌',
     workflowTitle: '日誌詳情',
+    fileListDetail: '細節',
+    fileListLabel: '檔詳細資訊',
   },
   promptLog: 'Prompt 日誌',
   agentLog: 'Agent 日誌',

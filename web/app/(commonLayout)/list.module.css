@@ -85,13 +85,13 @@
   background-image: url("./apps/assets/add.svg");
 }
 
-.newItemIconChat {
+/* .newItemIconChat {
   background-image: url("~@/app/components/base/icons/assets/public/header-nav/studio/Robot.svg");
 }
 
 .selected .newItemIconChat {
   background-image: url("~@/app/components/base/icons/assets/public/header-nav/studio/Robot-Active.svg");
-}
+} */
 
 .newItemIconComplete {
   background-image: url("./apps/assets/completion.svg");
@@ -199,16 +199,6 @@
 
 .socialMediaIcon {
   @apply block w-6 h-6 bg-center bg-contain;
-}
-
-.githubIcon {
-  background-image: url("./apps/assets/github.svg");
-}
-.tooneIcon {
-  background-image: url("./apps/assets/toone.svg");
-}
-.discordIcon {
-  background-image: url("./apps/assets/discord.svg");
 }
 
 /* #region new app dialog */

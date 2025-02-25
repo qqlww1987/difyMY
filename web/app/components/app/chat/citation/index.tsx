@@ -46,6 +46,8 @@ const Citation: FC<CitationProps> = ({
 
     return prev
   }, []), [data])
+  // 添加调试信息
+  console.log('resources:', resources);
 
   const handleAdjustResourcesLayout = () => {
     const containerWidth = document.querySelector(`.${containerClassName}`)!.clientWidth - 40

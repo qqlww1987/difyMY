@@ -15,9 +15,7 @@ class AzureOpenAISpeech2TextModel(_CommonAzureOpenAI, Speech2TextModel):
     Model class for OpenAI Speech to text model.
     """
 
-    def _invoke(self, model: str, credentials: dict,
-                file: IO[bytes], user: Optional[str] = None) \
-            -> str:
+    def _invoke(self, model: str, credentials: dict, file: IO[bytes], user: Optional[str] = None) -> str:
         """
         Invoke speech2text model
 
@@ -40,7 +38,7 @@ class AzureOpenAISpeech2TextModel(_CommonAzureOpenAI, Speech2TextModel):
         try:
             audio_file_path = self._get_demo_file_path()
 
-            with open(audio_file_path, 'rb') as audio_file:
+            with open(audio_file_path, "rb") as audio_file:
                 self._speech2text_invoke(model, credentials, audio_file)
         except Exception as ex:
             raise CredentialsValidateFailedError(str(ex))
@@ -65,12 +63,13 @@ class AzureOpenAISpeech2TextModel(_CommonAzureOpenAI, Speech2TextModel):
         return response.text
 
     def get_customizable_model_schema(self, model: str, credentials: dict) -> Optional[AIModelEntity]:
-        ai_model_entity = self._get_ai_model_entity(credentials['base_model_name'], model)
+        ai_model_entity = self._get_ai_model_entity(credentials["base_model_name"], model)
+        if not ai_model_entity:
+            return None
         return ai_model_entity.entity
 
-
     @staticmethod
-    def _get_ai_model_entity(base_model_name: str, model: str) -> AzureBaseModel:
+    def _get_ai_model_entity(base_model_name: str, model: str) -> Optional[AzureBaseModel]:
         for ai_model_entity in SPEECH2TEXT_BASE_MODELS:
             if ai_model_entity.base_model_name == base_model_name:
                 ai_model_entity_copy = copy.deepcopy(ai_model_entity)

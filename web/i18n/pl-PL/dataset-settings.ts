@@ -17,7 +17,7 @@ const translation = {
     indexMethod: 'Metoda indeksowania',
     indexMethodHighQuality: 'Wysoka jakość',
     indexMethodHighQualityTip:
-      'Wywołaj interfejs wbudowywanie OpenAI do przetwarzania, aby zapewnić wyższą dokładność przy zapytaniach użytkowników.',
+      'Wywołaj model Embedding do przetwarzania, aby zapewnić większą dokładność przy zapytaniach użytkowników.',
     indexMethodEconomy: 'Ekonomiczna',
     indexMethodEconomyTip:
       'Użyj silników wektorów offline, indeksów słów kluczowych itp., aby zmniejszyć dokładność bez wydawania tokenów',
@@ -32,6 +32,14 @@ const translation = {
         ' dotyczące metody doboru, możesz to zmienić w dowolnym momencie w ustawieniach wiedzy.',
     },
     save: 'Zapisz',
+    permissionsInvitedMembers: 'Częściowi członkowie zespołu',
+    me: '(Ty)',
+    externalKnowledgeAPI: 'Interfejs API wiedzy zewnętrznej',
+    retrievalSettings: 'Ustawienia pobierania',
+    externalKnowledgeID: 'Zewnętrzny identyfikator wiedzy',
+    helpText: 'Dowiedz się, jak napisać dobry opis zestawu danych.',
+    upgradeHighQualityTip: 'Po uaktualnieniu do trybu wysokiej jakości powrót do trybu ekonomicznego nie jest dostępny',
+    indexMethodChangeToEconomyDisabledTip: 'Niedostępne w przypadku zmiany z HQ na ECO',
   },
 }
 

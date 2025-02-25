@@ -1,4 +1,3 @@
-from core.tools.entities.values import ToolLabelEnum
 from core.tools.errors import ToolProviderCredentialValidationError
 from core.tools.provider.builtin.stackexchange.tools.searchStackExQuestions import SearchStackExQuestionsTool
 from core.tools.provider.builtin_tool_provider import BuiltinToolProviderController
@@ -12,16 +11,15 @@ class StackExchangeProvider(BuiltinToolProviderController):
                     "credentials": credentials,
                 }
             ).invoke(
-                user_id='',
+                user_id="",
                 tool_parameters={
                     "intitle": "Test",
-                    "sort": "relevance",  
+                    "sort": "relevance",
                     "order": "desc",
                     "site": "stackoverflow",
                     "accepted": True,
-                    "pagesize": 1
+                    "pagesize": 1,
                 },
             )
         except Exception as e:
             raise ToolProviderCredentialValidationError(str(e))
-        

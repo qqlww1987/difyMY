@@ -16,6 +16,9 @@ import type {
   Feedback,
 } from '../types'
 import { CONVERSATION_ID_INFO } from '../constants'
+import { buildChatItemTree } from '../utils'
+import { addFileInfos, sortAgentSorts } from '../../../tools/utils'
+import { getProcessedFilesFromResponse } from '@/app/components/base/file-uploader/utils'
 import {
   delConversation,
   fetchAppInfo,
@@ -28,27 +31,72 @@ import {
   renameConversation,
   unpinConversation,
   updateFeedback,
-  sendMsgByFeedback,
 } from '@/service/share'
 import type { InstalledApp } from '@/models/explore'
 import type {
   AppData,
   ConversationItem,
 } from '@/models/share'
-import { addFileInfos, sortAgentSorts } from '@/app/components/tools/utils'
 import { useToastContext } from '@/app/components/base/toast'
 import { changeLanguage } from '@/i18n/i18next-config'
+import { useAppFavicon } from '@/hooks/use-app-favicon'
+import { InputVarType } from '@/app/components/workflow/types'
+import { TransferMethod } from '@/types/app'
+
+function getFormattedChatList(messages: any[]) {
+  const newChatList: ChatItem[] = []
+  messages.forEach((item) => {
+    const questionFiles = item.message_files?.filter((file: any) => file.belongs_to === 'user') || []
+    newChatList.push({
+      id: `question-${item.id}`,
+      content: item.query,
+      isAnswer: false,
+      message_files: getProcessedFilesFromResponse(questionFiles.map((item: any) => ({ ...item, related_id: item.id }))),
+      parentMessageId: item.parent_message_id || undefined,
+    })
+    const answerFiles = item.message_files?.filter((file: any) => file.belongs_to === 'assistant') || []
+    newChatList.push({
+      id: item.id,
+      content: item.answer,
+      agent_thoughts: addFileInfos(item.agent_thoughts ? sortAgentSorts(item.agent_thoughts) : item.agent_thoughts, item.message_files),
+      feedback: item.feedback,
+      isAnswer: true,
+      citation: item.retriever_resources,
+      message_files: getProcessedFilesFromResponse(answerFiles.map((item: any) => ({ ...item, related_id: item.id }))),
+      parentMessageId: `question-${item.id}`,
+    })
+  })
+  return newChatList
+}
 
 export const useChatWithHistory = (installedAppInfo?: InstalledApp) => {
   const isInstalledApp = useMemo(() => !!installedAppInfo, [installedAppInfo])
   const { data: appInfo, isLoading: appInfoLoading, error: appInfoError } = useSWR(installedAppInfo ? null : 'appInfo', fetchAppInfo)
+
+  useAppFavicon({
+    enable: !installedAppInfo,
+    icon_type: appInfo?.site.icon_type,
+    icon: appInfo?.site.icon,
+    icon_background: appInfo?.site.icon_background,
+    icon_url: appInfo?.site.icon_url,
+  })
 
   const appData = useMemo(() => {
     if (isInstalledApp) {
       const { id, app } = installedAppInfo!
       return {
         app_id: id,
-        site: { title: app.name, icon: app.icon, icon_background: app.icon_background, prompt_public: false, copyright: '' },
+        site: {
+          title: app.name,
+          icon_type: app.icon_type,
+          icon: app.icon,
+          icon_background: app.icon_background,
+          icon_url: app.icon_url,
+          prompt_public: false,
+          copyright: '',
+          show_workflow_steps: true,
+          use_icon_as_answer_icon: app.use_icon_as_answer_icon,
+        },
         plan: 'basic',
       } as AppData
     }
@@ -90,32 +138,12 @@ export const useChatWithHistory = (installedAppInfo?: InstalledApp) => {
   const { data: appConversationData, isLoading: appConversationDataLoading, mutate: mutateAppConversationData } = useSWR(['appConversationData', isInstalledApp, appId, false], () => fetchConversations(isInstalledApp, appId, undefined, false, 100))
   const { data: appChatListData, isLoading: appChatListDataLoading } = useSWR(chatShouldReloadKey ? ['appChatList', chatShouldReloadKey, isInstalledApp, appId] : null, () => fetchChatList(chatShouldReloadKey, isInstalledApp, appId))
 
-  const appPrevChatList = useMemo(() => {
-    const data = appChatListData?.data || []
-    const chatList: ChatItem[] = []
-
-    if (currentConversationId && data.length) {
-      data.forEach((item: any) => {
-        chatList.push({
-          id: `question-${item.id}`,
-          content: item.query,
-          isAnswer: false,
-          message_files: item.message_files?.filter((file: any) => file.belongs_to === 'user') || [],
-        })
-        chatList.push({
-          id: item.id,
-          content: item.answer,
-          agent_thoughts: addFileInfos(item.agent_thoughts ? sortAgentSorts(item.agent_thoughts) : item.agent_thoughts, item.message_files),
-          feedback: item.feedback,
-          isAnswer: true,
-          citation: item.retriever_resources,
-          message_files: item.message_files?.filter((file: any) => file.belongs_to === 'assistant') || [],
-        })
-      })
-    }
-
-    return chatList
-  }, [appChatListData, currentConversationId])
+  const appPrevChatTree = useMemo(
+    () => (currentConversationId && appChatListData?.data.length)
+      ? buildChatItemTree(getFormattedChatList(appChatListData.data))
+      : [],
+    [appChatListData, currentConversationId],
+  )
 
   const [showNewConversationItemInList, setShowNewConversationItemInList] = useState(false)
 
@@ -130,7 +158,7 @@ export const useChatWithHistory = (installedAppInfo?: InstalledApp) => {
     setNewConversationInputs(newInputs)
   }, [])
   const inputsForms = useMemo(() => {
-    return (appParams?.user_input_form || []).filter((item: any) => item.paragraph || item.select || item['text-input'] || item.number).map((item: any) => {
+    return (appParams?.user_input_form || []).filter((item: any) => !item.external_data_tool).map((item: any) => {
       if (item.paragraph) {
         return {
           ...item.paragraph,
@@ -150,6 +178,20 @@ export const useChatWithHistory = (installedAppInfo?: InstalledApp) => {
         }
       }
 
+      if (item['file-list']) {
+        return {
+          ...item['file-list'],
+          type: 'file-list',
+        }
+      }
+
+      if (item.file) {
+        return {
+          ...item.file,
+          type: 'file',
+        }
+      }
+
       return {
         ...item['text-input'],
         type: 'text-input',
@@ -160,7 +202,7 @@ export const useChatWithHistory = (installedAppInfo?: InstalledApp) => {
     const conversationInputs: Record<string, any> = {}
 
     inputsForms.forEach((item: any) => {
-      conversationInputs[item.variable] = item.default || ''
+      conversationInputs[item.variable] = item.default || null
     })
     handleNewConversationInputsChange(conversationInputs)
   }, [handleNewConversationInputsChange, inputsForms])
@@ -199,31 +241,48 @@ export const useChatWithHistory = (installedAppInfo?: InstalledApp) => {
   }, [newConversation])
 
   const currentConversationItem = useMemo(() => {
-    let coversationItem = conversationList.find(item => item.id === currentConversationId)
+    let conversationItem = conversationList.find(item => item.id === currentConversationId)
 
-    if (!coversationItem && pinnedConversationList.length)
-      coversationItem = pinnedConversationList.find(item => item.id === currentConversationId)
+    if (!conversationItem && pinnedConversationList.length)
+      conversationItem = pinnedConversationList.find(item => item.id === currentConversationId)
 
-    return coversationItem
+    return conversationItem
   }, [conversationList, currentConversationId, pinnedConversationList])
 
   const { notify } = useToastContext()
   const checkInputsRequired = useCallback((silent?: boolean) => {
-    if (inputsForms.length) {
-      for (let i = 0; i < inputsForms.length; i += 1) {
-        const item = inputsForms[i]
-
-        if (item.required && !newConversationInputsRef.current[item.variable]) {
-          if (!silent) {
-            notify({
-              type: 'error',
-              message: t('appDebug.errorMessage.valueOfVarRequired', { key: item.variable }),
-            })
-          }
+    let hasEmptyInput = ''
+    let fileIsUploading = false
+    const requiredVars = inputsForms.filter(({ required }) => required)
+    if (requiredVars.length) {
+      requiredVars.forEach(({ variable, label, type }) => {
+        if (hasEmptyInput)
           return
+
+        if (fileIsUploading)
+          return
+
+        if (!newConversationInputsRef.current[variable] && !silent)
+          hasEmptyInput = label as string
+
+        if ((type === InputVarType.singleFile || type === InputVarType.multiFiles) && newConversationInputsRef.current[variable] && !silent) {
+          const files = newConversationInputsRef.current[variable]
+          if (Array.isArray(files))
+            fileIsUploading = files.find(item => item.transferMethod === TransferMethod.local_file && !item.uploadedId)
+          else
+            fileIsUploading = files.transferMethod === TransferMethod.local_file && !files.uploadedId
         }
-      }
-      return true
+      })
+    }
+
+    if (hasEmptyInput) {
+      notify({ type: 'error', message: t('appDebug.errorMessage.valueOfVarRequired', { key: hasEmptyInput }) })
+      return false
+    }
+
+    if (fileIsUploading) {
+      notify({ type: 'info', message: t('appDebug.errorMessage.waitForFileUpload') })
+      return
     }
 
     return true
@@ -355,11 +414,6 @@ export const useChatWithHistory = (installedAppInfo?: InstalledApp) => {
   const handleFeedback = useCallback(async (messageId: string, feedback: Feedback) => {
     await updateFeedback({ url: `/messages/${messageId}/feedbacks`, body: { rating: feedback.rating } }, isInstalledApp, appId)
     notify({ type: 'success', message: t('common.api.success') })
-    if (feedback.rating == "dislike") {
-      // 打印feedback
-      console.log(feedback)
-      sendMsgByFeedback({ url: `/messages/${messageId}/sendMsgByFeedback`, body: { rating: feedback.rating } }, isInstalledApp, installedAppInfo?.id)
-    }
   }, [isInstalledApp, appId, t, notify])
 
   return {
@@ -378,13 +432,14 @@ export const useChatWithHistory = (installedAppInfo?: InstalledApp) => {
     appConversationDataLoading,
     appChatListData,
     appChatListDataLoading,
-    appPrevChatList,
+    appPrevChatTree,
     pinnedConversationList,
     conversationList,
     showConfigPanelBeforeChat,
     setShowConfigPanelBeforeChat,
     setShowNewConversationItemInList,
     newConversationInputs,
+    newConversationInputsRef,
     handleNewConversationInputsChange,
     inputsForms,
     handleNewConversation,

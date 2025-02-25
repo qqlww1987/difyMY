@@ -44,6 +44,17 @@ const translation = {
         webDescTip: '以下文字將展示在客戶端中，對應用進行說明和使用上的基本引導',
         webDescPlaceholder: '請輸入 WebApp 的描述',
         language: '語言',
+        workflow: {
+          title: '工作流程步驟',
+          show: '展示',
+          hide: '隱藏',
+          subTitle: '工作流詳細資訊',
+          showDesc: '在 WebApp 中顯示或隱藏工作流詳細資訊',
+        },
+        chatColorTheme: '聊天顏色主題',
+        chatColorThemeDesc: '設定聊天機器人的顏色主題',
+        chatColorThemeInverted: '反轉',
+        invalidHexMessage: '無效的十六進制值',
         more: {
           entry: '展示更多設定',
           copyright: '版權',
@@ -54,7 +65,16 @@ const translation = {
           customDisclaimer: '自定義免責聲明',
           customDisclaimerPlaceholder: '請輸入免責聲明',
           customDisclaimerTip: '客製化的免責聲明文字將在客戶端顯示，提供有關應用程式的額外資訊。',
+          copyrightTip: '在 Web 應用程式中顯示版權資訊',
+          copyrightTooltip: '請升級至專業計劃或以上',
         },
+        sso: {
+          description: '所有使用者在使用 WebApp 之前都需要使用 SSO 登錄',
+          title: 'WebApp SSO',
+          tooltip: '聯繫管理員以啟用 WebApp SSO',
+          label: 'SSO 身份驗證',
+        },
+        modalTip: '用戶端 Web 應用程式設置。',
       },
       embedded: {
         entry: '嵌入',
@@ -114,7 +134,11 @@ const translation = {
     },
     activeUsers: {
       title: '活躍使用者數',
-      explanation: '與 AI 有效互動，即有一問一答以上的唯一使用者數。提示詞編排和除錯的會話不計入。',
+      explanation: '每日AI互動次數。',
+    },
+    totalConversations: {
+      title: '總對話數',
+      explanation: '每日AI對話次數；不包括提示工程/調試。',
     },
     tokenUsage: {
       title: '費用消耗',

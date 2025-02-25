@@ -1,6 +1,5 @@
 from typing import Any
 
-from core.tools.entities.values import ToolLabelEnum
 from core.tools.errors import ToolProviderCredentialValidationError
 from core.tools.provider.builtin.tavily.tools.tavily_search import TavilySearchTool
 from core.tools.provider.builtin_tool_provider import BuiltinToolProviderController
@@ -14,7 +13,7 @@ class TavilyProvider(BuiltinToolProviderController):
                     "credentials": credentials,
                 }
             ).invoke(
-                user_id='',
+                user_id="",
                 tool_parameters={
                     "query": "Sachin Tendulkar",
                     "search_depth": "basic",
@@ -23,9 +22,8 @@ class TavilyProvider(BuiltinToolProviderController):
                     "include_raw_content": False,
                     "max_results": 5,
                     "include_domains": "",
-                    "exclude_domains": ""
+                    "exclude_domains": "",
                 },
             )
         except Exception as e:
             raise ToolProviderCredentialValidationError(str(e))
-        

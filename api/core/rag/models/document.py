@@ -2,7 +2,20 @@ from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from typing import Any, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+
+
+class ChildDocument(BaseModel):
+    """Class for storing a piece of text and associated metadata."""
+
+    page_content: str
+
+    vector: Optional[list[float]] = None
+
+    """Arbitrary metadata about the page content (e.g., source, relationships to other
+        documents, etc.).
+    """
+    metadata: dict = {}
 
 
 class Document(BaseModel):
@@ -10,10 +23,16 @@ class Document(BaseModel):
 
     page_content: str
 
+    vector: Optional[list[float]] = None
+
     """Arbitrary metadata about the page content (e.g., source, relationships to other
         documents, etc.).
     """
-    metadata: Optional[dict] = Field(default_factory=dict)
+    metadata: dict = {}
+
+    provider: Optional[str] = "dify"
+
+    children: Optional[list[ChildDocument]] = None
 
 
 class BaseDocumentTransformer(ABC):
@@ -53,9 +72,7 @@ class BaseDocumentTransformer(ABC):
     """
 
     @abstractmethod
-    def transform_documents(
-        self, documents: Sequence[Document], **kwargs: Any
-    ) -> Sequence[Document]:
+    def transform_documents(self, documents: Sequence[Document], **kwargs: Any) -> Sequence[Document]:
         """Transform a list of documents.
 
         Args:
@@ -66,9 +83,7 @@ class BaseDocumentTransformer(ABC):
         """
 
     @abstractmethod
-    async def atransform_documents(
-        self, documents: Sequence[Document], **kwargs: Any
-    ) -> Sequence[Document]:
+    async def atransform_documents(self, documents: Sequence[Document], **kwargs: Any) -> Sequence[Document]:
         """Asynchronously transform a list of documents.
 
         Args:

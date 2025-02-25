@@ -27,10 +27,11 @@ import ShareQRCode from '@/app/components/base/qrcode'
 import SecretKeyButton from '@/app/components/develop/secret-key/secret-key-button'
 import type { AppDetailResponse } from '@/models/app'
 import { useAppContext } from '@/context/app-context'
+import type { AppSSO } from '@/types/app'
 
 export type IAppCardProps = {
   className?: string
-  appInfo: AppDetailResponse
+  appInfo: AppDetailResponse & Partial<AppSSO>
   cardType?: 'api' | 'webapp'
   customBgColor?: string
   onChangeStatus: (val: boolean) => Promise<void>
@@ -53,7 +54,7 @@ function AppCard({
 }: IAppCardProps) {
   const router = useRouter()
   const pathname = usePathname()
-  const { currentWorkspace, isCurrentWorkspaceManager, isCurrentWorkspaceEditor } = useAppContext()
+  const { isCurrentWorkspaceManager, isCurrentWorkspaceEditor } = useAppContext()
   const [showSettingsModal, setShowSettingsModal] = useState(false)
   const [showEmbedded, setShowEmbedded] = useState(false)
   const [showCustomizeModal, setShowCustomizeModal] = useState(false)
@@ -88,9 +89,7 @@ function AppCard({
   const runningStatus = isApp ? appInfo.enable_site : appInfo.enable_api
   const { app_base_url, access_token } = appInfo.site ?? {}
   const appMode = (appInfo.mode !== 'completion' && appInfo.mode !== 'workflow') ? 'chat' : appInfo.mode
-  window.location.host
-  const appUrl = `http://${ window.location.host}/${appMode}/${access_token}`
-  // const appUrl = `${app_base_url}/${appMode}/${access_token}`
+  const appUrl = `${app_base_url}/${appMode}/${access_token}`
   const apiUrl = appInfo?.api_base_url
 
   let bgColor = 'bg-primary-50 bg-opacity-40'
@@ -135,8 +134,8 @@ function AppCard({
 
   return (
     <div
-      className={`shadow-xs border-[0.5px] rounded-lg border-gray-200 ${className ?? ''
-      }`}
+      className={
+        `shadow-xs border-[0.5px] rounded-lg border-gray-200 ${className ?? ''}`}
     >
       <div className={`px-6 py-5 ${customBgColor ?? bgColor} rounded-lg`}>
         <div className="mb-2.5 flex flex-row items-start justify-between">
@@ -177,7 +176,6 @@ function AppCard({
               {isApp && <ShareQRCode content={isApp ? appUrl : apiUrl} selectorId={randomString(8)} className={'hover:bg-gray-200'} />}
               <CopyFeedback
                 content={isApp ? appUrl : apiUrl}
-                selectorId={randomString(8)}
                 className={'hover:bg-gray-200'}
               />
               {/* button copy link/ button regenerate */}
@@ -185,9 +183,8 @@ function AppCard({
                 <Confirm
                   type='warning'
                   title={t('appOverview.overview.appInfo.regenerate')}
-                  content={''}
+                  content={t('appOverview.overview.appInfo.regenerateNotice')}
                   isShow={showConfirmDelete}
-                  onClose={() => setShowConfirmDelete(false)}
                   onConfirm={() => {
                     onGenCode()
                     setShowConfirmDelete(false)
@@ -197,16 +194,15 @@ function AppCard({
               )}
               {isApp && isCurrentWorkspaceManager && (
                 <Tooltip
-                  content={t('appOverview.overview.appInfo.regenerate') || ''}
-                  selector={`code-generate-${randomString(8)}`}
+                  popupContent={t('appOverview.overview.appInfo.regenerate') || ''}
                 >
                   <div
                     className="w-8 h-8 ml-0.5 cursor-pointer hover:bg-gray-200 rounded-lg"
                     onClick={() => setShowConfirmDelete(true)}
                   >
                     <div
-                      className={`w-full h-full ${style.refreshIcon} ${genLoading ? style.generateLogo : ''
-                      }`}
+                      className={
+                        `w-full h-full ${style.refreshIcon} ${genLoading ? style.generateLogo : ''}`}
                     ></div>
                   </div>
                 </Tooltip>
@@ -223,17 +219,16 @@ function AppCard({
                 : !runningStatus
             return (
               <Button
-                className="mr-2 border-[0.5px] !h-8 hover:outline hover:outline-[0.5px] hover:outline-gray-300 text-gray-700 font-medium bg-white shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)]"
+                className="mr-2"
                 key={op.opName}
                 onClick={genClickFuncByName(op.opName)}
                 disabled={disabled}
               >
                 <Tooltip
-                  content={
+                  popupContent={
                     t('appOverview.overview.appInfo.preUseReminder') ?? ''
                   }
-                  selector={`op-btn-${randomString(16)}`}
-                  className={disabled ? 'mt-[-8px]' : '!hidden'}
+                  popupClassName={disabled ? 'mt-[-8px]' : '!hidden'}
                 >
                   <div className="flex flex-row items-center">
                     <op.opIcon className="h-4 w-4 mr-1.5 stroke-[1.8px]" />
@@ -249,12 +244,14 @@ function AppCard({
         ? (
           <>
             <SettingsModal
+              isChat={appMode === 'chat'}
               appInfo={appInfo}
               isShow={showSettingsModal}
               onClose={() => setShowSettingsModal(false)}
               onSave={onSaveSiteConfig}
             />
             <EmbeddedModal
+              siteInfo={appInfo.site}
               isShow={showEmbedded}
               onClose={() => setShowEmbedded(false)}
               appBaseUrl={app_base_url}

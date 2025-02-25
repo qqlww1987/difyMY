@@ -31,6 +31,8 @@ const translation = {
     manageInTools: '도구에서 관리',
     emptyTitle: '사용 가능한 워크플로우 도구 없음',
     emptyTip: '"워크플로우 -> 도구로 등록하기"로 이동',
+    emptyTipCustom: '사용자 지정 도구 만들기',
+    emptyTitleCustom: '사용 가능한 사용자 지정 도구가 없습니다.',
   },
   createTool: {
     title: '커스텀 도구 만들기',
@@ -105,6 +107,8 @@ const translation = {
     customDisclaimerPlaceholder: '사용자 정의 권리 포기 문구를 입력해주세요.',
     confirmTitle: '저장하시겠습니까?',
     confirmTip: '이 도구를 사용하는 앱은 영향을 받습니다.',
+    deleteToolConfirmTitle: '이 도구를 삭제하시겠습니까?',
+    deleteToolConfirmContent: '이 도구를 삭제하면 되돌릴 수 없습니다. 사용자는 더 이상 당신의 도구에 액세스할 수 없습니다.',
   },
   test: {
     title: '테스트',

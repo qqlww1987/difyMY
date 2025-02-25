@@ -3,11 +3,17 @@ import type {
   Node as ReactFlowNode,
   Viewport,
 } from 'reactflow'
-import type { TransferMethod } from '@/types/app'
+import type { Resolution, TransferMethod } from '@/types/app'
 import type { ToolDefaultValue } from '@/app/components/workflow/block-selector/types'
 import type { VarType as VarKindType } from '@/app/components/workflow/nodes/tool/types'
-import type { NodeTracing } from '@/types/workflow'
+import type { FileResponse, NodeTracing } from '@/types/workflow'
 import type { Collection, Tool } from '@/app/components/tools/types'
+import type { ChatVarType } from '@/app/components/workflow/panel/chat-variable-panel/type'
+import type {
+  DefaultValueForm,
+  ErrorHandleTypeEnum,
+} from '@/app/components/workflow/nodes/_base/components/error-handle/types'
+import type { WorkflowRetryConfig } from '@/app/components/workflow/nodes/_base/components/retry/types'
 
 export enum BlockEnum {
   Start = 'start',
@@ -25,8 +31,21 @@ export enum BlockEnum {
   Tool = 'tool',
   ParameterExtractor = 'parameter-extractor',
   Iteration = 'iteration',
+  DocExtractor = 'document-extractor',
+  ListFilter = 'list-operator',
+  IterationStart = 'iteration-start',
+  Assigner = 'assigner', // is now named as VariableAssigner
 }
 
+export enum ControlMode {
+  Pointer = 'pointer',
+  Hand = 'hand',
+}
+export enum ErrorHandleMode {
+  Terminated = 'terminated',
+  ContinueOnError = 'continue-on-error',
+  RemoveAbnormalOutput = 'remove-abnormal-output',
+}
 export type Branch = {
   id: string
   name: string
@@ -38,6 +57,7 @@ export type CommonNodeType<T = {}> = {
   _targetBranches?: Branch[]
   _isSingleRun?: boolean
   _runningStatus?: NodeRunningStatus
+  _runningBranchId?: string
   _singleRunningStatus?: NodeRunningStatus
   _isCandidate?: boolean
   _isBundled?: boolean
@@ -47,7 +67,9 @@ export type CommonNodeType<T = {}> = {
   _holdAddVariablePopup?: boolean
   _iterationLength?: number
   _iterationIndex?: number
-  isIterationStart?: boolean
+  _inParallelHovering?: boolean
+  _waitingRun?: boolean
+  _retryIndex?: number
   isInIteration?: boolean
   iteration_id?: string
   selected?: boolean
@@ -56,14 +78,19 @@ export type CommonNodeType<T = {}> = {
   type: BlockEnum
   width?: number
   height?: number
+  error_strategy?: ErrorHandleTypeEnum
+  retry_config?: WorkflowRetryConfig
+  default_value?: DefaultValueForm[]
 } & T & Partial<Pick<ToolDefaultValue, 'provider_id' | 'provider_type' | 'provider_name' | 'tool_name'>>
 
 export type CommonEdgeType = {
   _hovering?: boolean
   _connectedNodeIsHovering?: boolean
   _connectedNodeIsSelected?: boolean
-  _runned?: boolean
   _isBundled?: boolean
+  _sourceRunningStatus?: NodeRunningStatus
+  _targetRunningStatus?: NodeRunningStatus
+  _waitingRun?: boolean
   isInIteration?: boolean
   iteration_id?: string
   sourceType: BlockEnum
@@ -79,7 +106,7 @@ export type NodePanelProps<T> = {
 }
 export type Edge = ReactFlowEdge<CommonEdgeType>
 
-export type WorkflowDataUpdator = {
+export type WorkflowDataUpdater = {
   nodes: Node[]
   edges: Edge[]
   viewport: Viewport
@@ -102,6 +129,27 @@ export type Variable = {
   isParagraph?: boolean
 }
 
+export type EnvironmentVariable = {
+  id: string
+  name: string
+  value: any
+  value_type: 'string' | 'number' | 'secret'
+}
+
+export type ConversationVariable = {
+  id: string
+  name: string
+  value_type: ChatVarType
+  value: any
+  description: string
+}
+
+export type GlobalVariable = {
+  name: string
+  value_type: 'string' | 'number'
+  description: string
+}
+
 export type VariableWithValue = {
   key: string
   value: string
@@ -117,6 +165,8 @@ export enum InputVarType {
   json = 'json', // obj, array
   contexts = 'contexts', // knowledge retrieval
   iterator = 'iterator', // iteration input
+  singleFile = 'file',
+  multiFiles = 'file-list',
 }
 
 export type InputVar = {
@@ -125,6 +175,7 @@ export type InputVar = {
     nodeType: BlockEnum
     nodeName: string
     variable: string
+    isChatVar?: boolean
   }
   variable: string
   max_length?: number
@@ -132,7 +183,8 @@ export type InputVar = {
   required: boolean
   hint?: string
   options?: string[]
-}
+  value_selector?: ValueSelector
+} & Partial<UploadFileSetting>
 
 export type ModelConfig = {
   provider: string
@@ -182,8 +234,10 @@ export type Memory = {
 export enum VarType {
   string = 'string',
   number = 'number',
+  secret = 'secret',
   boolean = 'boolean',
   object = 'object',
+  file = 'file',
   array = 'array',
   arrayString = 'array[string]',
   arrayNumber = 'array[number]',
@@ -200,6 +254,8 @@ export type Var = {
   isSelect?: boolean
   options?: string[]
   required?: boolean
+  des?: string
+  isException?: boolean
 }
 
 export type NodeOutPutVar = {
@@ -233,12 +289,19 @@ export enum WorkflowRunningStatus {
   Stopped = 'stopped',
 }
 
+export enum WorkflowVersion {
+  Draft = 'draft',
+  Latest = 'latest',
+}
+
 export enum NodeRunningStatus {
   NotStart = 'not-start',
   Waiting = 'waiting',
   Running = 'running',
   Succeeded = 'succeeded',
   Failed = 'failed',
+  Exception = 'exception',
+  Retry = 'retry',
 }
 
 export type OnNodeAdd = (
@@ -288,6 +351,8 @@ export type WorkflowRunningData = {
     steps?: number
     showSteps?: boolean
     total_steps?: number
+    files?: FileResponse[]
+    exceptions_count?: number
   }
   tracing?: NodeTracing[]
 }
@@ -314,4 +379,25 @@ export type MoreInfo = {
 
 export type ToolWithProvider = Collection & {
   tools: Tool[]
+}
+
+export enum SupportUploadFileTypes {
+  image = 'image',
+  document = 'document',
+  audio = 'audio',
+  video = 'video',
+  custom = 'custom',
+}
+
+export type UploadFileSetting = {
+  allowed_file_upload_methods: TransferMethod[]
+  allowed_file_types: SupportUploadFileTypes[]
+  allowed_file_extensions?: string[]
+  max_length: number
+  number_limits?: number
+}
+
+export type VisionSetting = {
+  variable_selector: ValueSelector
+  detail: Resolution
 }

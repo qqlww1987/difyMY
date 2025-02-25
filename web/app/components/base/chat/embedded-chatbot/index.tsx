@@ -2,25 +2,29 @@ import {
   useEffect,
   useState,
 } from 'react'
-import cn from 'classnames'
 import { useAsyncEffect } from 'ahooks'
+import { useTranslation } from 'react-i18next'
+import { RiLoopLeftLine } from '@remixicon/react'
 import {
   EmbeddedChatbotContext,
   useEmbeddedChatbotContext,
 } from './context'
 import { useEmbeddedChatbot } from './hooks'
 import { isDify } from './utils'
+import { useThemeContext } from './theme/theme-context'
+import cn from '@/utils/classnames'
 import { checkOrSetAccessToken } from '@/app/components/share/utils'
 import AppUnavailable from '@/app/components/base/app-unavailable'
 import useBreakpoints, { MediaType } from '@/hooks/use-breakpoints'
 import Loading from '@/app/components/base/loading'
-import LogoHeader from '@/app/components/base/logo/logo-embeded-chat-header'
+import LogoHeader from '@/app/components/base/logo/logo-embedded-chat-header'
 import Header from '@/app/components/base/chat/embedded-chatbot/header'
 import ConfigPanel from '@/app/components/base/chat/embedded-chatbot/config-panel'
 import ChatWrapper from '@/app/components/base/chat/embedded-chatbot/chat-wrapper'
-import LogoTooneHeader from '@/app/components/base/logo/logo-embeded-chat-tooneheader'
+import Tooltip from '@/app/components/base/tooltip'
 
 const Chatbot = () => {
+  const { t } = useTranslation()
   const {
     isMobile,
     appInfoError,
@@ -29,8 +33,8 @@ const Chatbot = () => {
     appPrevChatList,
     showConfigPanelBeforeChat,
     appChatListDataLoading,
-    handleStartChat,
     handleNewConversation,
+    themeBuilder,
   } = useEmbeddedChatbotContext()
 
   const chatReady = (!showConfigPanelBeforeChat || !!appPrevChatList.length)
@@ -38,19 +42,16 @@ const Chatbot = () => {
   const site = appData?.site
 
   const difyIcon = <LogoHeader />
- 
-  const ToonIcon = (
-    <LogoTooneHeader />
-  )
-  useEffect(() => {
-    if (site) {
 
-      // if (customConfig)
+  useEffect(() => {
+    themeBuilder?.buildTheme(site?.chat_color_theme, site?.chat_color_theme_inverted)
+    if (site) {
+      if (customConfig)
         document.title = `${site.title}`
-      // else
-      //   document.title = `${site.title} - Powered by Toone`
+      else
+        document.title = `${site.title} - Powered by Dify`
     }
-  }, [site, customConfig])
+  }, [site, customConfig, themeBuilder])
 
   if (appInfoLoading) {
     return (
@@ -69,15 +70,11 @@ const Chatbot = () => {
         isMobile={isMobile}
         title={site?.title || ''}
         customerIcon={isDify() ? difyIcon : ''}
-        onCreateNewChat={handleNewConversation} 
-        onStartNewChat={handleStartChat}
-        middleIcon={ToonIcon}
-        icon={''} icon_background={''}      />
+        theme={themeBuilder?.theme}
+        onCreateNewChat={handleNewConversation}
+      />
       <div className='flex bg-white overflow-hidden'>
         <div className={cn('h-[100vh] grow flex flex-col overflow-y-auto', isMobile && '!h-[calc(100vh_-_3rem)]')}>
-          {/* guorq 屏蔽这款的显示 */}
-          {/* 打印appChatListDataLoading */}
-
           {showConfigPanelBeforeChat && !appChatListDataLoading && !appPrevChatList.length && (
             <div className={cn('flex w-full items-center justify-center h-full tablet:px-4', isMobile && 'px-4')}>
               <ConfigPanel />
@@ -87,7 +84,20 @@ const Chatbot = () => {
             <Loading type='app' />
           )}
           {chatReady && !appChatListDataLoading && (
-            <ChatWrapper />
+            <div className='relative h-full pt-8 mx-auto w-full max-w-[720px]'>
+              {!isMobile && (
+                <div className='absolute top-2.5 right-3 z-20'>
+                  <Tooltip
+                    popupContent={t('share.chat.resetChat')}
+                  >
+                    <div className='p-1.5 bg-white border-[0.5px] border-gray-100 rounded-lg shadow-md cursor-pointer' onClick={handleNewConversation}>
+                      <RiLoopLeftLine className="h-4 w-4 text-gray-500"/>
+                    </div>
+                  </Tooltip>
+                </div>
+              )}
+              <ChatWrapper />
+            </div>
           )}
         </div>
       </div>
@@ -97,8 +107,9 @@ const Chatbot = () => {
 
 const EmbeddedChatbotWrapper = () => {
   const media = useBreakpoints()
-  // const isMobile = media === MediaType.mobile
-  const isMobile =true
+  const isMobile = media === MediaType.mobile
+  const themeBuilder = useThemeContext()
+
   const {
     appInfoError,
     appInfoLoading,
@@ -113,6 +124,7 @@ const EmbeddedChatbotWrapper = () => {
     conversationList,
     showConfigPanelBeforeChat,
     newConversationInputs,
+    newConversationInputsRef,
     handleNewConversationInputsChange,
     inputsForms,
     handleNewConversation,
@@ -140,6 +152,7 @@ const EmbeddedChatbotWrapper = () => {
     conversationList,
     showConfigPanelBeforeChat,
     newConversationInputs,
+    newConversationInputsRef,
     handleNewConversationInputsChange,
     inputsForms,
     handleNewConversation,
@@ -152,6 +165,7 @@ const EmbeddedChatbotWrapper = () => {
     appId,
     handleFeedback,
     currentChatInstanceRef,
+    themeBuilder,
   }}>
     <Chatbot />
   </EmbeddedChatbotContext.Provider>

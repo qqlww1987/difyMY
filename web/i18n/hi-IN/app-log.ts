@@ -4,8 +4,9 @@ const translation = {
   dateTimeFormat: 'MM/DD/YYYY hh:mm A',
   table: {
     header: {
-      time: 'समय',
-      endUser: 'अंतिम उपयोगकर्ता',
+      updatedTime: 'अपडेट का समय',
+      time: 'बनाने का समय',
+      endUser: 'अंतिम उपयोगकर्ता या खाता',
       input: 'इनपुट',
       output: 'आउटपुट',
       summary: 'शीर्षक',
@@ -16,7 +17,7 @@ const translation = {
       status: 'स्थिति',
       runtime: 'रन टाइम',
       tokens: 'टोकन',
-      user: 'अंतिम उपयोगकर्ता',
+      user: 'अंतिम उपयोगकर्ता या खाता',
       version: 'संस्करण',
     },
     pagination: {
@@ -53,6 +54,7 @@ const translation = {
     },
     variables: 'वेरिएबल्स',
     uploadImages: 'अपलोड की गई छवियाँ',
+    modelParams: 'मॉडल पैरामीटर',
   },
   filter: {
     period: {
@@ -71,12 +73,17 @@ const translation = {
       annotated: 'एनोटेट किए गए सुधार ({{count}} आइटम)',
       not_annotated: 'एनोटेट नहीं किया गया',
     },
+    sortBy: 'इसके अनुसार क्रमबद्ध करें:',
+    descending: 'अवरोही',
+    ascending: 'आरोही',
   },
   workflowTitle: 'वर्कफ़्लो लॉग्स',
   workflowSubtitle: 'यह लॉग ऑटोमेटे के ऑपरेशन को रिकॉर्ड करता है।',
   runDetail: {
     title: 'बातचीत लॉग',
     workflowTitle: 'लॉग विवरण',
+    fileListDetail: 'विस्तार',
+    fileListLabel: 'फ़ाइल विवरण',
   },
   promptLog: 'प्रॉम्प्ट लॉग',
   agentLog: 'एजेंट लॉग',
@@ -89,6 +96,10 @@ const translation = {
     promptTemplate: 'प्रॉम्प्ट टेम्पलेट',
     promptInput: 'प्रॉम्प्ट इनपुट',
     response: 'प्रतिक्रिया',
+    iterations: 'पुनरूक्तियाँ',
+    toolUsed: 'प्रयुक्त उपकरण',
+    finalProcessing: 'अंतिम प्रसंस्करण',
+    iteration: 'चलना',
   },
 }
 

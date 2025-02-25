@@ -47,9 +47,6 @@ export const addAnnotation = (appId: string, body: AnnotationItemBasic) => {
 export const annotationBatchImport: Fetcher<{ job_id: string; job_status: string }, { url: string; body: FormData }> = ({ url, body }) => {
   return post<{ job_id: string; job_status: string }>(url, { body }, { bodyStringify: false, deleteContentType: true })
 }
-// export const annotationConvertFaq: Fetcher<{ job_id: string; job_status: string }, { url: string; body: FormData }> = ({ url, body }) => {
-//   return post<{ job_id: string; job_status: string }>(url, { body }, { bodyStringify: false, deleteContentType: true })
-// }
 
 export const checkAnnotationBatchImportProgress: Fetcher<{ job_id: string; job_status: string }, { jobID: string; appId: string }> = ({ jobID, appId }) => {
   return get<{ job_id: string; job_status: string }>(`/apps/${appId}/annotations/batch-import-status/${jobID}`)

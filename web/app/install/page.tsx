@@ -1,8 +1,8 @@
 import React from 'react'
-import classNames from 'classnames'
 import Header from '../signin/_header'
 import style from '../signin/page.module.css'
 import InstallForm from './installForm'
+import classNames from '@/utils/classnames'
 
 const Install = () => {
   return (
@@ -21,10 +21,9 @@ const Install = () => {
       }>
         <Header />
         <InstallForm />
-        {/* guorq 先把版权搞掉 */}
-        {/* <div className='px-8 py-6 text-sm font-normal text-gray-500'>
-          © {new Date().getFullYear()} Dify, Inc. All rights reserved.
-        </div> */}
+        <div className='px-8 py-6 text-sm font-normal text-gray-500'>
+          © {new Date().getFullYear()} LangGenius, Inc. All rights reserved.
+        </div>
       </div>
     </div>
   )

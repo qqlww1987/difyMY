@@ -1,19 +1,19 @@
 'use client'
 import type { FC } from 'react'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-// import React, { useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import useSWR from 'swr'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/navigation'
-import { debounce, groupBy, omit } from 'lodash-es'
+import { useDebounce, useDebounceFn } from 'ahooks'
+import { groupBy, omit } from 'lodash-es'
 import { PlusIcon } from '@heroicons/react/24/solid'
+import { RiExternalLinkLine } from '@remixicon/react'
+import AutoDisabledDocument from '../common/document-status-with-action/auto-disabled-document'
 import List from './list'
-import Modal from '@/app/components/base/modal'
 import s from './style.module.css'
 import Loading from '@/app/components/base/loading'
 import Button from '@/app/components/base/button'
 import Input from '@/app/components/base/input'
-import Pagination from '@/app/components/base/pagination'
 import { get } from '@/service/base'
 import { createDocument, fetchDocuments } from '@/service/datasets'
 import { useDatasetDetailContext } from '@/context/dataset-detail'
@@ -21,11 +21,12 @@ import { NotionPageSelectorModal } from '@/app/components/base/notion-page-selec
 import type { NotionPage } from '@/models/common'
 import type { CreateDocumentReq } from '@/models/datasets'
 import { DataSourceType } from '@/models/datasets'
-import RetryButton from '@/app/components/base/retry-button'
-import cn from 'classnames'
-import ChildPage from './faq/index';
-// Custom page count is not currently supported.
-const limit = 15
+import IndexFailed from '@/app/components/datasets/common/document-status-with-action/index-failed'
+import { useProviderContext } from '@/context/provider-context'
+import cn from '@/utils/classnames'
+import { useInvalidDocumentDetailKey } from '@/service/knowledge/use-document'
+import { useInvalid } from '@/service/use-base'
+import { useChildSegmentListKey, useSegmentListKey } from '@/service/knowledge/use-segment'
 
 const FolderPlusIcon = ({ className }: React.SVGProps<SVGElement>) => {
   return <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={className ?? ''}>
@@ -77,11 +78,16 @@ type IDocumentsProps = {
 }
 
 export const fetcher = (url: string) => get(url, {}, {})
+const DEFAULT_LIMIT = 15
 
 const Documents: FC<IDocumentsProps> = ({ datasetId }) => {
   const { t } = useTranslation()
+  const { plan } = useProviderContext()
+  const isFreePlan = plan.type === 'sandbox'
+  const [inputValue, setInputValue] = useState<string>('') // the input value
   const [searchValue, setSearchValue] = useState<string>('')
   const [currPage, setCurrPage] = React.useState<number>(0)
+  const [limit, setLimit] = useState<number>(DEFAULT_LIMIT)
   const router = useRouter()
   const { dataset } = useDatasetDetailContext()
   const [notionPageSelectorModalVisible, setNotionPageSelectorModalVisible] = useState(false)
@@ -91,11 +97,13 @@ const Documents: FC<IDocumentsProps> = ({ datasetId }) => {
   const isDataSourceFile = dataset?.data_source_type === DataSourceType.FILE
   const embeddingAvailable = !!dataset?.embedding_available
 
-  const query = useMemo(() => {
-    return { page: currPage + 1, limit, keyword: searchValue, fetch: isDataSourceNotion ? true : '' }
-  }, [searchValue, currPage, isDataSourceNotion])
+  const debouncedSearchValue = useDebounce(searchValue, { wait: 500 })
 
-  const { data: documentsRes, error, mutate } = useSWR(
+  const query = useMemo(() => {
+    return { page: currPage + 1, limit, keyword: debouncedSearchValue, fetch: isDataSourceNotion ? true : '' }
+  }, [currPage, debouncedSearchValue, isDataSourceNotion, limit])
+
+  const { data: documentsRes, mutate, isLoading: isListLoading } = useSWR(
     {
       action: 'fetchDocuments',
       datasetId,
@@ -105,20 +113,41 @@ const Documents: FC<IDocumentsProps> = ({ datasetId }) => {
     { refreshInterval: (isDataSourceNotion && timerCanRun) ? 2500 : 0 },
   )
 
+  const [isMuting, setIsMuting] = useState(false)
+  useEffect(() => {
+    if (!isListLoading && isMuting)
+      setIsMuting(false)
+  }, [isListLoading, isMuting])
+
+  const invalidDocumentDetail = useInvalidDocumentDetailKey()
+  const invalidChunkList = useInvalid(useSegmentListKey)
+  const invalidChildChunkList = useInvalid(useChildSegmentListKey)
+
+  const handleUpdate = useCallback(() => {
+    setIsMuting(true)
+    mutate()
+    invalidDocumentDetail()
+    setTimeout(() => {
+      invalidChunkList()
+      invalidChildChunkList()
+    }, 5000)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const documentsWithProgress = useMemo(() => {
     let completedNum = 0
     let percent = 0
     const documentsData = documentsRes?.data?.map((documentItem) => {
       const { indexing_status, completed_segments, total_segments } = documentItem
-      const isEmbeddinged = indexing_status === 'completed' || indexing_status === 'paused' || indexing_status === 'error'
+      const isEmbedded = indexing_status === 'completed' || indexing_status === 'paused' || indexing_status === 'error'
 
-      if (isEmbeddinged)
+      if (isEmbedded)
         completedNum++
 
       const completedCount = completed_segments || 0
       const totalCount = total_segments || 0
       if (totalCount === 0 && completedCount === 0) {
-        percent = isEmbeddinged ? 100 : 0
+        percent = isEmbedded ? 100 : 0
       }
       else {
         const per = Math.round(completedCount * 100 / totalCount)
@@ -146,7 +175,7 @@ const Documents: FC<IDocumentsProps> = ({ datasetId }) => {
     router.push(`/datasets/${datasetId}/documents/create`)
   }
 
-  const isLoading = !documentsRes && !error
+  const isLoading = isListLoading // !documentsRes && !error
 
   const handleSaveNotionPageSelected = async (selectedPages: NotionPage[]) => {
     const workspacesMap = groupBy(selectedPages, 'workspace_id')
@@ -195,72 +224,74 @@ const Documents: FC<IDocumentsProps> = ({ datasetId }) => {
   }
 
   const documentsList = isDataSourceNotion ? documentsWithProgress?.data : documentsRes?.data
-  const [showModal, setShowModal] = useState(false)
-  // guorq 实现上传和下载
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [dragging, setDragging] = useState(false)
-  const dropRef = useRef<HTMLDivElement>(null)
-  const dragRef = useRef<HTMLDivElement>(null)
-  const fileUploader = useRef<HTMLInputElement>(null)
-  const selectHandle = () => {
-    if (fileUploader.current)
-      fileUploader.current.click()
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const { run: handleSearch } = useDebounceFn(() => {
+    setSearchValue(inputValue)
+  }, { wait: 500 })
+
+  const handleInputChange = (value: string) => {
+    setInputValue(value)
+    handleSearch()
   }
-  const itemClassName = `
-    flex items-center w-full h-9 px-3 text-gray-700 text-[14px]
-    rounded-lg font-normal hover:bg-gray-50 cursor-pointer
-  `
 
   return (
-    
     <div className='flex flex-col h-full overflow-y-auto'>
       <div className='flex flex-col justify-center gap-1 px-6 pt-4'>
-        <h1 className={s.title}>{t('datasetDocuments.list.title')}</h1>
-        <p className={s.desc}>{t('datasetDocuments.list.desc')}</p>
+        <h1 className='text-base font-semibold text-text-primary'>{t('datasetDocuments.list.title')}</h1>
+        <div className='flex items-center text-sm font-normal text-text-tertiary space-x-0.5'>
+          <span>{t('datasetDocuments.list.desc')}</span>
+          <a
+            className='flex items-center text-text-accent'
+            target='_blank'
+            href='https://docs.dify.ai/guides/knowledge-base/integrate-knowledge-within-application'>
+            <span>{t('datasetDocuments.list.learnMore')}</span>
+            <RiExternalLinkLine className='w-3 h-3' />
+          </a>
+        </div>
       </div>
       <div className='flex flex-col px-6 py-4 flex-1'>
         <div className='flex items-center justify-between flex-wrap'>
           <Input
-            showPrefix
+            showLeftIcon
+            showClearIcon
             wrapperClassName='!w-[200px]'
-            className='!h-8 !text-[13px]'
-            onChange={debounce(setSearchValue, 500)}
-            value={searchValue}
+            value={inputValue}
+            onChange={e => handleInputChange(e.target.value)}
+            onClear={() => handleInputChange('')}
           />
           <div className='flex gap-2 justify-center items-center !h-8'>
-            {/* 暂时屏蔽 */}
-            {/* <div className='flex gap-2 justify-center items-center !h-8'>
-              <RetryButton datasetId={datasetId} />
-              {embeddingAvailable && (
-                <Button type='primary' onClick={() => setShowModal(true)} className='!h-8 !text-[13px] !shrink-0'>
-                  <PlusIcon className='h-4 w-4 mr-2 stroke-current' />
-                  {'FAQ转换'}
-                </Button>
-              )}
-            </div> */}
-            <RetryButton datasetId={datasetId} />
+            {!isFreePlan && <AutoDisabledDocument datasetId={datasetId} />}
+            <IndexFailed datasetId={datasetId} />
             {embeddingAvailable && (
-              <Button type='primary' onClick={routeToDocCreate} className='!h-8 !text-[13px] !shrink-0'>
-                <PlusIcon className='h-4 w-4 mr-2 stroke-current' />
+              <Button variant='primary' onClick={routeToDocCreate} className='shrink-0'>
+                <PlusIcon className={cn('h-4 w-4 mr-2 stroke-current')} />
                 {isDataSourceNotion && t('datasetDocuments.list.addPages')}
                 {isDataSourceWeb && t('datasetDocuments.list.addUrl')}
-                {isDataSourceFile && t('datasetDocuments.list.addFile')}
+                {(!dataset?.data_source_type || isDataSourceFile) && t('datasetDocuments.list.addFile')}
               </Button>
-              
             )}
           </div>
-          
         </div>
-        {isLoading
+        {(isLoading && !isMuting)
           ? <Loading type='app' />
           : total > 0
-            ? <List embeddingAvailable={embeddingAvailable} documents={documentsList || []} datasetId={datasetId} onUpdate={mutate} />
+            ? <List
+              embeddingAvailable={embeddingAvailable}
+              documents={documentsList || []}
+              datasetId={datasetId}
+              onUpdate={handleUpdate}
+              selectedIds={selectedIds}
+              onSelectedIdChange={setSelectedIds}
+              pagination={{
+                total,
+                limit,
+                onLimitChange: setLimit,
+                current: currPage,
+                onChange: setCurrPage,
+              }}
+            />
             : <EmptyElement canAdd={embeddingAvailable} onClick={routeToDocCreate} type={isDataSourceNotion ? 'sync' : 'upload'} />
         }
-        {/* Show Pagination only if the total is more than the limit */}
-        {(total && total > limit)
-          ? <Pagination current={currPage} onChange={setCurrPage} total={total} limit={limit} />
-          : null}
         <NotionPageSelectorModal
           isShow={notionPageSelectorModalVisible}
           onClose={() => setNotionPageSelectorModalVisible(false)}
@@ -268,16 +299,6 @@ const Documents: FC<IDocumentsProps> = ({ datasetId }) => {
           datasetId={dataset?.id || ''}
         />
       </div>
-      {showModal && <Modal isShow={showModal} onClose={() => setShowModal(false)}  closable>
-      <div className='mt-6'>
-      <ChildPage appId={''} isShow={true} onCancel={function (): void {
-            throw new Error('Function not implemented.')
-          } } onAdded={function (): void {
-            throw new Error('Function not implemented.')
-          } } />
-
-    </div>
-    </Modal>}
     </div>
   )
 }

@@ -10,10 +10,11 @@ class NotionInfo(BaseModel):
     """
     Notion import info.
     """
+
     notion_workspace_id: str
     notion_obj_id: str
     notion_page_type: str
-    document: Document = None
+    document: Optional[Document] = None
     tenant_id: str
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -25,6 +26,7 @@ class WebsiteInfo(BaseModel):
     """
     website import info.
     """
+
     provider: str
     job_id: str
     url: str
@@ -43,6 +45,7 @@ class ExtractSetting(BaseModel):
     """
     Model class for provider response.
     """
+
     datasource_type: str
     upload_file: Optional[UploadFile] = None
     notion_info: Optional[NotionInfo] = None

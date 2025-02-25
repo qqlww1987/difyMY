@@ -1,14 +1,17 @@
-import type { AppMode } from '@/types/app'
+import type { AppIconType, AppMode } from '@/types/app'
 export type AppBasicInfo = {
   id: string
   mode: AppMode
+  icon_type: AppIconType | null
   icon: string
   icon_background: string
+  icon_url: string
   name: string
   description: string
+  use_icon_as_answer_icon: boolean
 }
 
-export type AppCategory = 'Writing' | 'Translate' | 'HR' | 'Programming' | 'Assistant'
+export type AppCategory = 'Writing' | 'Translate' | 'HR' | 'Programming' | 'Assistant' | 'Agent' | 'Recommended' | 'Workflow'
 
 export type App = {
   app: AppBasicInfo

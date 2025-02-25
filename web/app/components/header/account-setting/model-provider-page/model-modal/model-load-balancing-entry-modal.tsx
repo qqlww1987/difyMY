@@ -7,6 +7,9 @@ import {
   useState,
 } from 'react'
 import { useTranslation } from 'react-i18next'
+import {
+  RiErrorWarningFill,
+} from '@remixicon/react'
 import type {
   CredentialFormSchema,
   CredentialFormSchemaRadio,
@@ -32,13 +35,12 @@ import Form from './Form'
 import Button from '@/app/components/base/button'
 import { Lock01 } from '@/app/components/base/icons/src/vender/solid/security'
 import { LinkExternal02 } from '@/app/components/base/icons/src/vender/line/general'
-import { AlertCircle } from '@/app/components/base/icons/src/vender/solid/alertsAndFeedback'
 import {
   PortalToFollowElem,
   PortalToFollowElemContent,
 } from '@/app/components/base/portal-to-follow-elem'
 import { useToastContext } from '@/app/components/base/toast'
-import ConfirmCommon from '@/app/components/base/confirm/common'
+import Confirm from '@/app/components/base/confirm'
 
 type ModelModalProps = {
   provider: ModelProvider
@@ -190,12 +192,12 @@ const ModelLoadBalancingEntryModal: FC<ModelModalProps> = ({
   })
   const getSecretValues = useCallback((v: FormValue) => {
     return secretFormSchemas.reduce((prev, next) => {
-      if (v[next.variable] === initialFormSchemasValue[next.variable])
+      if (isEditMode && v[next.variable] && v[next.variable] === initialFormSchemasValue[next.variable])
         prev[next.variable] = '[__HIDDEN__]'
 
       return prev
     }, {} as Record<string, string>)
-  }, [initialFormSchemasValue, secretFormSchemas])
+  }, [initialFormSchemasValue, isEditMode, secretFormSchemas])
 
   // const handleValueChange = ({ __model_type, __model_name, ...v }: FormValue) => {
   const handleValueChange = (v: FormValue) => {
@@ -212,6 +214,7 @@ const ModelLoadBalancingEntryModal: FC<ModelModalProps> = ({
           ...value,
           ...getSecretValues(value),
         },
+        entry?.id,
       )
       if (res.status === ValidatedStatus.Success) {
         // notify({ type: 'success', message: t('common.actionMsg.modifiedSuccessfully') })
@@ -274,7 +277,8 @@ const ModelLoadBalancingEntryModal: FC<ModelModalProps> = ({
                   {
                     isEditMode && (
                       <Button
-                        className='mr-2 h-9 text-sm font-medium text-[#D92D20]'
+                        size='large'
+                        className='mr-2 text-[#D92D20]'
                         onClick={() => setShowConfirm(true)}
                       >
                         {t('common.operation.remove')}
@@ -282,14 +286,15 @@ const ModelLoadBalancingEntryModal: FC<ModelModalProps> = ({
                     )
                   }
                   <Button
-                    className='mr-2 h-9 text-sm font-medium text-gray-700'
+                    size='large'
+                    className='mr-2'
                     onClick={onCancel}
                   >
                     {t('common.operation.cancel')}
                   </Button>
                   <Button
-                    className='h-9 text-sm font-medium'
-                    type='primary'
+                    size='large'
+                    variant='primary'
                     onClick={handleSave}
                     disabled={loading || filteredRequiredFormSchemas.some(item => value[item.variable] === undefined)}
                   >
@@ -303,7 +308,7 @@ const ModelLoadBalancingEntryModal: FC<ModelModalProps> = ({
                 (validatedStatusState.status === ValidatedStatus.Error && validatedStatusState.message)
                   ? (
                     <div className='flex px-[10px] py-3 bg-[#FEF3F2] text-xs text-[#D92D20]'>
-                      <AlertCircle className='mt-[1px] mr-2 w-[14px] h-[14px]' />
+                      <RiErrorWarningFill className='mt-[1px] mr-2 w-[14px] h-[14px]' />
                       {validatedStatusState.message}
                     </div>
                   )
@@ -326,12 +331,11 @@ const ModelLoadBalancingEntryModal: FC<ModelModalProps> = ({
           </div>
           {
             showConfirm && (
-              <ConfirmCommon
+              <Confirm
                 title={t('common.modelProvider.confirmDelete')}
                 isShow={showConfirm}
                 onCancel={() => setShowConfirm(false)}
                 onConfirm={handleRemove}
-                confirmWrapperClassName='z-[70]'
               />
             )
           }

@@ -9,8 +9,8 @@ import type { SubmitHandler } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import classNames from 'classnames'
 import Loading from '../components/base/loading'
+import classNames from '@/utils/classnames'
 import Button from '@/app/components/base/button'
 
 import { fetchInitValidateStatus, fetchSetupStatus, setup } from '@/service/common'
@@ -65,6 +65,7 @@ const InstallForm = () => {
   useEffect(() => {
     fetchSetupStatus().then((res: SetupStatusResponse) => {
       if (res.step === 'finished') {
+        localStorage.setItem('setup_status', 'finished')
         window.location.href = '/signin'
       }
       else {
@@ -148,12 +149,12 @@ const InstallForm = () => {
               </div>
 
               <div>
-                <Button type='primary' className='w-full !fone-medium !text-sm' onClick={handleSetting}>
+                <Button variant='primary' className='w-full' onClick={handleSetting}>
                   {t('login.installBtn')}
                 </Button>
               </div>
             </form>
-            {/* <div className="block w-hull mt-2 text-xs text-gray-600">
+            <div className="block w-full mt-2 text-xs text-gray-600">
               {t('login.license.tip')}
               &nbsp;
               <Link
@@ -161,7 +162,7 @@ const InstallForm = () => {
                 target='_blank' rel='noopener noreferrer'
                 href={'https://docs.dify.ai/user-agreement/open-source'}
               >{t('login.license.link')}</Link>
-            </div> */}
+            </div>
           </div>
         </div>
       </>

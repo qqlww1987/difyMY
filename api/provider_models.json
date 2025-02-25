@@ -1,37 +1,23 @@
 [
     {
         "provider_name": "xinference",
-        "model_name": "codeqwen1.5",
+        "model_name": "deepseek-r1-distill-qwen",
         "model_type": "text-generation",
-        "encrypted_config": "{\"server_url\": \"http://10.1.30.43:9999/\", \"model_uid\": \"codeqwen1.5\", \"completion_type\": \"completion\", \"context_length\": 65536}",
+        "encrypted_config": "{\"server_url\": \"http://10.1.30.45:9988/\", \"model_uid\": \"deepseek-r1-distill-qwen\", \"completion_type\": \"chat\", \"support_function_call\": true, \"context_length\": 1248576, \"max_tokens\": 1248076}",
         "is_valid": true
     },
     {
         "provider_name": "xinference",
         "model_name": "bge-reranker-large",
         "model_type": "reranking",
-        "encrypted_config": "{\"server_url\": \"http://10.1.30.43:9999/\", \"model_uid\": \"bge-reranker-large\"}",
-        "is_valid": true
-    },
-    {
-        "provider_name": "xinference",
-        "model_name": "glm4-chat-1m",
-        "model_type": "text-generation",
-        "encrypted_config": "{\"server_url\": \"http://10.1.30.43:9997/\", \"model_uid\": \"glm4-chat-1m\", \"completion_type\": \"chat\", \"support_function_call\": true, \"context_length\": 1048576}",
+        "encrypted_config": "{\"server_url\": \"http://10.1.30.45:9997/\", \"model_uid\": \"bge-reranker-large\"}",
         "is_valid": true
     },
     {
         "provider_name": "xinference",
         "model_name": "bge-large-zh-v1.5",
         "model_type": "embeddings",
-        "encrypted_config": "{\"server_url\": \"http://10.1.30.43:9999/\", \"model_uid\": \"bge-large-zh-v1.5\", \"max_tokens\": 512}",
-        "is_valid": true
-    },
-    {
-        "provider_name": "ollama",
-        "model_name": "codeqwen:7b-chat-v1.5-q8_0",
-        "model_type": "text-generation",
-        "encrypted_config": "{\"base_url\": \"http://10.1.33.139:11434/\", \"mode\": \"completion\", \"context_size\": \"32768\", \"max_tokens\": \"32768\", \"vision_support\": \"false\"}",
+        "encrypted_config": "{\"server_url\": \"http://10.1.30.45:9997/\", \"model_uid\": \"bge-large-zh-v1.5\", \"max_tokens\": 512}",
         "is_valid": true
     }
 ]

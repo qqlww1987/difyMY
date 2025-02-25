@@ -44,6 +44,17 @@ const translation = {
         webDescTip: 'Este texto será exibido no lado do cliente, fornecendo orientações básicas sobre como usar o aplicativo',
         webDescPlaceholder: 'Insira a descrição do WebApp',
         language: 'Idioma',
+        workflow: {
+          title: 'Etapas do fluxo de trabalho',
+          show: 'Mostrar',
+          hide: 'Ocultar',
+          subTitle: 'Detalhes do fluxo de trabalho',
+          showDesc: 'Mostrar ou ocultar detalhes do fluxo de trabalho no WebApp',
+        },
+        chatColorTheme: 'Tema de cor do chatbot',
+        chatColorThemeDesc: 'Defina o tema de cor do chatbot',
+        chatColorThemeInverted: 'Inve',
+        invalidHexMessage: 'Valor hex inválido',
         more: {
           entry: 'Mostrar mais configurações',
           copyright: 'Direitos autorais',
@@ -54,7 +65,16 @@ const translation = {
           customDisclaimer: 'Aviso Legal Personalizado',
           customDisclaimerPlaceholder: 'Insira o texto do aviso legal',
           customDisclaimerTip: 'O texto do aviso legal personalizado será exibido no lado do cliente, fornecendo informações adicionais sobre o aplicativo',
+          copyrightTip: 'Exibir informações de direitos autorais no webapp',
+          copyrightTooltip: 'Por favor, atualize para o plano Professional ou superior',
         },
+        sso: {
+          tooltip: 'Entre em contato com o administrador para habilitar o SSO do WebApp',
+          label: 'Autenticação SSO',
+          title: 'WebApp SSO',
+          description: 'Todos os usuários devem fazer login com SSO antes de usar o WebApp',
+        },
+        modalTip: 'Configurações do aplicativo Web do lado do cliente.',
       },
       embedded: {
         entry: 'Embutido',
@@ -110,7 +130,11 @@ const translation = {
     tokenPS: 'Token/s',
     totalMessages: {
       title: 'Total de Mensagens',
-      explanation: 'Contagem diária de interações AI; engenharia/de depuração excluída.',
+      explanation: 'Contagem diária de interações com IA.',
+    },
+    totalConversations: {
+      title: 'Total de Conversas',
+      explanation: 'Contagem diária de conversas com IA; engenharia/depuração de prompts excluída.',
     },
     activeUsers: {
       title: 'Usuários Ativos',

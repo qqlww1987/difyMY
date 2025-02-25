@@ -5,8 +5,7 @@ import { useTranslation } from 'react-i18next'
 import MemoryConfig from '../../_base/components/memory-config'
 import Editor from '@/app/components/workflow/nodes/_base/components/prompt/editor'
 import type { Memory, Node, NodeOutPutVar } from '@/app/components/workflow/types'
-import TooltipPlus from '@/app/components/base/tooltip-plus'
-import { HelpCircle } from '@/app/components/base/icons/src/vender/line/general'
+import Tooltip from '@/app/components/base/tooltip'
 const i18nPrefix = 'workflow.nodes.questionClassifiers'
 
 type Props = {
@@ -48,12 +47,14 @@ const AdvancedSetting: FC<Props> = ({
         title={
           <div className='flex items-center space-x-1'>
             <span className='uppercase'>{t(`${i18nPrefix}.instruction`)}</span>
-            <TooltipPlus popupContent={
-              <div className='w-[120px]'>
-                {t(`${i18nPrefix}.instructionTip`)}
-              </div>}>
-              <HelpCircle className='w-3.5 h-3.5 ml-0.5 text-gray-400' />
-            </TooltipPlus>
+            <Tooltip
+              popupContent={
+                <div className='w-[120px]'>
+                  {t(`${i18nPrefix}.instructionTip`)}
+                </div>
+              }
+              triggerClassName='w-3.5 h-3.5 ml-0.5'
+            />
           </div>
         }
         value={instruction}

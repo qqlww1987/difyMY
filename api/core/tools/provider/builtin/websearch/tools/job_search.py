@@ -43,21 +43,23 @@ class SerplyApi:
     def parse_results(res: dict) -> str:
         """Process response from Serply Job Search."""
         jobs = res.get("jobs", [])
-        if not jobs:
+        if not res or "jobs" not in res:
             raise ValueError(f"Got error from Serply: {res}")
 
         string = []
         for job in jobs[:10]:
             try:
                 string.append(
-                    "\n".join([
-                        f"Position: {job['position']}",
-                        f"Employer: {job['employer']}",
-                        f"Location: {job['location']}",
-                        f"Link: {job['link']}",
-                        f"""Highest: {", ".join([h for h in job["highlights"]])}""",
-                        "---",
-                    ])
+                    "\n".join(
+                        [
+                            f"Position: {job['position']}",
+                            f"Employer: {job['employer']}",
+                            f"Location: {job['location']}",
+                            f"Link: {job['link']}",
+                            f"""Highest: {", ".join(list(job["highlights"]))}""",
+                            "---",
+                        ]
+                    )
                 )
             except KeyError:
                 continue
@@ -78,7 +80,7 @@ class JobSearchTool(BuiltinTool):
         query = tool_parameters["query"]
         gl = tool_parameters.get("gl", "us")
         hl = tool_parameters.get("hl", "en")
-        location = tool_parameters.get("location", None)
+        location = tool_parameters.get("location")
 
         api_key = self.runtime.credentials["serply_api_key"]
         result = SerplyApi(api_key).run(query, gl=gl, hl=hl, location=location)

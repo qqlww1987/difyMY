@@ -1,6 +1,6 @@
 import logging
 
-from flask_restful import reqparse
+from flask_restful import reqparse  # type: ignore
 from werkzeug.exceptions import InternalServerError
 
 from controllers.web import api
@@ -14,7 +14,11 @@ from controllers.web.error import (
 from controllers.web.wraps import WebApiResource
 from core.app.apps.base_app_queue_manager import AppQueueManager
 from core.app.entities.app_invoke_entities import InvokeFrom
-from core.errors.error import ModelCurrentlyNotSupportError, ProviderTokenNotInitError, QuotaExceededError
+from core.errors.error import (
+    ModelCurrentlyNotSupportError,
+    ProviderTokenNotInitError,
+    QuotaExceededError,
+)
 from core.model_runtime.errors.invoke import InvokeError
 from libs import helper
 from models.model import App, AppMode, EndUser
@@ -33,17 +37,13 @@ class WorkflowRunApi(WebApiResource):
             raise NotWorkflowAppError()
 
         parser = reqparse.RequestParser()
-        parser.add_argument('inputs', type=dict, required=True, nullable=False, location='json')
-        parser.add_argument('files', type=list, required=False, location='json')
+        parser.add_argument("inputs", type=dict, required=True, nullable=False, location="json")
+        parser.add_argument("files", type=list, required=False, location="json")
         args = parser.parse_args()
 
         try:
             response = AppGenerateService.generate(
-                app_model=app_model,
-                user=end_user,
-                args=args,
-                invoke_from=InvokeFrom.WEB_APP,
-                streaming=True
+                app_model=app_model, user=end_user, args=args, invoke_from=InvokeFrom.WEB_APP, streaming=True
             )
 
             return helper.compact_generate_response(response)
@@ -73,10 +73,8 @@ class WorkflowTaskStopApi(WebApiResource):
 
         AppQueueManager.set_stop_flag(task_id, InvokeFrom.WEB_APP, end_user.id)
 
-        return {
-            "result": "success"
-        }
+        return {"result": "success"}
 
 
-api.add_resource(WorkflowRunApi, '/workflows/run')
-api.add_resource(WorkflowTaskStopApi, '/workflows/tasks/<string:task_id>/stop')
+api.add_resource(WorkflowRunApi, "/workflows/run")
+api.add_resource(WorkflowTaskStopApi, "/workflows/tasks/<string:task_id>/stop")

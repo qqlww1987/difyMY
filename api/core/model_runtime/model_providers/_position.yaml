@@ -1,4 +1,5 @@
 - openai
+- deepseek
 - anthropic
 - azure_openai
 - google
@@ -6,6 +7,7 @@
 - nvidia
 - nvidia_nim
 - cohere
+- upstage
 - bedrock
 - togetherai
 - openrouter
@@ -23,6 +25,7 @@
 - tongyi
 - wenxin
 - moonshot
+- tencent
 - jina
 - chatglm
 - yi
@@ -30,6 +33,11 @@
 - localai
 - volcengine_maas
 - openai_api_compatible
-- deepseek
 - hunyuan
 - siliconflow
+- perfxcloud
+- zhinao
+- fireworks
+- mixedbread
+- nomic
+- voyage

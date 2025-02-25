@@ -2,13 +2,11 @@ import base64
 import json
 import time
 from decimal import Decimal
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 import tiktoken
-from google.cloud import aiplatform
-from google.oauth2 import service_account
-from vertexai.language_models import TextEmbeddingModel as VertexTextEmbeddingModel
 
+from core.entities.embedding_type import EmbeddingInputType
 from core.model_runtime.entities.common_entities import I18nObject
 from core.model_runtime.entities.model_entities import (
     AIModelEntity,
@@ -23,27 +21,44 @@ from core.model_runtime.errors.validate import CredentialsValidateFailedError
 from core.model_runtime.model_providers.__base.text_embedding_model import TextEmbeddingModel
 from core.model_runtime.model_providers.vertex_ai._common import _CommonVertexAi
 
+if TYPE_CHECKING:
+    from vertexai.language_models import TextEmbeddingModel as VertexTextEmbeddingModel
+else:
+    VertexTextEmbeddingModel = None
+
 
 class VertexAiTextEmbeddingModel(_CommonVertexAi, TextEmbeddingModel):
     """
     Model class for Vertex AI text embedding model.
     """
 
-    def _invoke(self, model: str, credentials: dict,
-                texts: list[str], user: Optional[str] = None) \
-            -> TextEmbeddingResult:
+    def _invoke(
+        self,
+        model: str,
+        credentials: dict,
+        texts: list[str],
+        user: Optional[str] = None,
+        input_type: EmbeddingInputType = EmbeddingInputType.DOCUMENT,
+    ) -> TextEmbeddingResult:
         """
         Invoke text embedding model
 
         :param model: model name
         :param credentials: model credentials
         :param texts: texts to embed
+        :param user: unique user id
+        :param input_type: input type
         :return: embeddings result
         """
-        service_account_info = json.loads(base64.b64decode(credentials["vertex_service_account_key"]))
+        from google.cloud import aiplatform
+        from google.oauth2 import service_account
+        from vertexai.language_models import TextEmbeddingModel as VertexTextEmbeddingModel
+
+        service_account_key = credentials.get("vertex_service_account_key", "")
         project_id = credentials["vertex_project_id"]
         location = credentials["vertex_location"]
-        if service_account_info:
+        if service_account_key:
+            service_account_info = json.loads(base64.b64decode(service_account_key))
             service_accountSA = service_account.Credentials.from_service_account_info(service_account_info)
             aiplatform.init(credentials=service_accountSA, project=project_id, location=location)
         else:
@@ -51,23 +66,12 @@ class VertexAiTextEmbeddingModel(_CommonVertexAi, TextEmbeddingModel):
 
         client = VertexTextEmbeddingModel.from_pretrained(model)
 
-        embeddings_batch, embedding_used_tokens = self._embedding_invoke(
-            client=client,
-            texts=texts
-        )
+        embeddings_batch, embedding_used_tokens = self._embedding_invoke(client=client, texts=texts)
 
         # calc usage
-        usage = self._calc_response_usage(
-            model=model,
-            credentials=credentials,
-            tokens=embedding_used_tokens
-        )
+        usage = self._calc_response_usage(model=model, credentials=credentials, tokens=embedding_used_tokens)
 
-        return TextEmbeddingResult(
-            embeddings=embeddings_batch,
-            usage=usage,
-            model=model
-        )
+        return TextEmbeddingResult(embeddings=embeddings_batch, usage=usage, model=model)
 
     def get_num_tokens(self, model: str, credentials: dict, texts: list[str]) -> int:
         """
@@ -102,11 +106,16 @@ class VertexAiTextEmbeddingModel(_CommonVertexAi, TextEmbeddingModel):
         :param credentials: model credentials
         :return:
         """
+        from google.cloud import aiplatform
+        from google.oauth2 import service_account
+        from vertexai.language_models import TextEmbeddingModel as VertexTextEmbeddingModel
+
         try:
-            service_account_info = json.loads(base64.b64decode(credentials["vertex_service_account_key"]))
+            service_account_key = credentials.get("vertex_service_account_key", "")
             project_id = credentials["vertex_project_id"]
             location = credentials["vertex_location"]
-            if service_account_info:
+            if service_account_key:
+                service_account_info = json.loads(base64.b64decode(service_account_key))
                 service_accountSA = service_account.Credentials.from_service_account_info(service_account_info)
                 aiplatform.init(credentials=service_accountSA, project=project_id, location=location)
             else:
@@ -115,15 +124,11 @@ class VertexAiTextEmbeddingModel(_CommonVertexAi, TextEmbeddingModel):
             client = VertexTextEmbeddingModel.from_pretrained(model)
 
             # call embedding model
-            self._embedding_invoke(
-                model=model,
-                client=client,
-                texts=['ping']
-            )
+            self._embedding_invoke(model=model, client=client, texts=["ping"])
         except Exception as ex:
             raise CredentialsValidateFailedError(str(ex))
 
-    def _embedding_invoke(self, client: VertexTextEmbeddingModel, texts: list[str]) -> [list[float], int]: # type: ignore
+    def _embedding_invoke(self, client: VertexTextEmbeddingModel, texts: list[str]) -> [list[float], int]:  # type: ignore
         """
         Invoke embedding model
 
@@ -154,10 +159,7 @@ class VertexAiTextEmbeddingModel(_CommonVertexAi, TextEmbeddingModel):
         """
         # get input price info
         input_price_info = self.get_price(
-            model=model,
-            credentials=credentials,
-            price_type=PriceType.INPUT,
-            tokens=tokens
+            model=model, credentials=credentials, price_type=PriceType.INPUT, tokens=tokens
         )
 
         # transform usage
@@ -168,14 +170,14 @@ class VertexAiTextEmbeddingModel(_CommonVertexAi, TextEmbeddingModel):
             price_unit=input_price_info.unit,
             total_price=input_price_info.total_amount,
             currency=input_price_info.currency,
-            latency=time.perf_counter() - self.started_at
+            latency=time.perf_counter() - self.started_at,
         )
 
         return usage
-    
+
     def get_customizable_model_schema(self, model: str, credentials: dict) -> AIModelEntity:
         """
-            generate custom model entities from credentials
+        generate custom model entities from credentials
         """
         entity = AIModelEntity(
             model=model,
@@ -183,15 +185,15 @@ class VertexAiTextEmbeddingModel(_CommonVertexAi, TextEmbeddingModel):
             model_type=ModelType.TEXT_EMBEDDING,
             fetch_from=FetchFrom.CUSTOMIZABLE_MODEL,
             model_properties={
-                ModelPropertyKey.CONTEXT_SIZE: int(credentials.get('context_size')),
+                ModelPropertyKey.CONTEXT_SIZE: int(credentials.get("context_size", 512)),
                 ModelPropertyKey.MAX_CHUNKS: 1,
             },
             parameter_rules=[],
             pricing=PriceConfig(
-                input=Decimal(credentials.get('input_price', 0)),
-                unit=Decimal(credentials.get('unit', 0)),
-                currency=credentials.get('currency', "USD")
-            )
+                input=Decimal(credentials.get("input_price", 0)),
+                unit=Decimal(credentials.get("unit", 0)),
+                currency=credentials.get("currency", "USD"),
+            ),
         )
 
         return entity

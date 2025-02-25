@@ -31,6 +31,8 @@ const translation = {
     manageInTools: 'Manage in Tools',
     emptyTitle: 'No workflow tool available',
     emptyTip: 'Go to "Workflow -> Publish as Tool"',
+    emptyTitleCustom: 'No custom tool available',
+    emptyTipCustom: 'Create a custom tool',
   },
   createTool: {
     title: 'Create Custom Tool',
@@ -105,6 +107,8 @@ const translation = {
     customDisclaimerPlaceholder: 'Please enter custom disclaimer',
     confirmTitle: 'Confirm to save ?',
     confirmTip: 'Apps using this tool will be affected',
+    deleteToolConfirmTitle: 'Delete this Tool?',
+    deleteToolConfirmContent: 'Deleting the Tool is irreversible. Users will no longer be able to access your Tool.',
   },
   test: {
     title: 'Test',
@@ -117,8 +121,8 @@ const translation = {
   thought: {
     using: 'Using',
     used: 'Used',
-    requestTitle: 'Request to',
-    responseTitle: 'Response from',
+    requestTitle: 'Request',
+    responseTitle: 'Response',
   },
   setBuiltInTools: {
     info: 'Info',

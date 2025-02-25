@@ -17,7 +17,7 @@ const translation = {
     indexMethod: 'सूचीकरण प्रक्रिया',
     indexMethodHighQuality: ' उच्च गुणवत्ता',
     indexMethodHighQualityTip:
-      'ओपनएआई के एम्बेडिंग इंटरफ़ेस का उपयोग करें ताकि प्रयोक्ताओं की मांगों की सटीकता बढ़ाई जा सके।',
+      'उपयोगकर्ता के प्रश्नों के समय उच्च सटीकता प्रदान करने के लिए Embedding मॉडल को प्रोसेसिंग के लिए कॉल करें।',
     indexMethodEconomy: 'आर्थिक',
     indexMethodEconomyTip:
       'ऑफ़लाइन वेक्टर इंजन, कीवर्ड इंडेक्स आदि का उपयोग करें ताकि टोकनों की बचत हो।',
@@ -32,6 +32,14 @@ const translation = {
         'प्राप्ति पद्धति के बारे में, आप इसे किसी भी समय ज्ञान सेटिंग्ज में बदल सकते हैं।',
     },
     save: 'सेवना',
+    me: '(आप)',
+    permissionsInvitedMembers: 'आंशिक टीम के सदस्य',
+    externalKnowledgeID: 'बाहरी ज्ञान ID',
+    externalKnowledgeAPI: 'बाहरी ज्ञान एपीआई',
+    retrievalSettings: 'पुनर्प्राप्ति सेटिंग्स',
+    indexMethodChangeToEconomyDisabledTip: 'मुख्यालय से ईसीओ में डाउनग्रेड करने के लिए उपलब्ध नहीं है',
+    helpText: 'एक अच्छा डेटासेट विवरण लिखना सीखें।',
+    upgradeHighQualityTip: 'एक बार उच्च गुणवत्ता मोड में अपग्रेड करने के बाद, किफायती मोड में वापस जाना उपलब्ध नहीं है',
   },
 }
 

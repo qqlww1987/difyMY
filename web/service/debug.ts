@@ -7,6 +7,12 @@ export type AutomaticRes = {
   prompt: string
   variables: string[]
   opening_statement: string
+  error?: string
+}
+export type CodeGenRes = {
+  code: string
+  language: string[]
+  error?: string
 }
 
 export const sendChatMessage = async (appId: string, body: Record<string, any>, { onData, onCompleted, onThought, onFile, onError, getAbortController, onMessageEnd, onMessageReplace }: {
@@ -55,7 +61,7 @@ export const fetchSuggestedQuestions = (appId: string, messageId: string, getAbo
   )
 }
 
-export const fetchConvesationMessages = (appId: string, conversation_id: string, getAbortController?: any) => {
+export const fetchConversationMessages = (appId: string, conversation_id: string, getAbortController?: any) => {
   return get(`apps/${appId}/chat-messages`, {
     params: {
       conversation_id,
@@ -67,6 +73,11 @@ export const fetchConvesationMessages = (appId: string, conversation_id: string,
 
 export const generateRule = (body: Record<string, any>) => {
   return post<AutomaticRes>('/rule-generate', {
+    body,
+  })
+}
+export const generateRuleCode = (body: Record<string, any>) => {
+  return post<CodeGenRes>('/rule-code-generate', {
     body,
   })
 }
@@ -95,7 +106,7 @@ export const fetchPromptTemplate = ({
   })
 }
 
-export const fetchTextGenerationMessge = ({
+export const fetchTextGenerationMessage = ({
   appId,
   messageId,
 }: { appId: string; messageId: string }) => {

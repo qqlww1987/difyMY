@@ -1,6 +1,5 @@
 import json
 
-from core.tools.entities.values import ToolLabelEnum
 from core.tools.errors import ToolProviderCredentialValidationError
 from core.tools.provider.builtin.spark.tools.spark_img_generation import spark_response
 from core.tools.provider.builtin_tool_provider import BuiltinToolProviderController
@@ -30,17 +29,8 @@ class SparkProvider(BuiltinToolProviderController):
                     #  0 success，
                     pass
                 else:
-                    raise ToolProviderCredentialValidationError(
-                        "image generate error, code:{}".format(code)
-                    )
+                    raise ToolProviderCredentialValidationError("image generate error, code:{}".format(code))
             except Exception as e:
-                raise ToolProviderCredentialValidationError(
-                    "APPID APISecret APIKey is invalid. {}".format(e)
-                )
+                raise ToolProviderCredentialValidationError("APPID APISecret APIKey is invalid. {}".format(e))
         except Exception as e:
             raise ToolProviderCredentialValidationError(str(e))
-
-    def _get_tool_labels(self) -> list[ToolLabelEnum]:
-        return [
-            ToolLabelEnum.IMAGE
-        ]

@@ -4,8 +4,9 @@ const translation = {
   dateTimeFormat: 'DD/MM/YYYY hh:mm A',
   table: {
     header: {
-      time: 'Oră',
-      endUser: 'Utilizator final',
+      updatedTime: 'Timp actualizare',
+      time: 'Timp creare',
+      endUser: 'Utilizator final sau cont',
       input: 'Intrare',
       output: 'Ieșire',
       summary: 'Titlu',
@@ -16,7 +17,7 @@ const translation = {
       status: 'STARE',
       runtime: 'TIMP DE RULARE',
       tokens: 'JETOANE',
-      user: 'UTILIZATOR FINAL',
+      user: 'UTILIZATOR FINAL SAU CONT',
       version: 'VERSIUNE',
     },
     pagination: {
@@ -51,6 +52,7 @@ const translation = {
     },
     variables: 'Variabile',
     uploadImages: 'Imagini încărcate',
+    modelParams: 'Parametrii modelului',
   },
   filter: {
     period: {
@@ -69,12 +71,17 @@ const translation = {
       annotated: 'Îmbunătățiri annotate ({{count}} elemente)',
       not_annotated: 'Fără annotări',
     },
+    sortBy: 'Sortează după:',
+    descending: 'descrescător',
+    ascending: 'crescător',
   },
   workflowTitle: 'Jurnale de flux de lucru',
   workflowSubtitle: 'Jurnalul a înregistrat operațiunea Automate.',
   runDetail: {
     title: 'Jurnal de conversație',
     workflowTitle: 'Detalii jurnal',
+    fileListDetail: 'Amănunt',
+    fileListLabel: 'Detalii fișier',
   },
   promptLog: 'Jurnal prompt',
   agentLog: 'Jurnal agent',

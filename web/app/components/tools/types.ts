@@ -47,7 +47,6 @@ export type Collection = {
   is_team_authorization: boolean
   allow_delete: boolean
   labels: string[]
-  isUse:boolean
 }
 
 export type ToolParameter = {
@@ -71,7 +70,6 @@ export type Tool = {
   name: string
   author: string
   label: TypeWithI18N
-  isUse:boolean
   description: any
   parameters: ToolParameter[]
   labels: string[]

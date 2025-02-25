@@ -2,29 +2,34 @@
 import type { FC } from 'react'
 import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import cn from 'classnames'
+import {
+  RiClipboardLine,
+} from '@remixicon/react'
 import copy from 'copy-to-clipboard'
 import { useParams } from 'next/navigation'
 import { HandThumbDownIcon, HandThumbUpIcon } from '@heroicons/react/24/outline'
 import { useBoolean } from 'ahooks'
 import { HashtagIcon } from '@heroicons/react/24/solid'
 import ResultTab from './result-tab'
+import cn from '@/utils/classnames'
 import { Markdown } from '@/app/components/base/markdown'
 import Loading from '@/app/components/base/loading'
 import Toast from '@/app/components/base/toast'
 import AudioBtn from '@/app/components/base/audio-btn'
-import type { Feedbacktype } from '@/app/components/app/chat/type'
-import { fetchMoreLikeThis, updateFeedback, sendMsgByFeedback} from '@/service/share'
-import { Clipboard, File02 } from '@/app/components/base/icons/src/vender/line/files'
+import type { FeedbackType } from '@/app/components/base/chat/chat/type'
+import { fetchMoreLikeThis, updateFeedback } from '@/service/share'
+import { File02 } from '@/app/components/base/icons/src/vender/line/files'
 import { Bookmark } from '@/app/components/base/icons/src/vender/line/general'
 import { Stars02 } from '@/app/components/base/icons/src/vender/line/weather'
 import { RefreshCcw01 } from '@/app/components/base/icons/src/vender/line/arrows'
-import { fetchTextGenerationMessge } from '@/service/debug'
-import AnnotationCtrlBtn from '@/app/components/app/configuration/toolbox/annotation/annotation-ctrl-btn'
+import AnnotationCtrlBtn from '@/app/components/base/features/new-feature-panel/annotation-reply/annotation-ctrl-btn'
+import { fetchTextGenerationMessage } from '@/service/debug'
 import EditReplyModal from '@/app/components/app/annotation/edit-annotation-modal'
 import { useStore as useAppStore } from '@/app/components/app/store'
 import WorkflowProcessItem from '@/app/components/base/chat/chat/answer/workflow-process'
 import type { WorkflowProcess } from '@/app/components/base/chat/types'
+import type { SiteInfo } from '@/models/share'
+import { useChatContext } from '@/app/components/base/chat/chat/context'
 
 const MAX_DEPTH = 3
 
@@ -42,8 +47,8 @@ export type IGenerationItemProps = {
   isInWebApp?: boolean
   moreLikeThis?: boolean
   depth?: number
-  feedback?: Feedbacktype
-  onFeedback?: (feedback: Feedbacktype) => void
+  feedback?: FeedbackType
+  onFeedback?: (feedback: FeedbackType) => void
   onSave?: (messageId: string) => void
   isMobile?: boolean
   isInstalledApp: boolean
@@ -59,6 +64,7 @@ export type IGenerationItemProps = {
   contentClassName?: string
   footerClassName?: string
   hideProcessDetail?: boolean
+  siteInfo: SiteInfo | null
 }
 
 export const SimpleBtn = ({ className, isDisabled, onClick, children }: {
@@ -68,7 +74,7 @@ export const SimpleBtn = ({ className, isDisabled, onClick, children }: {
   children: React.ReactNode
 }) => (
   <div
-    className={cn(className, isDisabled ? 'border-gray-100 text-gray-300' : 'border-gray-200 text-gray-700 cursor-pointer hover:border-gray-300 hover:shadow-sm', 'flex items-center h-7 px-3 rounded-md border text-xs  font-medium')}
+    className={cn(isDisabled ? 'border-gray-100 text-gray-300' : 'border-gray-200 text-gray-700 cursor-pointer hover:border-gray-300 hover:shadow-sm', 'flex items-center h-7 px-3 rounded-md border text-xs  font-medium', className)}
     onClick={() => !isDisabled && onClick?.()}
   >
     {children}
@@ -110,6 +116,7 @@ const GenerationItem: FC<IGenerationItemProps> = ({
   innerClassName,
   contentClassName,
   hideProcessDetail,
+  siteInfo,
 }) => {
   const { t } = useTranslation()
   const params = useParams()
@@ -118,20 +125,19 @@ const GenerationItem: FC<IGenerationItemProps> = ({
   const [completionRes, setCompletionRes] = useState('')
   const [childMessageId, setChildMessageId] = useState<string | null>(null)
   const hasChild = !!childMessageId
-  const [childFeedback, setChildFeedback] = useState<Feedbacktype>({
+  const [childFeedback, setChildFeedback] = useState<FeedbackType>({
     rating: null,
   })
+  const {
+    config,
+  } = useChatContext()
+
   const setCurrentLogItem = useAppStore(s => s.setCurrentLogItem)
   const setShowPromptLogModal = useAppStore(s => s.setShowPromptLogModal)
 
-  const handleFeedback = async (childFeedback: Feedbacktype) => {
+  const handleFeedback = async (childFeedback: FeedbackType) => {
     await updateFeedback({ url: `/messages/${childMessageId}/feedbacks`, body: { rating: childFeedback.rating } }, isInstalledApp, installedAppId)
     setChildFeedback(childFeedback)
-    if (childFeedback.rating == "dislike") {
-      // 打印feedback
-      console.log(feedback)
-      sendMsgByFeedback({ url: `/messages/${messageId}/sendMsgByFeedback`, body: { rating: childFeedback.rating } }, isInstalledApp, installedAppId)
-    }
   }
 
   const [isShowReplyModal, setIsShowReplyModal] = useState(false)
@@ -154,6 +160,7 @@ const GenerationItem: FC<IGenerationItemProps> = ({
     installedAppId,
     controlClearMoreLikeThis,
     isWorkflow,
+    siteInfo,
   }
 
   const handleMoreLikeThis = async () => {
@@ -198,7 +205,7 @@ const GenerationItem: FC<IGenerationItemProps> = ({
   }, [isLoading])
 
   const handleOpenLogModal = async () => {
-    const data = await fetchTextGenerationMessge({
+    const data = await fetchTextGenerationMessage({
       appId: params.appId as string,
       messageId: messageId!,
     })
@@ -275,7 +282,7 @@ const GenerationItem: FC<IGenerationItemProps> = ({
   const [currentTab, setCurrentTab] = useState<string>('DETAIL')
 
   return (
-    <div ref={ref} className={cn(className, isTop ? `rounded-xl border ${!isError ? 'border-gray-200 bg-white' : 'border-[#FECDCA] bg-[#FEF3F2]'} ` : 'rounded-br-xl !mt-0')}
+    <div ref={ref} className={cn(isTop ? `rounded-xl border ${!isError ? 'border-gray-200 bg-chat-bubble-bg' : 'border-[#FECDCA] bg-[#FEF3F2]'} ` : 'rounded-br-xl !mt-0', className)}
       style={isTop
         ? {
           boxShadow: '0px 1px 2px rgba(16, 24, 40, 0.05)',
@@ -299,8 +306,14 @@ const GenerationItem: FC<IGenerationItemProps> = ({
             }
             <div className={`flex ${contentClassName}`}>
               <div className='grow w-0'>
-                {workflowProcessData && (
-                  <WorkflowProcessItem grayBg hideInfo data={workflowProcessData} expand={workflowProcessData.expand} hideProcessDetail={hideProcessDetail} />
+                {siteInfo && workflowProcessData && (
+                  <WorkflowProcessItem
+                    data={workflowProcessData}
+                    expand={workflowProcessData.expand}
+                    hideProcessDetail={hideProcessDetail}
+                    hideInfo={hideProcessDetail}
+                    readonly={!siteInfo.show_workflow_steps}
+                  />
                 )}
                 {workflowProcessData && !isError && (
                   <ResultTab data={workflowProcessData} content={content} currentTab={currentTab} onCurrentTabChange={setCurrentTab} />
@@ -327,7 +340,7 @@ const GenerationItem: FC<IGenerationItemProps> = ({
                     </SimpleBtn>
                   )
                 }
-                {(currentTab === 'RESULT' || !isWorkflow) && (
+                {((currentTab === 'RESULT' && workflowProcessData?.resultText) || !isWorkflow) && (
                   <SimpleBtn
                     isDisabled={isError || !messageId}
                     className={cn(isMobile && '!px-1.5', 'space-x-1')}
@@ -339,7 +352,7 @@ const GenerationItem: FC<IGenerationItemProps> = ({
                         copy(JSON.stringify(copyContent))
                       Toast.notify({ type: 'success', message: t('common.actionMsg.copySuccessfully') })
                     }}>
-                    <Clipboard className='w-3.5 h-3.5' />
+                    <RiClipboardLine className='w-3.5 h-3.5' />
                     {!isMobile && <div>{t('common.operation.copy')}</div>}
                   </SimpleBtn>
                 )}
@@ -426,9 +439,9 @@ const GenerationItem: FC<IGenerationItemProps> = ({
                   <>
                     <div className='ml-2 mr-2 h-[14px] w-[1px] bg-gray-200'></div>
                     <AudioBtn
-                      value={content}
-                      noCache={false}
+                      id={messageId!}
                       className={'mr-1'}
+                      voice={config?.text_to_speech?.voice}
                     />
                   </>
                 )}

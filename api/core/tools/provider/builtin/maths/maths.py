@@ -1,6 +1,5 @@
 from typing import Any
 
-from core.tools.entities.values import ToolLabelEnum
 from core.tools.errors import ToolProviderCredentialValidationError
 from core.tools.provider.builtin.maths.tools.eval_expression import EvaluateExpressionTool
 from core.tools.provider.builtin_tool_provider import BuiltinToolProviderController
@@ -10,15 +9,10 @@ class MathsProvider(BuiltinToolProviderController):
     def _validate_credentials(self, credentials: dict[str, Any]) -> None:
         try:
             EvaluateExpressionTool().invoke(
-                user_id='',
+                user_id="",
                 tool_parameters={
-                    'expression': '1+(2+3)*4',
+                    "expression": "1+(2+3)*4",
                 },
             )
         except Exception as e:
             raise ToolProviderCredentialValidationError(str(e))
-
-    def _get_tool_labels(self) -> list[ToolLabelEnum]:
-        return [
-            ToolLabelEnum.UTILITIES, ToolLabelEnum.PRODUCTIVITY
-        ]

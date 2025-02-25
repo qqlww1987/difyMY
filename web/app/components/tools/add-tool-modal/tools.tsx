@@ -2,10 +2,13 @@ import {
   memo,
   useCallback,
 } from 'react'
-import cn from 'classnames'
 import { useTranslation } from 'react-i18next'
+import {
+  RiAddLine,
+} from '@remixicon/react'
+import cn from '@/utils/classnames'
 import { ArrowUpRight } from '@/app/components/base/icons/src/vender/line/arrows'
-import { Check, Plus } from '@/app/components/base/icons/src/vender/line/general'
+import { Check } from '@/app/components/base/icons/src/vender/line/general'
 import { Tag01 } from '@/app/components/base/icons/src/vender/line/financeAndECommerce'
 import type { ToolWithProvider } from '@/app/components/workflow/types'
 import { BlockEnum } from '@/app/components/workflow/types'
@@ -65,10 +68,9 @@ const Blocks = ({
           return (
             <Tooltip
               key={tool.name}
-              selector={`workflow-block-tool-${tool.name}`}
               position='bottom'
-              className='!p-0 !px-3 !py-2.5 !w-[210px] !leading-[18px] !text-xs !text-gray-700 !border-[0.5px] !border-black/5 !bg-transparent !rounded-xl !shadow-lg translate-x-[108px]'
-              htmlContent={(
+              popupClassName='!p-0 !px-3 !py-2.5 !w-[210px] !leading-[18px] !text-xs !text-gray-700 !border-[0.5px] !border-black/5 !bg-transparent !rounded-xl !shadow-lg translate-x-[108px]'
+              popupContent={(
                 <div>
                   <BlockIcon
                     size='md'
@@ -88,7 +90,6 @@ const Blocks = ({
                   )}
                 </div>
               )}
-              noArrow
             >
               <div className='group/item flex items-center w-full pl-3 pr-1 h-8 rounded-lg hover:bg-gray-50 cursor-pointer'>
                 <BlockIcon
@@ -99,24 +100,26 @@ const Blocks = ({
                 <div className={cn('grow text-sm text-gray-900 truncate', needAuth && 'opacity-30')}>{tool.label[language]}</div>
                 {!needAuth && added && (
                   <div className='flex items-center gap-1 rounded-[6px] border border-gray-100 px-2 py-[3px] bg-white text-gray-300 text-xs font-medium leading-[18px]'>
-                    <Check className='w-3 h-3'/>
+                    <Check className='w-3 h-3' />
                     {t('tools.addToolModal.added').toLocaleUpperCase()}
                   </div>
                 )}
                 {!needAuth && !added && addable && (
                   <Button
-                    type='default'
-                    className={cn('hidden shrink-0 items-center !h-6 px-2 py-1 bg-white text-xs font-medium leading-[18px] text-primary-600 group-hover/item:flex')}
+                    variant='secondary-accent'
+                    size='small'
+                    className={cn('hidden shrink-0 items-center group-hover/item:flex')}
                     onClick={() => onSelect(toolWithProvider, tool)}
                   >
-                    <Plus className='w-3 h-3'/>
+                    <RiAddLine className='w-3 h-3' />
                     {t('tools.addToolModal.add').toLocaleUpperCase()}
                   </Button>
                 )}
                 {needAuth && (
                   <Button
-                    type='default'
-                    className={cn('hidden shrink-0 items-center !h-6 px-2 py-1 bg-white text-xs font-medium leading-[18px] text-primary-600 group-hover/item:flex')}
+                    variant='secondary-accent'
+                    size='small'
+                    className={cn('hidden shrink-0 group-hover/item:flex')}
                     onClick={() => onAuthSetup(toolWithProvider)}
                   >{t('tools.auth.setup')}</Button>
                 )}
@@ -135,7 +138,7 @@ const Blocks = ({
       )}
       {!tools.length && showWorkflowEmpty && (
         <div className='pt-[280px]'>
-          <Empty/>
+          <Empty />
         </div>
       )}
       {!!tools.length && tools.map(renderGroup)}

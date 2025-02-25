@@ -14,7 +14,7 @@ const translation = {
     permissionsAllMember: '모든 팀 멤버',
     indexMethod: '인덱스 방법',
     indexMethodHighQuality: '고품질',
-    indexMethodHighQualityTip: '사용자 쿼리 시 더 높은 정확도를 제공하기 위해 OpenAI의 임베딩 인터페이스를 호출하여 처리합니다.',
+    indexMethodHighQualityTip: '사용자 쿼리 시 더 높은 정확도를 제공하기 위해 Embedding 모델을 호출하여 처리합니다.',
     indexMethodEconomy: '경제적',
     indexMethodEconomyTip: '오프라인 벡터 엔진, 키워드 인덱스 등을 사용하여 토큰을 소비하지 않고도 정확도를 감소시킵니다.',
     embeddingModel: '임베딩 모델',
@@ -27,6 +27,14 @@ const translation = {
       longDescription: ' 검색 방법에 대한 자세한 내용은 언제든지 지식 설정에서 변경할 수 있습니다.',
     },
     save: '저장',
+    permissionsInvitedMembers: '부분 팀 구성원',
+    me: '(당신)',
+    externalKnowledgeAPI: '외부 지식 API',
+    externalKnowledgeID: '외부 지식 ID',
+    retrievalSettings: '검색 설정',
+    upgradeHighQualityTip: '고품질 모드로 업그레이드한 후에는 경제적 모드로 되돌릴 수 없습니다.',
+    indexMethodChangeToEconomyDisabledTip: 'HQ에서 ECO로 다운그레이드할 수 없습니다.',
+    helpText: '좋은 데이터 세트 설명을 작성하는 방법을 알아보세요.',
   },
 }
 

@@ -4,8 +4,9 @@ const translation = {
   dateTimeFormat: 'MM/DD/YYYY hh:mm A',
   table: {
     header: {
-      time: '時間',
-      endUser: 'エンドユーザー',
+      updatedTime: '更新時間',
+      time: '作成時間',
+      endUser: 'エンドユーザーまたはアカウント',
       input: '入力',
       output: '出力',
       summary: 'タイトル',
@@ -16,7 +17,7 @@ const translation = {
       status: 'ステータス',
       runtime: 'ランタイム',
       tokens: 'トークン',
-      user: 'エンドユーザー',
+      user: 'エンドユーザーまたはアカウント',
       version: 'バージョン',
     },
     pagination: {
@@ -51,6 +52,7 @@ const translation = {
     },
     variables: '変数',
     uploadImages: 'アップロードされた画像',
+    modelParams: 'モデルパラメータ',
   },
   filter: {
     period: {
@@ -69,12 +71,17 @@ const translation = {
       annotated: '注釈付きの改善 ({{count}} アイテム)',
       not_annotated: '注釈なし',
     },
+    sortBy: '並べ替え',
+    descending: '降順',
+    ascending: '昇順',
   },
   workflowTitle: 'ワークフローログ',
   workflowSubtitle: 'このログは Automate の操作を記録しました。',
   runDetail: {
     title: '会話ログ',
     workflowTitle: 'ログの詳細',
+    fileListLabel: 'ファイルの詳細',
+    fileListDetail: '詳細',
   },
   promptLog: 'プロンプトログ',
   agentLog: 'エージェントログ',

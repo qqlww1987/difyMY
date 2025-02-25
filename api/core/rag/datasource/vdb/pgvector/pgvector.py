@@ -3,15 +3,15 @@ import uuid
 from contextlib import contextmanager
 from typing import Any
 
-import psycopg2.extras
-import psycopg2.pool
-from flask import current_app
+import psycopg2.extras  # type: ignore
+import psycopg2.pool  # type: ignore
 from pydantic import BaseModel, model_validator
 
-from core.rag.datasource.entity.embedding import Embeddings
+from configs import dify_config
 from core.rag.datasource.vdb.vector_base import BaseVector
 from core.rag.datasource.vdb.vector_factory import AbstractVectorFactory
 from core.rag.datasource.vdb.vector_type import VectorType
+from core.rag.embedding.embedding_base import Embeddings
 from core.rag.models.document import Document
 from extensions.ext_redis import redis_client
 from models.dataset import Dataset
@@ -23,8 +23,11 @@ class PGVectorConfig(BaseModel):
     user: str
     password: str
     database: str
+    min_connection: int
+    max_connection: int
 
-    @model_validator(mode='before')
+    @model_validator(mode="before")
+    @classmethod
     def validate_config(cls, values: dict) -> dict:
         if not values["host"]:
             raise ValueError("config PGVECTOR_HOST is required")
@@ -36,6 +39,12 @@ class PGVectorConfig(BaseModel):
             raise ValueError("config PGVECTOR_PASSWORD is required")
         if not values["database"]:
             raise ValueError("config PGVECTOR_DATABASE is required")
+        if not values["min_connection"]:
+            raise ValueError("config PGVECTOR_MIN_CONNECTION is required")
+        if not values["max_connection"]:
+            raise ValueError("config PGVECTOR_MAX_CONNECTION is required")
+        if values["min_connection"] > values["max_connection"]:
+            raise ValueError("config PGVECTOR_MIN_CONNECTION should less than PGVECTOR_MAX_CONNECTION")
         return values
 
 
@@ -45,7 +54,12 @@ CREATE TABLE IF NOT EXISTS {table_name} (
     text TEXT NOT NULL,
     meta JSONB NOT NULL,
     embedding vector({dimension}) NOT NULL
-) using heap; 
+) using heap;
+"""
+
+SQL_CREATE_INDEX = """
+CREATE INDEX IF NOT EXISTS embedding_cosine_v1_idx ON {table_name} 
+USING hnsw (embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
 """
 
 
@@ -60,8 +74,8 @@ class PGVector(BaseVector):
 
     def _create_connection_pool(self, config: PGVectorConfig):
         return psycopg2.pool.SimpleConnectionPool(
-            1,
-            5,
+            config.min_connection,
+            config.max_connection,
             host=config.host,
             port=config.port,
             user=config.user,
@@ -89,16 +103,17 @@ class PGVector(BaseVector):
         values = []
         pks = []
         for i, doc in enumerate(documents):
-            doc_id = doc.metadata.get("doc_id", str(uuid.uuid4()))
-            pks.append(doc_id)
-            values.append(
-                (
-                    doc_id,
-                    doc.page_content,
-                    json.dumps(doc.metadata),
-                    embeddings[i],
+            if doc.metadata is not None:
+                doc_id = doc.metadata.get("doc_id", str(uuid.uuid4()))
+                pks.append(doc_id)
+                values.append(
+                    (
+                        doc_id,
+                        doc.page_content,
+                        json.dumps(doc.metadata),
+                        embeddings[i],
+                    )
                 )
-            )
         with self._get_cursor() as cur:
             psycopg2.extras.execute_values(
                 cur, f"INSERT INTO {self.table_name} (id, text, meta, embedding) VALUES %s", values
@@ -119,6 +134,11 @@ class PGVector(BaseVector):
         return docs
 
     def delete_by_ids(self, ids: list[str]) -> None:
+        # Avoiding crashes caused by performing delete operations on empty lists in certain scenarios
+        # Scenario 1: extract a document fails, resulting in a table not being created.
+        # Then clicking the retry button triggers a delete operation on an empty list.
+        if not ids:
+            return
         with self._get_cursor() as cur:
             cur.execute(f"DELETE FROM {self.table_name} WHERE id IN %s", (tuple(ids),))
 
@@ -134,15 +154,16 @@ class PGVector(BaseVector):
         :param top_k: The number of nearest neighbors to return, default is 5.
         :return: List of Documents that are nearest to the query vector.
         """
-        top_k = kwargs.get("top_k", 5)
+        top_k = kwargs.get("top_k", 4)
 
         with self._get_cursor() as cur:
             cur.execute(
-                f"SELECT meta, text, embedding <=> %s AS distance FROM {self.table_name} ORDER BY distance LIMIT {top_k}",
+                f"SELECT meta, text, embedding <=> %s AS distance FROM {self.table_name}"
+                f" ORDER BY distance LIMIT {top_k}",
                 (json.dumps(query_vector),),
             )
             docs = []
-            score_threshold = kwargs.get("score_threshold") if kwargs.get("score_threshold") else 0.0
+            score_threshold = float(kwargs.get("score_threshold") or 0.0)
             for record in cur:
                 metadata, text, distance = record
                 score = 1 - distance
@@ -152,8 +173,27 @@ class PGVector(BaseVector):
         return docs
 
     def search_by_full_text(self, query: str, **kwargs: Any) -> list[Document]:
-        # do not support bm25 search
-        return []
+        top_k = kwargs.get("top_k", 5)
+
+        with self._get_cursor() as cur:
+            cur.execute(
+                f"""SELECT meta, text, ts_rank(to_tsvector(coalesce(text, '')), plainto_tsquery(%s)) AS score
+                FROM {self.table_name}
+                WHERE to_tsvector(text) @@ plainto_tsquery(%s)
+                ORDER BY score DESC
+                LIMIT {top_k}""",
+                # f"'{query}'" is required in order to account for whitespace in query
+                (f"'{query}'", f"'{query}'"),
+            )
+
+            docs = []
+
+            for record in cur:
+                metadata, text, score = record
+                metadata["score"] = score
+                docs.append(Document(page_content=text, metadata=metadata))
+
+        return docs
 
     def delete(self) -> None:
         with self._get_cursor() as cur:
@@ -170,7 +210,10 @@ class PGVector(BaseVector):
             with self._get_cursor() as cur:
                 cur.execute("CREATE EXTENSION IF NOT EXISTS vector")
                 cur.execute(SQL_CREATE_TABLE.format(table_name=self.table_name, dimension=dimension))
-                # TODO: create index https://github.com/pgvector/pgvector?tab=readme-ov-file#indexing
+                # PG hnsw index only support 2000 dimension or less
+                # ref: https://github.com/pgvector/pgvector?tab=readme-ov-file#indexing
+                if dimension <= 2000:
+                    cur.execute(SQL_CREATE_INDEX.format(table_name=self.table_name))
             redis_client.set(collection_exist_cache_key, 1, ex=3600)
 
 
@@ -182,17 +225,17 @@ class PGVectorFactory(AbstractVectorFactory):
         else:
             dataset_id = dataset.id
             collection_name = Dataset.gen_collection_name_by_id(dataset_id)
-            dataset.index_struct = json.dumps(
-                self.gen_index_struct_dict(VectorType.PGVECTOR, collection_name))
+            dataset.index_struct = json.dumps(self.gen_index_struct_dict(VectorType.PGVECTOR, collection_name))
 
-        config = current_app.config
         return PGVector(
             collection_name=collection_name,
             config=PGVectorConfig(
-                host=config.get("PGVECTOR_HOST"),
-                port=config.get("PGVECTOR_PORT"),
-                user=config.get("PGVECTOR_USER"),
-                password=config.get("PGVECTOR_PASSWORD"),
-                database=config.get("PGVECTOR_DATABASE"),
+                host=dify_config.PGVECTOR_HOST or "localhost",
+                port=dify_config.PGVECTOR_PORT,
+                user=dify_config.PGVECTOR_USER or "postgres",
+                password=dify_config.PGVECTOR_PASSWORD or "",
+                database=dify_config.PGVECTOR_DATABASE or "postgres",
+                min_connection=dify_config.PGVECTOR_MIN_CONNECTION,
+                max_connection=dify_config.PGVECTOR_MAX_CONNECTION,
             ),
         )

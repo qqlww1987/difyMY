@@ -7,7 +7,6 @@ from core.rag.models.document import Document
 
 
 class BaseVector(ABC):
-
     def __init__(self, collection_name: str):
         self._collection_name = collection_name
 
@@ -31,9 +30,6 @@ class BaseVector(ABC):
     def delete_by_ids(self, ids: list[str]) -> None:
         raise NotImplementedError
 
-    def delete_by_document_id(self, document_id: str):
-        raise NotImplementedError
-
     def get_ids_by_metadata_field(self, key: str, value: str):
         raise NotImplementedError
 
@@ -42,31 +38,30 @@ class BaseVector(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def search_by_vector(
-            self,
-            query_vector: list[float],
-            **kwargs: Any
-    ) -> list[Document]:
+    def search_by_vector(self, query_vector: list[float], **kwargs: Any) -> list[Document]:
         raise NotImplementedError
 
     @abstractmethod
-    def search_by_full_text(
-            self, query: str,
-            **kwargs: Any
-    ) -> list[Document]:
+    def search_by_full_text(self, query: str, **kwargs: Any) -> list[Document]:
         raise NotImplementedError
 
+    @abstractmethod
     def delete(self) -> None:
         raise NotImplementedError
 
     def _filter_duplicate_texts(self, texts: list[Document]) -> list[Document]:
-        for text in texts:
-            doc_id = text.metadata['doc_id']
-            exists_duplicate_node = self.text_exists(doc_id)
-            if exists_duplicate_node:
-                texts.remove(text)
+        for text in texts.copy():
+            if text.metadata and "doc_id" in text.metadata:
+                doc_id = text.metadata["doc_id"]
+                exists_duplicate_node = self.text_exists(doc_id)
+                if exists_duplicate_node:
+                    texts.remove(text)
 
         return texts
 
     def _get_uuids(self, texts: list[Document]) -> list[str]:
-        return [text.metadata['doc_id'] for text in texts]
+        return [text.metadata["doc_id"] for text in texts if text.metadata and "doc_id" in text.metadata]
+
+    @property
+    def collection_name(self):
+        return self._collection_name

@@ -3,8 +3,11 @@
 import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
 import { useSelectedLayoutSegment } from 'next/navigation'
-import classNames from 'classnames'
-import { Tools, ToolsActive } from '../../base/icons/src/public/header-nav/tools'
+import {
+  RiHammerFill,
+  RiHammerLine,
+} from '@remixicon/react'
+import classNames from '@/utils/classnames'
 type ToolsNavProps = {
   className?: string
 }
@@ -14,18 +17,19 @@ const ToolsNav = ({
 }: ToolsNavProps) => {
   const { t } = useTranslation()
   const selectedSegment = useSelectedLayoutSegment()
-  const actived = selectedSegment === 'tools'
+  const activated = selectedSegment === 'tools'
 
   return (
     <Link href="/tools" className={classNames(
-      className, 'group',
-      actived && 'bg-white shadow-md',
-      actived ? 'text-primary-600' : 'text-gray-500 hover:bg-gray-200',
+      'group text-sm font-medium',
+      activated && 'font-semibold bg-components-main-nav-nav-button-bg-active hover:bg-components-main-nav-nav-button-bg-active-hover shadow-md',
+      activated ? 'text-components-main-nav-nav-button-text-active' : 'text-components-main-nav-nav-button-text hover:bg-components-main-nav-nav-button-bg-hover',
+      className,
     )}>
       {
-        actived
-          ? <ToolsActive className='mr-2 w-4 h-4' />
-          : <Tools className='mr-2 w-4 h-4' />
+        activated
+          ? <RiHammerFill className='mr-2 w-4 h-4' />
+          : <RiHammerLine className='mr-2 w-4 h-4' />
       }
       {t('common.menus.tools')}
     </Link>

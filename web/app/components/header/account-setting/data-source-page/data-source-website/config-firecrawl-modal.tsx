@@ -9,7 +9,7 @@ import {
 import { Lock01 } from '@/app/components/base/icons/src/vender/solid/security'
 import Button from '@/app/components/base/button'
 import type { FirecrawlConfig } from '@/models/common'
-import Field from '@/app/components/datasets/create/website/firecrawl/base/field'
+import Field from '@/app/components/datasets/create/website/base/field'
 import Toast from '@/app/components/base/toast'
 import { createDataSourceApiKeyBinding } from '@/service/datasets'
 import { LinkExternal02 } from '@/app/components/base/icons/src/vender/line/general'
@@ -50,9 +50,6 @@ const ConfigFirecrawlModal: FC<Props> = ({
         errorMsg = t('common.errorMsg.fieldRequired', {
           field: 'API Key',
         })
-      }
-      else if (!config.api_key.startsWith('fc-')) {
-        errorMsg = t(`${I18N_PREFIX}.apiKeyFormatError`)
       }
     }
 
@@ -123,14 +120,15 @@ const ConfigFirecrawlModal: FC<Props> = ({
                 </a>
                 <div className='flex'>
                   <Button
-                    className='mr-2 h-9 text-sm font-medium text-gray-700'
+                    size='large'
+                    className='mr-2'
                     onClick={onCancel}
                   >
                     {t('common.operation.cancel')}
                   </Button>
                   <Button
-                    className='h-9 text-sm font-medium'
-                    type='primary'
+                    variant='primary'
+                    size='large'
                     onClick={handleSave}
                     loading={isSaving}
                   >

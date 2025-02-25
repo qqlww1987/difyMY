@@ -12,16 +12,20 @@ import {
 import Chat from '@/app/components/base/chat/chat'
 import { useChat } from '@/app/components/base/chat/chat/hooks'
 import { useDebugConfigurationContext } from '@/context/debug-configuration'
-import type { OnSend } from '@/app/components/base/chat/types'
+import type { ChatConfig, ChatItem, ChatItemInTree, OnSend } from '@/app/components/base/chat/types'
 import { useProviderContext } from '@/context/provider-context'
 import {
-  fetchConvesationMessages,
+  fetchConversationMessages,
   fetchSuggestedQuestions,
   stopChatMessageResponding,
 } from '@/service/debug'
 import Avatar from '@/app/components/base/avatar'
 import { useAppContext } from '@/context/app-context'
 import { ModelFeatureEnum } from '@/app/components/header/account-setting/model-provider-page/declarations'
+import { useStore as useAppStore } from '@/app/components/app/store'
+import { useFeatures } from '@/app/components/base/features/hooks'
+import { getLastAnswer, isValidGeneratedAnswer } from '@/app/components/base/chat/utils'
+import type { InputForm } from '@/app/components/base/chat/chat/type'
 
 type DebugWithSingleModelProps = {
   checkCanSend?: () => boolean
@@ -37,14 +41,34 @@ const DebugWithSingleModel = forwardRef<DebugWithSingleModelRefType, DebugWithSi
     modelConfig,
     appId,
     inputs,
-    visionConfig,
     collectionList,
     completionParams,
+    // isShowVisionConfig,
   } = useDebugConfigurationContext()
   const { textGenerationModelList } = useProviderContext()
-  const config = useConfigFromDebugContext()
+  const features = useFeatures(s => s.features)
+  const configTemplate = useConfigFromDebugContext()
+  const config = useMemo(() => {
+    return {
+      ...configTemplate,
+      more_like_this: features.moreLikeThis,
+      opening_statement: features.opening?.enabled ? (features.opening?.opening_statement || '') : '',
+      suggested_questions: features.opening?.enabled ? (features.opening?.suggested_questions || []) : [],
+      sensitive_word_avoidance: features.moderation,
+      speech_to_text: features.speech2text,
+      text_to_speech: features.text2speech,
+      file_upload: features.file,
+      suggested_questions_after_answer: features.suggested,
+      retriever_resource: features.citation,
+      annotation_reply: features.annotationReply,
+    } as ChatConfig
+  }, [configTemplate, features])
+  const inputsForm = useMemo(() => {
+    return modelConfig.configs.prompt_variables.filter(item => item.type !== 'api').map(item => ({ ...item, label: item.name, variable: item.key })) as InputForm[]
+  }, [modelConfig.configs.prompt_variables])
   const {
     chatList,
+    setTargetMessageId,
     isResponding,
     handleSend,
     suggestedQuestions,
@@ -57,14 +81,14 @@ const DebugWithSingleModel = forwardRef<DebugWithSingleModelRefType, DebugWithSi
     config,
     {
       inputs,
-      promptVariables: modelConfig.configs.prompt_variables,
+      inputsForm,
     },
     [],
     taskId => stopChatMessageResponding(appId, taskId),
   )
   useFormattingChangedSubscription(chatList)
 
-  const doSend: OnSend = useCallback((message, files) => {
+  const doSend: OnSend = useCallback((message, files, isRegenerate = false, parentAnswer: ChatItem | null = null) => {
     if (checkCanSend && !checkCanSend())
       return
     const currentProvider = textGenerationModelList.find(item => item.provider === modelConfig.provider)
@@ -85,20 +109,27 @@ const DebugWithSingleModel = forwardRef<DebugWithSingleModelRefType, DebugWithSi
       query: message,
       inputs,
       model_config: configData,
+      parent_message_id: (isRegenerate ? parentAnswer?.id : getLastAnswer(chatList)?.id) || null,
     }
 
-    if (visionConfig.enabled && files?.length && supportVision)
+    if ((config.file_upload as any)?.enabled && files?.length && supportVision)
       data.files = files
 
     handleSend(
       `apps/${appId}/chat-messages`,
       data,
       {
-        onGetConvesationMessages: (conversationId, getAbortController) => fetchConvesationMessages(appId, conversationId, getAbortController),
+        onGetConversationMessages: (conversationId, getAbortController) => fetchConversationMessages(appId, conversationId, getAbortController),
         onGetSuggestedQuestions: (responseItemId, getAbortController) => fetchSuggestedQuestions(appId, responseItemId, getAbortController),
       },
     )
-  }, [appId, checkCanSend, completionParams, config, handleSend, inputs, modelConfig, textGenerationModelList, visionConfig.enabled])
+  }, [appId, chatList, checkCanSend, completionParams, config, handleSend, inputs, modelConfig.mode, modelConfig.model_id, modelConfig.provider, textGenerationModelList])
+
+  const doRegenerate = useCallback((chatItem: ChatItemInTree) => {
+    const question = chatList.find(item => item.id === chatItem.parentMessageId)!
+    const parentAnswer = chatList.find(item => item.id === question.parentMessageId)
+    doSend(question.content, question.message_files, true, isValidGeneratedAnswer(parentAnswer) ? parentAnswer : null)
+  }, [chatList, doSend])
 
   const allToolIcons = useMemo(() => {
     const icons: Record<string, any> = {}
@@ -114,22 +145,32 @@ const DebugWithSingleModel = forwardRef<DebugWithSingleModelRefType, DebugWithSi
     }
   }, [handleRestart])
 
+  const setShowAppConfigureFeaturesModal = useAppStore(s => s.setShowAppConfigureFeaturesModal)
+
   return (
     <Chat
       config={config}
       chatList={chatList}
       isResponding={isResponding}
-      chatContainerClassName='p-6'
-      chatFooterClassName='px-6 pt-10 pb-4'
+      chatContainerClassName='px-3 pt-6'
+      chatFooterClassName='px-3 pt-10 pb-0'
+      showFeatureBar
+      showFileUpload={false}
+      onFeatureBarClick={setShowAppConfigureFeaturesModal}
       suggestedQuestions={suggestedQuestions}
       onSend={doSend}
+      inputs={inputs}
+      inputsForm={inputsForm}
+      onRegenerate={doRegenerate}
+      switchSibling={siblingMessageId => setTargetMessageId(siblingMessageId)}
       onStopResponding={handleStop}
       showPromptLog
-      questionIcon={<Avatar name={userProfile.name} size={40} />}
+      questionIcon={<Avatar avatar={userProfile.avatar_url} name={userProfile.name} size={40} />}
       allToolIcons={allToolIcons}
       onAnnotationEdited={handleAnnotationEdited}
       onAnnotationAdded={handleAnnotationAdded}
       onAnnotationRemoved={handleAnnotationRemoved}
+      noSpacing
     />
   )
 })

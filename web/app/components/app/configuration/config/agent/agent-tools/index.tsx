@@ -2,16 +2,18 @@
 import type { FC } from 'react'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import cn from 'classnames'
 import { useContext } from 'use-context-selector'
 import produce from 'immer'
+import {
+  RiDeleteBinLine,
+  RiHammerFill,
+} from '@remixicon/react'
 import { useFormattingChangedDispatcher } from '../../../debug/hooks'
 import SettingBuiltInTool from './setting-built-in-tool'
+import cn from '@/utils/classnames'
 import Panel from '@/app/components/app/configuration/base/feature-panel'
-import Tooltip from '@/app/components/base/tooltip'
-import { HelpCircle, InfoCircle, Trash03 } from '@/app/components/base/icons/src/vender/line/general'
+import { InfoCircle } from '@/app/components/base/icons/src/vender/line/general'
 import OperationBtn from '@/app/components/app/configuration/base/operation-btn'
-import { ToolsActive } from '@/app/components/base/icons/src/public/header-nav/tools'
 import AppIcon from '@/app/components/base/app-icon'
 import Switch from '@/app/components/base/switch'
 import ConfigContext from '@/context/debug-configuration'
@@ -19,7 +21,7 @@ import type { AgentTool } from '@/types/app'
 import { type Collection, CollectionType } from '@/app/components/tools/types'
 import { MAX_TOOLS_NUM } from '@/config'
 import { AlertTriangle } from '@/app/components/base/icons/src/vender/solid/alertsAndFeedback'
-import TooltipPlus from '@/app/components/base/tooltip-plus'
+import Tooltip from '@/app/components/base/tooltip'
 import { DefaultToolIcon } from '@/app/components/base/icons/src/public/other'
 import AddToolModal from '@/app/components/tools/add-tool-modal'
 
@@ -56,19 +58,21 @@ const AgentTools: FC = () => {
   return (
     <>
       <Panel
-        className="mt-4"
+        className="mt-2"
         noBodySpacing={tools.length === 0}
         headerIcon={
-          <ToolsActive className='w-4 h-4 text-primary-500' />
+          <RiHammerFill className='w-4 h-4 text-primary-500' />
         }
         title={
           <div className='flex items-center'>
             <div className='mr-1'>{t('appDebug.agent.tools.name')}</div>
-            <Tooltip htmlContent={<div className='w-[180px]'>
-              {t('appDebug.agent.tools.description')}
-            </div>} selector='config-tools-tooltip'>
-              <HelpCircle className='w-[14px] h-[14px] text-gray-400' />
-            </Tooltip>
+            <Tooltip
+              popupContent={
+                <div className='w-[180px]'>
+                  {t('appDebug.agent.tools.description')}
+                </div>
+              }
+            />
           </div>
         }
         headerRight={
@@ -115,19 +119,20 @@ const AgentTools: FC = () => {
                   className={cn((item.isDeleted || item.notAuthor) ? 'line-through opacity-50' : '', 'grow w-0 ml-2 leading-[18px] text-[13px] font-medium text-gray-800  truncate')}
                 >
                   <span className='text-gray-800 pr-2'>{item.provider_type === CollectionType.builtIn ? item.provider_name : item.tool_label}</span>
-                  <TooltipPlus
+                  <Tooltip
                     popupContent={t('tools.toolNameUsageTip')}
                   >
                     <span className='text-gray-500'>{item.tool_name}</span>
-                  </TooltipPlus>
+                  </Tooltip>
                 </div>
               </div>
               <div className='shrink-0 ml-1 flex items-center'>
                 {(item.isDeleted || item.notAuthor)
                   ? (
                     <div className='flex items-center'>
-                      <TooltipPlus
+                      <Tooltip
                         popupContent={t(`tools.${item.isDeleted ? 'toolRemoved' : 'notAuthorized'}`)}
+                        needsDelay
                       >
                         <div className='mr-1 p-1 rounded-md hover:bg-black/5  cursor-pointer' onClick={() => {
                           if (item.notAuthor)
@@ -135,7 +140,7 @@ const AgentTools: FC = () => {
                         }}>
                           <AlertTriangle className='w-4 h-4 text-[#F79009]' />
                         </div>
-                      </TooltipPlus>
+                      </Tooltip>
 
                       <div className='p-1 rounded-md hover:bg-black/5 cursor-pointer' onClick={() => {
                         const newModelConfig = produce(modelConfig, (draft) => {
@@ -144,23 +149,24 @@ const AgentTools: FC = () => {
                         setModelConfig(newModelConfig)
                         formattingChangedDispatcher()
                       }}>
-                        <Trash03 className='w-4 h-4 text-gray-500' />
+                        <RiDeleteBinLine className='w-4 h-4 text-gray-500' />
                       </div>
                       <div className='ml-2 mr-3 w-px h-3.5 bg-gray-200'></div>
                     </div>
                   )
                   : (
                     <div className='hidden group-hover:flex items-center'>
-                      <TooltipPlus
+                      <Tooltip
                         popupContent={t('tools.setBuiltInTools.infoAndSetting')}
+                        needsDelay
                       >
-                        <div className='mr-1 p-1 rounded-md hover:bg-black/5  cursor-pointer' onClick={() => {
+                        <div className='p-1 rounded-md hover:bg-black/5  cursor-pointer' onClick={() => {
                           setCurrentTool(item)
                           setIsShowSettingTool(true)
                         }}>
                           <InfoCircle className='w-4 h-4 text-gray-500' />
                         </div>
-                      </TooltipPlus>
+                      </Tooltip>
 
                       <div className='p-1 rounded-md hover:bg-black/5 cursor-pointer' onClick={() => {
                         const newModelConfig = produce(modelConfig, (draft) => {
@@ -169,7 +175,7 @@ const AgentTools: FC = () => {
                         setModelConfig(newModelConfig)
                         formattingChangedDispatcher()
                       }}>
-                        <Trash03 className='w-4 h-4 text-gray-500' />
+                        <RiDeleteBinLine className='w-4 h-4 text-gray-500' />
                       </div>
                       <div className='ml-2 mr-3 w-px h-3.5 bg-gray-200'></div>
                     </div>

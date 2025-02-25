@@ -8,9 +8,9 @@ import {
   useState,
 } from 'react'
 import { Tab } from '@headlessui/react'
-import classNames from 'classnames'
-
 import { Tag } from './tag'
+import classNames from '@/utils/classnames'
+import { writeTextToClipboard } from '@/utils/clipboard'
 
 const languageNames = {
   js: 'JavaScript',
@@ -72,7 +72,7 @@ function CopyButton({ code }: { code: string }) {
           : 'bg-white/5 hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5',
       )}
       onClick={() => {
-        window.navigator.clipboard.writeText(code).then(() => {
+        writeTextToClipboard(code).then(() => {
           setCopyCount(count => count + 1)
         })
       }}

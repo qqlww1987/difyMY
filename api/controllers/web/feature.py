@@ -1,4 +1,4 @@
-from flask_restful import Resource
+from flask_restful import Resource  # type: ignore
 
 from controllers.web import api
 from services.feature_service import FeatureService
@@ -9,4 +9,4 @@ class SystemFeatureApi(Resource):
         return FeatureService.get_system_features().model_dump()
 
 
-api.add_resource(SystemFeatureApi, '/system-features')
+api.add_resource(SystemFeatureApi, "/system-features")

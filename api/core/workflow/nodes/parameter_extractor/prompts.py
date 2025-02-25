@@ -1,4 +1,6 @@
-FUNCTION_CALLING_EXTRACTOR_NAME = 'extract_parameters'
+from typing import Any
+
+FUNCTION_CALLING_EXTRACTOR_NAME = "extract_parameters"
 
 FUNCTION_CALLING_EXTRACTOR_SYSTEM_PROMPT = f"""You are a helpful assistant tasked with extracting structured information based on specific criteria provided. Follow the guidelines below to ensure consistency and accuracy.
 ### Task
@@ -23,7 +25,7 @@ Steps:
 To illustrate, if the task involves extracting a user's name and their request, your function call might look like this: Ensure your output follows a similar structure to examples.
 ### Final Output
 Produce well-formatted function calls in json without XML tags, as shown in the example.
-"""
+"""  # noqa: E501
 
 FUNCTION_CALLING_EXTRACTOR_USER_TEMPLATE = f"""extract structured information from context inside <context></context> XML tags by calling the function {FUNCTION_CALLING_EXTRACTOR_NAME} with the correct parameters with structure inside <structure></structure> XML tags.
 <context>
@@ -33,63 +35,52 @@ FUNCTION_CALLING_EXTRACTOR_USER_TEMPLATE = f"""extract structured information fr
 <structure>
 \x7bstructure\x7d
 </structure>
-"""
+"""  # noqa: E501
 
-FUNCTION_CALLING_EXTRACTOR_EXAMPLE = [{
-    'user': {
-        'query': 'What is the weather today in SF?',
-        'function': {
-            'name': FUNCTION_CALLING_EXTRACTOR_NAME,
-            'parameters': {
-                'type': 'object',
-                'properties': {
-                    'location': {
-                        'type': 'string',
-                        'description': 'The location to get the weather information',
-                        'required': True
+FUNCTION_CALLING_EXTRACTOR_EXAMPLE: list[dict[str, Any]] = [
+    {
+        "user": {
+            "query": "What is the weather today in SF?",
+            "function": {
+                "name": FUNCTION_CALLING_EXTRACTOR_NAME,
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "location": {
+                            "type": "string",
+                            "description": "The location to get the weather information",
+                            "required": True,
+                        },
                     },
+                    "required": ["location"],
                 },
-                'required': ['location']
-            }
-        }
+            },
+        },
+        "assistant": {
+            "text": "I need always call the function with the correct parameters."
+            " in this case, I need to call the function with the location parameter.",
+            "function_call": {"name": FUNCTION_CALLING_EXTRACTOR_NAME, "parameters": {"location": "San Francisco"}},
+        },
     },
-    'assistant': {
-        'text': 'I need always call the function with the correct parameters. in this case, I need to call the function with the location parameter.',
-        'function_call' : {
-            'name': FUNCTION_CALLING_EXTRACTOR_NAME,
-            'parameters': {
-                'location': 'San Francisco'
-            }
-        }
-    }
-}, {
-    'user': {
-        'query': 'I want to eat some apple pie.',
-        'function': {
-            'name': FUNCTION_CALLING_EXTRACTOR_NAME,
-            'parameters': {
-                'type': 'object',
-                'properties': {
-                    'food': {
-                        'type': 'string',
-                        'description': 'The food to eat',
-                        'required': True
-                    }
+    {
+        "user": {
+            "query": "I want to eat some apple pie.",
+            "function": {
+                "name": FUNCTION_CALLING_EXTRACTOR_NAME,
+                "parameters": {
+                    "type": "object",
+                    "properties": {"food": {"type": "string", "description": "The food to eat", "required": True}},
+                    "required": ["food"],
                 },
-                'required': ['food']
-            }
-        }
+            },
+        },
+        "assistant": {
+            "text": "I need always call the function with the correct parameters."
+            " in this case, I need to call the function with the food parameter.",
+            "function_call": {"name": FUNCTION_CALLING_EXTRACTOR_NAME, "parameters": {"food": "apple pie"}},
+        },
     },
-    'assistant': {
-        'text': 'I need always call the function with the correct parameters. in this case, I need to call the function with the food parameter.',
-        'function_call' : {
-            'name': FUNCTION_CALLING_EXTRACTOR_NAME,
-            'parameters': {
-                'food': 'apple pie'
-            }
-        }
-    }
-}]
+]
 
 COMPLETION_GENERATE_JSON_PROMPT = """### Instructions:
 Some extra information are provided below, I should always follow the instructions as possible as I can.
@@ -109,7 +100,7 @@ Step 3: Structure the extracted parameters to JSON object as specified in <struc
 Step 4: Ensure that the JSON object is properly formatted and valid. The output should not contain any XML tags. Only the JSON object should be outputted.
 
 ### Memory
-Here is the chat histories between human and assistant, inside <histories></histories> XML tags.
+Here are the chat histories between human and assistant, inside <histories></histories> XML tags.
 <histories>
 {histories}
 </histories>
@@ -130,13 +121,13 @@ Inside <text></text> XML tags, there is a text that I should extract parameters 
 ### Answer
 I should always output a valid JSON object. Output nothing other than the JSON object. 
 ```JSON
-"""
+"""  # noqa: E501
 
 CHAT_GENERATE_JSON_PROMPT = """You should always follow the instructions and output a valid JSON object.
 The structure of the JSON object you can found in the instructions.
 
 ### Memory
-Here is the chat histories between human and assistant, inside <histories></histories> XML tags.
+Here are the chat histories between human and assistant, inside <histories></histories> XML tags.
 <histories>
 {histories}
 </histories>
@@ -161,46 +152,33 @@ Inside <text></text> XML tags, there is a text that you should convert to a JSON
 </text>
 """
 
-CHAT_EXAMPLE = [{
-    'user': {
-        'query': 'What is the weather today in SF?',
-        'json': {
-            'type': 'object',
-            'properties': {
-                'location': {
-                    'type': 'string',
-                    'description': 'The location to get the weather information',
-                    'required': True
-                }
+CHAT_EXAMPLE = [
+    {
+        "user": {
+            "query": "What is the weather today in SF?",
+            "json": {
+                "type": "object",
+                "properties": {
+                    "location": {
+                        "type": "string",
+                        "description": "The location to get the weather information",
+                        "required": True,
+                    }
+                },
+                "required": ["location"],
             },
-            'required': ['location']
-        }
+        },
+        "assistant": {"text": "I need to output a valid JSON object.", "json": {"location": "San Francisco"}},
     },
-    'assistant': {
-        'text': 'I need to output a valid JSON object.',
-        'json': {
-            'location': 'San Francisco'
-        }
-    }
-}, {
-    'user': {
-        'query': 'I want to eat some apple pie.',
-        'json': {
-            'type': 'object',
-            'properties': {
-                'food': {
-                    'type': 'string',
-                    'description': 'The food to eat',
-                    'required': True
-                }
+    {
+        "user": {
+            "query": "I want to eat some apple pie.",
+            "json": {
+                "type": "object",
+                "properties": {"food": {"type": "string", "description": "The food to eat", "required": True}},
+                "required": ["food"],
             },
-            'required': ['food']
-        }
+        },
+        "assistant": {"text": "I need to output a valid JSON object.", "json": {"result": "apple pie"}},
     },
-    'assistant': {
-        'text': 'I need to output a valid JSON object.',
-        'json': {
-            'result': 'apple pie'
-        }
-    }
-}]
+]

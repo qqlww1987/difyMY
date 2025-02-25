@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Any, Optional
 
-from msal_extensions.persistence import ABC
+from msal_extensions.persistence import ABC  # type: ignore
 from pydantic import BaseModel, ConfigDict
 
 from core.callback_handler.index_tool_callback_handler import DatasetIndexToolCallbackHandler
@@ -9,6 +9,7 @@ from core.callback_handler.index_tool_callback_handler import DatasetIndexToolCa
 
 class DatasetRetrieverBaseTool(BaseModel, ABC):
     """Tool for querying a Dataset."""
+
     name: str = "dataset"
     description: str = "use this to retrieve a dataset. "
     tenant_id: str

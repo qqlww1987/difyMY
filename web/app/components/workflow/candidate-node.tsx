@@ -12,11 +12,13 @@ import {
   useStore,
   useWorkflowStore,
 } from './store'
-import { useNodesInteractions } from './hooks'
+import { WorkflowHistoryEvent, useNodesInteractions, useWorkflowHistory } from './hooks'
 import { CUSTOM_NODE } from './constants'
+import { getIterationStartNode } from './utils'
 import CustomNode from './nodes'
 import CustomNoteNode from './note-node'
 import { CUSTOM_NOTE_NODE } from './note-node/constants'
+import { BlockEnum } from './types'
 
 const CandidateNode = () => {
   const store = useStoreApi()
@@ -26,6 +28,7 @@ const CandidateNode = () => {
   const mousePosition = useStore(s => s.mousePosition)
   const { zoom } = useViewport()
   const { handleNodeSelect } = useNodesInteractions()
+  const { saveStateToHistory } = useWorkflowHistory()
 
   useEventListener('click', (e) => {
     const { candidateNode, mousePosition } = workflowStore.getState()
@@ -51,8 +54,15 @@ const CandidateNode = () => {
             y,
           },
         })
+        if (candidateNode.data.type === BlockEnum.Iteration)
+          draft.push(getIterationStartNode(candidateNode.id))
       })
       setNodes(newNodes)
+      if (candidateNode.type === CUSTOM_NOTE_NODE)
+        saveStateToHistory(WorkflowHistoryEvent.NoteAdd)
+      else
+        saveStateToHistory(WorkflowHistoryEvent.NodeAdd)
+
       workflowStore.setState({ candidateNode: undefined })
 
       if (candidateNode.type === CUSTOM_NOTE_NODE)

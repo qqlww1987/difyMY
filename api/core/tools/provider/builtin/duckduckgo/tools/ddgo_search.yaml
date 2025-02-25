@@ -28,29 +28,6 @@ parameters:
     label:
       en_US: Max results
       zh_Hans: 最大结果数量
-    human_description:
-      en_US: The max results.
-      zh_Hans: 最大结果数量
-    form: form
-  - name: result_type
-    type: select
-    required: true
-    options:
-      - value: text
-        label:
-          en_US: text
-          zh_Hans: 文本
-      - value: link
-        label:
-          en_US: link
-          zh_Hans: 链接
-    default: text
-    label:
-      en_US: Result type
-      zh_Hans: 结果类型
-    human_description:
-      en_US: used for selecting the result type, text or link
-      zh_Hans: 用于选择结果类型，使用文本还是链接进行展示
     form: form
   - name: require_summary
     type: boolean
@@ -62,3 +39,14 @@ parameters:
       en_US: Whether to pass the search results to llm for summarization.
       zh_Hans: 是否需要将搜索结果传给大模型总结
     form: form
+  - name: query_prefix
+    label:
+      en_US: Query Prefix
+      zh_Hans: 查询前缀
+    type: string
+    required: false
+    default: ""
+    form: form
+    human_description:
+      en_US: Specific Search e.g. "site:wikipedia.org"
+      zh_Hans: 定向搜索 e.g. "site:wikipedia.org"

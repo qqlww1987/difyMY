@@ -1,4 +1,3 @@
-from core.tools.entities.values import ToolLabelEnum
 from core.tools.errors import ToolProviderCredentialValidationError
 from core.tools.provider.builtin.devdocs.tools.searchDevDocs import SearchDevDocsTool
 from core.tools.provider.builtin_tool_provider import BuiltinToolProviderController
@@ -12,7 +11,7 @@ class DevDocsProvider(BuiltinToolProviderController):
                     "credentials": credentials,
                 }
             ).invoke(
-                user_id='',
+                user_id="",
                 tool_parameters={
                     "doc": "python~3.12",
                     "topic": "library/code",
@@ -20,4 +19,3 @@ class DevDocsProvider(BuiltinToolProviderController):
             )
         except Exception as e:
             raise ToolProviderCredentialValidationError(str(e))
-    

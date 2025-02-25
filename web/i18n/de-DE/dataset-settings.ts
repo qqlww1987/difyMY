@@ -14,7 +14,7 @@ const translation = {
     permissionsAllMember: 'Alle Teammitglieder',
     indexMethod: 'Indexierungsmethode',
     indexMethodHighQuality: 'Hohe Qualität',
-    indexMethodHighQualityTip: 'Ruft die Einbettungsschnittstelle von OpenAI für die Verarbeitung auf, um bei Benutzerabfragen eine höhere Genauigkeit zu bieten.',
+    indexMethodHighQualityTip: 'Den Embedding-Modell zur Verarbeitung aufrufen, um bei Benutzeranfragen eine höhere Genauigkeit zu bieten.',
     indexMethodEconomy: 'Ökonomisch',
     indexMethodEconomyTip: 'Verwendet Offline-Vektor-Engines, Schlagwortindizes usw., um die Genauigkeit ohne Tokenverbrauch zu reduzieren',
     embeddingModel: 'Einbettungsmodell',
@@ -27,6 +27,14 @@ const translation = {
       longDescription: ' über die Abrufmethode, dies kann jederzeit in den Wissenseinstellungen geändert werden.',
     },
     save: 'Speichern',
+    permissionsInvitedMembers: 'Teilweise Teammitglieder',
+    me: '(Sie)',
+    externalKnowledgeID: 'ID für externes Wissen',
+    externalKnowledgeAPI: 'API für externes Wissen',
+    retrievalSettings: 'Einstellungen für den Abruf',
+    upgradeHighQualityTip: 'Nach dem Upgrade auf den Modus "Hohe Qualität" ist das Zurücksetzen auf den Modus "Wirtschaftlich" nicht mehr möglich',
+    helpText: 'Erfahren Sie, wie Sie eine gute Datensatzbeschreibung schreiben.',
+    indexMethodChangeToEconomyDisabledTip: 'Nicht verfügbar für ein Downgrade von HQ auf ECO',
   },
 }
 

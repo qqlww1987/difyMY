@@ -44,6 +44,17 @@ const translation = {
         webDescTip: 'Acest text va fi afișat pe partea clientului, oferind îndrumare de bază privind modul de utilizare a aplicației',
         webDescPlaceholder: 'Introduceți descrierea aplicației web',
         language: 'Limbă',
+        workflow: {
+          title: 'Pași flux de lucru',
+          show: 'Afișați',
+          hide: 'Ascundeți',
+          subTitle: 'Detalii despre fluxul de lucru',
+          showDesc: 'Afișarea sau ascunderea detaliilor fluxului de lucru în WebApp',
+        },
+        chatColorTheme: 'Tema de culoare a chatului',
+        chatColorThemeDesc: 'Setați tema de culoare a chatbotului',
+        chatColorThemeInverted: 'Inversat',
+        invalidHexMessage: 'Valoare hex nevalidă',
         more: {
           entry: 'Afișați mai multe setări',
           copyright: 'Drepturi de autor',
@@ -51,7 +62,19 @@ const translation = {
           privacyPolicy: 'Politica de confidențialitate',
           privacyPolicyPlaceholder: 'Introduceți link-ul politicii de confidențialitate',
           privacyPolicyTip: 'Ajută vizitatorii să înțeleagă datele pe care le colectează aplicația, consultați <privacyPolicyLink>Politica de confidențialitate</privacyPolicyLink> a Dify.',
+          customDisclaimerPlaceholder: 'Introduceți textul personalizat de declinare a responsabilității',
+          customDisclaimerTip: 'Textul personalizat de declinare a responsabilității va fi afișat pe partea clientului, oferind informații suplimentare despre aplicație',
+          customDisclaimer: 'Declinarea responsabilității personalizate',
+          copyrightTip: 'Afișați informații despre drepturile de autor în aplicația web',
+          copyrightTooltip: 'Vă rugăm să faceți upgrade la planul Professional sau la o versiune ulterioară',
         },
+        sso: {
+          label: 'Autentificare SSO',
+          title: 'WebApp SSO',
+          description: 'Toți utilizatorii trebuie să se conecteze cu SSO înainte de a utiliza WebApp',
+          tooltip: 'Contactați administratorul pentru a activa WebApp SSO',
+        },
+        modalTip: 'Setările aplicației web pe partea clientului.',
       },
       embedded: {
         entry: 'Încorporat',
@@ -107,7 +130,11 @@ const translation = {
     tokenPS: 'Token/s',
     totalMessages: {
       title: 'Mesaje totale',
-      explanation: 'Număr de interacțiuni AI zilnice; exclud proiectarea și depanarea promptelor.',
+      explanation: 'Numărul de interacțiuni zilnice cu IA.',
+    },
+    totalConversations: {
+      title: 'Total Conversații',
+      explanation: 'Numărul de conversații zilnice cu IA; ingineria/depanarea prompturilor exclusă.',
     },
     activeUsers: {
       title: 'Utilizatori activi',

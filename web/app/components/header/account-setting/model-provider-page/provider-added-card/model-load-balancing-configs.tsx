@@ -1,14 +1,17 @@
-import classNames from 'classnames'
 import type { Dispatch, SetStateAction } from 'react'
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import {
+  RiDeleteBinLine,
+} from '@remixicon/react'
 import type { ConfigurationMethodEnum, CustomConfigurationModelFixedFields, ModelLoadBalancingConfig, ModelLoadBalancingConfigEntry, ModelProvider } from '../declarations'
 import Indicator from '../../../indicator'
 import CooldownTimer from './cooldown-timer'
-import TooltipPlus from '@/app/components/base/tooltip-plus'
+import classNames from '@/utils/classnames'
+import Tooltip from '@/app/components/base/tooltip'
 import Switch from '@/app/components/base/switch'
 import { Balance } from '@/app/components/base/icons/src/vender/line/financeAndECommerce'
-import { Edit02, HelpCircle, Plus02, Trash03 } from '@/app/components/base/icons/src/vender/line/general'
+import { Edit02, Plus02 } from '@/app/components/base/icons/src/vender/line/general'
 import { AlertTriangle } from '@/app/components/base/icons/src/vender/solid/alertsAndFeedback'
 import { useModalContextSelector } from '@/context/modal-context'
 import UpgradeBtn from '@/app/components/billing/upgrade-btn'
@@ -156,9 +159,11 @@ const ModelLoadBalancingConfigs = ({
           <div className='grow'>
             <div className='flex items-center gap-1 text-sm'>
               {t('common.modelProvider.loadBalancing')}
-              <TooltipPlus popupContent={t('common.modelProvider.loadBalancingInfo')} popupClassName='max-w-[300px]'>
-                <HelpCircle className='w-3 h-3 text-gray-400' />
-              </TooltipPlus>
+              <Tooltip
+                popupContent={t('common.modelProvider.loadBalancingInfo')}
+                popupClassName='max-w-[300px]'
+                triggerClassName='w-3 h-3'
+              />
             </div>
             <div className='text-xs text-gray-500'>{t('common.modelProvider.loadBalancingDescription')}</div>
           </div>
@@ -187,9 +192,9 @@ const ModelLoadBalancingConfigs = ({
                           <CooldownTimer secondsRemaining={config.ttl} onFinish={() => clearCountdown(index)} />
                         )
                         : (
-                          <TooltipPlus popupContent={t('common.modelProvider.apiKeyStatusNormal')}>
+                          <Tooltip popupContent={t('common.modelProvider.apiKeyStatusNormal')}>
                             <Indicator color='green' />
-                          </TooltipPlus>
+                          </Tooltip>
                         )}
                     </div>
                     <div className='text-[13px] mr-1'>
@@ -213,7 +218,7 @@ const ModelLoadBalancingConfigs = ({
                             className='flex items-center justify-center w-8 h-8 text-gray-500 bg-white rounded-lg transition-colors cursor-pointer hover:bg-black/5'
                             onClick={() => updateConfigEntry(index, () => undefined)}
                           >
-                            <Trash03 className='w-4 h-4' />
+                            <RiDeleteBinLine className='w-4 h-4' />
                           </span>
                           <span className='mr-2 h-3 border-r border-r-gray-100' />
                         </div>

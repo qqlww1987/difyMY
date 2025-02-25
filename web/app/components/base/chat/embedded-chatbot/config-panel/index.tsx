@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import cn from 'classnames'
 import { useEmbeddedChatbotContext } from '../context'
+import { useThemeContext } from '../theme/theme-context'
+import { CssTransform } from '../theme/utils'
 import Form from './form'
+import cn from '@/utils/classnames'
 import Button from '@/app/components/base/button'
 import AppIcon from '@/app/components/base/app-icon'
 import { MessageDotsCircle } from '@/app/components/base/icons/src/vender/solid/communication'
 import { Edit02 } from '@/app/components/base/icons/src/vender/line/general'
 import { Star06 } from '@/app/components/base/icons/src/vender/solid/shapes'
-import { FootLogo } from '@/app/components/share/chat/welcome/massive-component'
+import LogoSite from '@/app/components/base/logo/logo-site'
 
 const ConfigPanel = () => {
   const { t } = useTranslation()
@@ -22,6 +24,7 @@ const ConfigPanel = () => {
   const [collapsed, setCollapsed] = useState(true)
   const customConfig = appData?.custom_config
   const site = appData?.site
+  const themeBuilder = useThemeContext()
 
   return (
     <div className='flex flex-col max-h-[80%] w-full max-w-[720px]'>
@@ -34,6 +37,7 @@ const ConfigPanel = () => {
         )}
       >
         <div
+          style={CssTransform(themeBuilder.theme?.roundedBackgroundColorStyle ?? '')}
           className={`
             flex flex-wrap px-6 py-4 rounded-t-xl bg-indigo-25
             ${isMobile && '!px-4 !py-3'}
@@ -44,9 +48,12 @@ const ConfigPanel = () => {
               <>
                 <div className='flex items-center h-8 text-2xl font-semibold text-gray-800'>
                   <AppIcon
+                    iconType={appData?.site.icon_type}
                     icon={appData?.site.icon}
+                    imageUrl={appData?.site.icon_url}
                     background='transparent'
                     size='small'
+                    className="mr-2"
                   />
                   {appData?.site.title}
                 </div>
@@ -68,7 +75,10 @@ const ConfigPanel = () => {
                   {t('share.chat.configStatusDes')}
                 </div>
                 <Button
-                  className='shrink-0 px-2 py-0 h-6 bg-white text-xs font-medium text-primary-600 rounded-md'
+                  styleCss={CssTransform(themeBuilder.theme?.backgroundButtonDefaultColorStyle ?? '')}
+                  variant='secondary-accent'
+                  size='small'
+                  className='shrink-0'
                   onClick={() => setCollapsed(false)}
                 >
                   <Edit02 className='mr-1 w-3 h-3' />
@@ -94,8 +104,9 @@ const ConfigPanel = () => {
               <Form />
               <div className={cn('pl-[136px] flex items-center', isMobile && '!pl-0')}>
                 <Button
-                  type='primary'
-                  className='mr-2 text-sm font-medium'
+                  styleCss={CssTransform(themeBuilder.theme?.backgroundButtonDefaultColorStyle ?? '')}
+                  variant='primary'
+                  className='mr-2'
                   onClick={() => {
                     setCollapsed(true)
                     handleStartChat()
@@ -104,7 +115,6 @@ const ConfigPanel = () => {
                   {t('common.operation.save')}
                 </Button>
                 <Button
-                  className='text-sm font-medium'
                   onClick={() => setCollapsed(true)}
                 >
                   {t('common.operation.cancel')}
@@ -118,12 +128,11 @@ const ConfigPanel = () => {
             <div className='p-6 rounded-b-xl'>
               <Form />
               <Button
-                className={cn('px-4 py-0 h-9', inputsForms.length && !isMobile && 'ml-[136px]')}
-                type='primary'
-                onClick={() => {
-                  debugger
-                  handleStartChat()
-                }}
+                styleCss={CssTransform(themeBuilder.theme?.backgroundButtonDefaultColorStyle ?? '')}
+                className={cn(inputsForms.length && !isMobile && 'ml-[136px]')}
+                variant='primary'
+                size='large'
+                onClick={handleStartChat}
               >
                 <MessageDotsCircle className='mr-2 w-4 h-4 text-white' />
                 {t('share.chat.startChat')}
@@ -151,11 +160,11 @@ const ConfigPanel = () => {
                 : (
                   <div className={cn('flex items-center justify-end', isMobile && 'w-full')}>
                     <div className='flex items-center pr-3 space-x-3'>
-                      <span className='uppercase'>{t('share.chat.powerBy')}</span>
+                      <span className='uppercase'>{t('share.chat.poweredBy')}</span>
                       {
                         customConfig?.replace_webapp_logo
                           ? <img src={customConfig?.replace_webapp_logo} alt='logo' className='block w-auto h-5' />
-                          : <FootLogo />
+                          : <LogoSite className='!h-5' />
                       }
                     </div>
                   </div>

@@ -2,9 +2,7 @@
 import type { FC } from 'react'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import cn from 'classnames'
-import { useBoolean } from 'ahooks'
-import { ChevronRight } from '@/app/components/base/icons/src/vender/line/arrows'
+import { FieldCollapse } from '@/app/components/workflow/nodes/_base/components/collapse'
 
 type Props = {
   className?: string
@@ -13,28 +11,14 @@ type Props = {
 }
 
 const OutputVars: FC<Props> = ({
-  className,
   title,
   children,
 }) => {
   const { t } = useTranslation()
-  const [isFold, {
-    toggle: toggleFold,
-  }] = useBoolean(true)
   return (
-    <div>
-      <div
-        onClick={toggleFold}
-        className={cn(className, 'flex justify-between leading-[18px] text-[13px] font-semibold text-gray-700 uppercase cursor-pointer')}>
-        <div>{title || t('workflow.nodes.common.outputVars')}</div>
-        <ChevronRight className='w-4 h-4 text-gray-500 transform transition-transform' style={{ transform: isFold ? 'rotate(0deg)' : 'rotate(90deg)' }} />
-      </div>
-      {!isFold && (
-        <div className='mt-2 space-y-1'>
-          {children}
-        </div>
-      )}
-    </div>
+    <FieldCollapse title={title || t('workflow.nodes.common.outputVars')}>
+      {children}
+    </FieldCollapse>
   )
 }
 type VarItemProps = {
@@ -57,10 +41,10 @@ export const VarItem: FC<VarItemProps> = ({
   return (
     <div className='py-1'>
       <div className='flex leading-[18px] items-center'>
-        <div className='text-[13px] font-medium text-gray-900 font-mono'>{name}</div>
-        <div className='ml-2 text-xs font-normal text-gray-500 capitalize'>{type}</div>
+        <div className='code-sm-semibold text-text-secondary'>{name}</div>
+        <div className='ml-2 system-xs-regular text-text-tertiary'>{type}</div>
       </div>
-      <div className='mt-0.5 leading-[18px] text-xs font-normal text-gray-600'>
+      <div className='mt-0.5 system-xs-regular text-text-tertiary'>
         {description}
         {subItems && (
           <div className='ml-2 border-l border-gray-200 pl-2'>

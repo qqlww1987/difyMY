@@ -1,59 +1,48 @@
 import {
   memo,
+  useEffect,
   useRef,
 } from 'react'
-import cn from 'classnames'
 import { useTranslation } from 'react-i18next'
 import { useClickAway } from 'ahooks'
+import Divider from '../base/divider'
 import ShortcutsName from './shortcuts-name'
 import { useStore } from './store'
 import {
+  useDSL,
   useNodesInteractions,
   usePanelInteractions,
   useWorkflowStartRun,
 } from './hooks'
 import AddBlock from './operator/add-block'
 import { useOperator } from './operator/hooks'
-import { exportAppConfig } from '@/service/apps'
-import { useToastContext } from '@/app/components/base/toast'
-import { useStore as useAppStore } from '@/app/components/app/store'
+import cn from '@/utils/classnames'
 
 const PanelContextmenu = () => {
   const { t } = useTranslation()
-  const { notify } = useToastContext()
   const ref = useRef(null)
   const panelMenu = useStore(s => s.panelMenu)
   const clipboardElements = useStore(s => s.clipboardElements)
-  const appDetail = useAppStore(s => s.appDetail)
+  const setShowImportDSLModal = useStore(s => s.setShowImportDSLModal)
   const { handleNodesPaste } = useNodesInteractions()
-  const { handlePaneContextmenuCancel } = usePanelInteractions()
+  const { handlePaneContextmenuCancel, handleNodeContextmenuCancel } = usePanelInteractions()
   const { handleStartWorkflowRun } = useWorkflowStartRun()
   const { handleAddNote } = useOperator()
+  const { exportCheck } = useDSL()
+
+  useEffect(() => {
+    if (panelMenu)
+      handleNodeContextmenuCancel()
+  }, [panelMenu, handleNodeContextmenuCancel])
 
   useClickAway(() => {
     handlePaneContextmenuCancel()
   }, ref)
 
-  const onExport = async () => {
-    if (!appDetail)
-      return
-    try {
-      const { data } = await exportAppConfig(appDetail.id)
-      const a = document.createElement('a')
-      const file = new Blob([data], { type: 'application/yaml' })
-      a.href = URL.createObjectURL(file)
-      a.download = `${appDetail.name}.yml`
-      a.click()
-    }
-    catch (e) {
-      notify({ type: 'error', message: t('app.exportFailed') })
-    }
-  }
-
   const renderTrigger = () => {
     return (
       <div
-        className='flex items-center justify-between px-3 h-8 text-sm text-gray-700 rounded-lg cursor-pointer hover:bg-gray-50'
+        className='flex items-center justify-between px-3 h-8 text-sm text-text-secondary rounded-lg cursor-pointer hover:bg-state-base-hover'
       >
         {t('workflow.common.addBlock')}
       </div>
@@ -65,7 +54,7 @@ const PanelContextmenu = () => {
 
   return (
     <div
-      className='absolute w-[200px] rounded-lg border-[0.5px] border-gray-200 bg-white shadow-xl z-[9]'
+      className='absolute w-[200px] rounded-lg border-[0.5px] border-components-panel-border bg-components-panel-bg-blur shadow-lg z-[9]'
       style={{
         left: panelMenu.left,
         top: panelMenu.top,
@@ -81,7 +70,7 @@ const PanelContextmenu = () => {
           }}
         />
         <div
-          className='flex items-center justify-between px-3 h-8 text-sm text-gray-700 rounded-lg cursor-pointer hover:bg-gray-50'
+          className='flex items-center justify-between px-3 h-8 text-sm text-text-secondary rounded-lg cursor-pointer hover:bg-state-base-hover'
           onClick={(e) => {
             e.stopPropagation()
             handleAddNote()
@@ -91,7 +80,7 @@ const PanelContextmenu = () => {
           {t('workflow.nodes.note.addNote')}
         </div>
         <div
-          className='flex items-center justify-between px-3 h-8 text-sm text-gray-700 rounded-lg cursor-pointer hover:bg-gray-50'
+          className='flex items-center justify-between px-3 h-8 text-sm text-text-secondary rounded-lg cursor-pointer hover:bg-state-base-hover'
           onClick={() => {
             handleStartWorkflowRun()
             handlePaneContextmenuCancel()
@@ -101,12 +90,12 @@ const PanelContextmenu = () => {
           <ShortcutsName keys={['alt', 'r']} />
         </div>
       </div>
-      <div className='h-[1px] bg-gray-100'></div>
+      <Divider className='m-0' />
       <div className='p-1'>
         <div
           className={cn(
-            'flex items-center justify-between px-3 h-8 text-sm text-gray-700 rounded-lg cursor-pointer',
-            !clipboardElements.length ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50',
+            'flex items-center justify-between px-3 h-8 text-sm text-text-secondary rounded-lg cursor-pointer',
+            !clipboardElements.length ? 'opacity-50 cursor-not-allowed' : 'hover:bg-state-base-hover',
           )}
           onClick={() => {
             if (clipboardElements.length) {
@@ -119,13 +108,19 @@ const PanelContextmenu = () => {
           <ShortcutsName keys={['ctrl', 'v']} />
         </div>
       </div>
-      <div className='h-[1px] bg-gray-100'></div>
+      <Divider className='m-0' />
       <div className='p-1'>
         <div
-          className='flex items-center justify-between px-3 h-8 text-sm text-gray-700 rounded-lg cursor-pointer hover:bg-gray-50'
-          onClick={() => onExport()}
+          className='flex items-center justify-between px-3 h-8 text-sm text-text-secondary rounded-lg cursor-pointer hover:bg-state-base-hover'
+          onClick={() => exportCheck()}
         >
           {t('app.export')}
+        </div>
+        <div
+          className='flex items-center justify-between px-3 h-8 text-sm text-text-secondary rounded-lg cursor-pointer hover:bg-state-base-hover'
+          onClick={() => setShowImportDSLModal(true)}
+        >
+          {t('workflow.common.importDSL')}
         </div>
       </div>
     </div>

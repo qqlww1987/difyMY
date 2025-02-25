@@ -3,17 +3,17 @@ import {
   useMemo,
 } from 'react'
 import { useTranslation } from 'react-i18next'
-import cn from 'classnames'
+import {
+  RiBold,
+  RiItalic,
+  RiLink,
+  RiListUnordered,
+  RiStrikethrough,
+} from '@remixicon/react'
 import { useStore } from '../store'
 import { useCommand } from './hooks'
-import { Link01 } from '@/app/components/base/icons/src/vender/line/general'
-import {
-  Bold01,
-  Dotpoints01,
-  Italic01,
-  Strikethrough01,
-} from '@/app/components/base/icons/src/vender/line/editor'
-import TooltipPlus from '@/app/components/base/tooltip-plus'
+import cn from '@/utils/classnames'
+import Tooltip from '@/app/components/base/tooltip'
 
 type CommandProps = {
   type: 'bold' | 'italic' | 'strikethrough' | 'link' | 'bullet'
@@ -32,15 +32,15 @@ const Command = ({
   const icon = useMemo(() => {
     switch (type) {
       case 'bold':
-        return <Bold01 className={cn('w-4 h-4', selectedIsBold && 'text-primary-600')} />
+        return <RiBold className={cn('w-4 h-4', selectedIsBold && 'text-primary-600')} />
       case 'italic':
-        return <Italic01 className={cn('w-4 h-4', selectedIsItalic && 'text-primary-600')} />
+        return <RiItalic className={cn('w-4 h-4', selectedIsItalic && 'text-primary-600')} />
       case 'strikethrough':
-        return <Strikethrough01 className={cn('w-4 h-4', selectedIsStrikeThrough && 'text-primary-600')} />
+        return <RiStrikethrough className={cn('w-4 h-4', selectedIsStrikeThrough && 'text-primary-600')} />
       case 'link':
-        return <Link01 className={cn('w-4 h-4', selectedIsLink && 'text-primary-600')} />
+        return <RiLink className={cn('w-4 h-4', selectedIsLink && 'text-primary-600')} />
       case 'bullet':
-        return <Dotpoints01 className={cn('w-4 h-4', selectedIsBullet && 'text-primary-600')} />
+        return <RiListUnordered className={cn('w-4 h-4', selectedIsBullet && 'text-primary-600')} />
     }
   }, [type, selectedIsBold, selectedIsItalic, selectedIsStrikeThrough, selectedIsLink, selectedIsBullet])
 
@@ -60,21 +60,23 @@ const Command = ({
   }, [type, t])
 
   return (
-    <TooltipPlus popupContent={tip}>
+    <Tooltip
+      popupContent={tip}
+    >
       <div
         className={cn(
-          'flex items-center justify-center w-8 h-8 cursor-pointer rounded-md text-gray-500 hover:text-gray-800 hover:bg-black/5',
-          type === 'bold' && selectedIsBold && 'bg-primary-50',
-          type === 'italic' && selectedIsItalic && 'bg-primary-50',
-          type === 'strikethrough' && selectedIsStrikeThrough && 'bg-primary-50',
-          type === 'link' && selectedIsLink && 'bg-primary-50',
-          type === 'bullet' && selectedIsBullet && 'bg-primary-50',
+          'flex items-center justify-center w-8 h-8 cursor-pointer rounded-md text-text-tertiary hover:text-text-accent hover:bg-state-accent-active',
+          type === 'bold' && selectedIsBold && 'bg-state-accent-active',
+          type === 'italic' && selectedIsItalic && 'bg-state-accent-active',
+          type === 'strikethrough' && selectedIsStrikeThrough && 'bg-state-accent-active',
+          type === 'link' && selectedIsLink && 'bg-state-accent-active',
+          type === 'bullet' && selectedIsBullet && 'bg-state-accent-active',
         )}
         onClick={() => handleCommand(type)}
       >
         {icon}
       </div>
-    </TooltipPlus>
+    </Tooltip>
   )
 }
 

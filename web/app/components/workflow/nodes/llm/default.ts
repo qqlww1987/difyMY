@@ -1,7 +1,7 @@
 import { BlockEnum, EditionType } from '../../types'
 import { type NodeDefault, type PromptItem, PromptRole } from '../../types'
 import type { LLMNodeType } from './types'
-import { ALL_CHAT_AVAILABLE_BLOCKS, ALL_COMPLETION_AVAILABLE_BLOCKS } from '@/app/components/workflow/constants'
+import { ALL_CHAT_AVAILABLE_BLOCKS, ALL_COMPLETION_AVAILABLE_BLOCKS } from '@/app/components/workflow/blocks'
 
 const i18nPrefix = 'workflow.errorMsg'
 
@@ -44,7 +44,7 @@ const nodeDefault: NodeDefault<LLMNodeType> = {
 
     if (!errorMessages && !payload.memory) {
       const isChatModel = payload.model.mode === 'chat'
-      const isPromptyEmpty = isChatModel
+      const isPromptEmpty = isChatModel
         ? !(payload.prompt_template as PromptItem[]).some((t) => {
           if (t.edition_type === EditionType.jinja2)
             return t.jinja2_text !== ''
@@ -52,7 +52,7 @@ const nodeDefault: NodeDefault<LLMNodeType> = {
           return t.text !== ''
         })
         : ((payload.prompt_template as PromptItem).edition_type === EditionType.jinja2 ? (payload.prompt_template as PromptItem).jinja2_text === '' : (payload.prompt_template as PromptItem).text === '')
-      if (isPromptyEmpty)
+      if (isPromptEmpty)
         errorMessages = t(`${i18nPrefix}.fieldRequired`, { field: t('workflow.nodes.llm.prompt') })
     }
 
@@ -79,6 +79,8 @@ const nodeDefault: NodeDefault<LLMNodeType> = {
         })
       }
     }
+    if (!errorMessages && payload.vision?.enabled && !payload.vision.configs?.variable_selector?.length)
+      errorMessages = t(`${i18nPrefix}.fieldRequired`, { field: t(`${i18nPrefix}.fields.visionVariable`) })
     return {
       isValid: !errorMessages,
       errorMessage: errorMessages,

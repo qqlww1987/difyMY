@@ -4,8 +4,9 @@ const translation = {
   dateTimeFormat: 'MM/DD/YYYY hh:mm A',
   table: {
     header: {
-      time: 'Hora',
-      endUser: 'Usuário Final',
+      updatedTime: 'Hora de atualização',
+      time: 'Hora de criação',
+      endUser: 'Usuário final ou conta',
       input: 'Entrada',
       output: 'Saída',
       summary: 'Título',
@@ -16,7 +17,7 @@ const translation = {
       status: 'STATUS',
       runtime: 'TEMPO DE EXECUÇÃO',
       tokens: 'TOKENS',
-      user: 'USUÁRIO FINAL',
+      user: 'USUÁRIO FINAL OU CONTA',
       version: 'VERSÃO',
     },
     pagination: {
@@ -51,6 +52,7 @@ const translation = {
     },
     variables: 'Variáveis',
     uploadImages: 'Imagens Carregadas',
+    modelParams: 'Parâmetros do modelo',
   },
   filter: {
     period: {
@@ -69,12 +71,17 @@ const translation = {
       annotated: 'Melhorias Anotadas ({{count}} itens)',
       not_annotated: 'Não Anotado',
     },
+    sortBy: 'Ordenar por:',
+    descending: 'decrescente',
+    ascending: 'crescente',
   },
   workflowTitle: 'Registros de Fluxo de Trabalho',
   workflowSubtitle: 'O registro registrou a operação do Automate.',
   runDetail: {
     title: 'Registro de Conversa',
     workflowTitle: 'Detalhes do Registro',
+    fileListLabel: 'Detalhes do arquivo',
+    fileListDetail: 'Detalhe',
   },
   promptLog: 'Registro de Prompt',
   agentLog: 'Registro do agente',
@@ -82,9 +89,16 @@ const translation = {
   agenteLogDetail: {
     agentMode: 'Modo Agente',
     toolUsed: 'Ferramenta usada',
-    iterações: 'Iterações',
-    iteração: 'Iteração',
+    iterations: 'Iterações',
+    iteration: 'Iteração',
     finalProcessing: 'Processamento Final',
+  },
+  agentLogDetail: {
+    iterations: 'Iterações',
+    agentMode: 'Modo Agente',
+    finalProcessing: 'Processamento final',
+    iteration: 'Iteração',
+    toolUsed: 'Ferramenta usada',
   },
 }
 

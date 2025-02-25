@@ -3,7 +3,6 @@ import {
   useCallback,
   useRef,
 } from 'react'
-import cn from 'classnames'
 import { useTranslation } from 'react-i18next'
 import { useClickAway } from 'ahooks'
 import type { NodeProps } from 'reactflow'
@@ -21,11 +20,12 @@ import {
 import { THEME_MAP } from './constants'
 import { useNote } from './hooks'
 import type { NoteNodeType } from './types'
+import cn from '@/utils/classnames'
 
 const Icon = () => {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
-      <path fillRule="evenodd" clipRule="evenodd" d="M12 9.75V6H13.5V9.75C13.5 11.8211 11.8211 13.5 9.75 13.5H6V12H9.75C10.9926 12 12 10.9926 12 9.75Z" fill="black" fillOpacity="0.16"/>
+      <path fillRule="evenodd" clipRule="evenodd" d="M12 9.75V6H13.5V9.75C13.5 11.8211 11.8211 13.5 9.75 13.5H6V12H9.75C10.9926 12 12 10.9926 12 9.75Z" fill="black" fillOpacity="0.16" />
     </svg>
   )
 }
@@ -62,10 +62,10 @@ const NoteNode = ({
     <div
       className={cn(
         'flex flex-col relative rounded-md shadow-xs border hover:shadow-md',
+        THEME_MAP[theme].bg,
+        data.selected ? THEME_MAP[theme].border : 'border-black/5',
       )}
       style={{
-        background: THEME_MAP[theme].bg,
-        borderColor: data.selected ? THEME_MAP[theme].border : 'rgba(0, 0, 0, 0.05)',
         width: data.width,
         height: data.height,
       }}
@@ -81,10 +81,13 @@ const NoteNode = ({
             nodeData={data}
             icon={<Icon />}
             minWidth={240}
-            maxWidth={640}
             minHeight={88}
           />
-          <div className='shrink-0 h-2 opacity-50 rounded-t-md' style={{ background: THEME_MAP[theme].title }}></div>
+          <div
+            className={cn(
+              'shrink-0 h-2 opacity-50 rounded-t-md',
+              THEME_MAP[theme].title,
+            )}></div>
           {
             data.selected && (
               <div className='absolute -top-[41px] left-1/2 -translate-x-1/2'>
@@ -113,7 +116,7 @@ const NoteNode = ({
           </div>
           {
             data.showAuthor && (
-              <div className='p-3 pt-0 text-xs text-black/[0.32]'>
+              <div className='p-3 pt-0 text-xs text-text-tertiary'>
                 {data.author}
               </div>
             )

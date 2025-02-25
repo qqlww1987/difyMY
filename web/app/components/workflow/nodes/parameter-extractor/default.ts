@@ -1,7 +1,7 @@
 import { BlockEnum } from '../../types'
 import type { NodeDefault } from '../../types'
 import { type ParameterExtractorNodeType, ReasoningModeType } from './types'
-import { ALL_CHAT_AVAILABLE_BLOCKS, ALL_COMPLETION_AVAILABLE_BLOCKS } from '@/app/components/workflow/constants'
+import { ALL_CHAT_AVAILABLE_BLOCKS, ALL_COMPLETION_AVAILABLE_BLOCKS } from '@/app/components/workflow/blocks'
 const i18nPrefix = 'workflow'
 
 const nodeDefault: NodeDefault<ParameterExtractorNodeType> = {
@@ -16,6 +16,9 @@ const nodeDefault: NodeDefault<ParameterExtractorNodeType> = {
       },
     },
     reasoning_mode: ReasoningModeType.prompt,
+    vision: {
+      enabled: false,
+    },
   },
   getAvailablePrevNodes(isChatMode: boolean) {
     const nodes = isChatMode
@@ -54,6 +57,8 @@ const nodeDefault: NodeDefault<ParameterExtractorNodeType> = {
           errorMessages = t(`${i18nPrefix}.errorMsg.fieldRequired`, { field: t(`${i18nPrefix}.nodes.parameterExtractor.addExtractParameterContent.descriptionPlaceholder`) })
       })
     }
+    if (!errorMessages && payload.vision?.enabled && !payload.vision.configs?.variable_selector?.length)
+      errorMessages = t(`${i18nPrefix}.errorMsg.fieldRequired`, { field: t(`${i18nPrefix}.errorMsg.fields.visionVariable`) })
     return {
       isValid: !errorMessages,
       errorMessage: errorMessages,
