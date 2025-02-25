@@ -7,7 +7,7 @@ import { useAppContext } from '@/context/app-context'
 import { useRouter } from 'next/navigation'
 import s from './index.module.css'
 import Modal from '@/app/components/base/modal'
-import { XClose } from '@/app/components/base/icons/src/vender/line/general'
+import { X } from '@/app/components/base/icons/src/vender/line/general'
 import Button from '@/app/components/base/button'
 import { createWorkspaceNew } from '@/service/common'
 import { ToastContext } from '@/app/components/base/toast'
@@ -58,7 +58,7 @@ export default function WorkSpaceSetting({
             onClick={onCancel}
             className='flex justify-center items-center w-6 h-6 cursor-pointer'
           >
-            <XClose className='w-4 h-4 text-gray-500' />
+            <X className='w-4 h-4 text-gray-500' />
           </div>
         </div>
       </div>
