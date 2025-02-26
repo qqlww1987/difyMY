@@ -9,7 +9,6 @@ export type Resources = {
   documentId: string
   documentName: string
   dataSourceType: string
-  doc_metadata:string
   sources: CitationItem[]
 }
 
@@ -30,7 +29,6 @@ const Citation: FC<CitationProps> = ({
   const resources = useMemo(() => data.reduce((prev: Resources[], next) => {
     const documentId = next.document_id
     const documentName = next.document_name
-    const doc_metadata = next.doc_metadata
     const dataSourceType = next.data_source_type
     const documentIndex = prev.findIndex(i => i.documentId === documentId)
 
@@ -76,28 +74,7 @@ const Citation: FC<CitationProps> = ({
   }, [])
 
   const resourcesLength = resources.length
-  const [clickTimeout, setClickTimeout] = useState<NodeJS.Timeout | null>(null);
 
-  const handleClick = (res: Resources) => {
-    if (clickTimeout) {
-      clearTimeout(clickTimeout);
-      setClickTimeout(null);
-      // 双击事件处理
-      console.log('Double click on:', res);
-      if (res.doc_metadata && typeof res.doc_metadata === 'object' && res.doc_metadata.url) {
-        window.open(res.doc_metadata.url, '_blank');
-      } else {
-        console.log('doc_metadata is not an object or does not have a url:', res.doc_metadata);
-      }
-    } else {
-      const timeout = setTimeout(() => {
-        // 单击事件处理
-        console.log('Single click on:', res);
-        setClickTimeout(null);
-      }, 300); // 300ms 的延迟
-      setClickTimeout(timeout);
-    }
-  };
   return (
     <div className='mt-3 -mb-1'>
       <div className='flex items-center mb-2 text-xs font-medium text-gray-500'>

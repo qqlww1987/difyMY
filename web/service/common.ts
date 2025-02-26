@@ -1,5 +1,5 @@
 import type { Fetcher } from 'swr'
-import { del, get, patch, post,postNew, put } from './base'
+import { del, get, patch, post, put } from './base'
 import type {
   AccountIntegrate,
   ApiBasedExtension,
@@ -303,18 +303,6 @@ type RetrievalMethodsRes = {
 export const fetchSupportRetrievalMethods: Fetcher<RetrievalMethodsRes, string> = (url) => {
   return get<RetrievalMethodsRes>(url)
 }
-// 写个调用创建工作空间的函数，api的的post参数有name和owner_email
-export const createWorkspaceNew: Fetcher<ICurrentWorkspace, { url: string; body: Record<string, any> }> = ({ url, body }) => {
-  return post<ICurrentWorkspace>(url, { body })
-}
-// 写个调用删除工作空间的函数，api的的post参数有name和owner_email
-export const removeWorkspaceNew: Fetcher<ICurrentWorkspace, { url: string; body: Record<string, any> }> = ({ url, body }) => {
-  return post<ICurrentWorkspace>(url, { body })
-}
-export const annotationConvertFaq: Fetcher<{ response: Response }, { url: string; body: FormData }> = ({ url, body }) => {
-  return postNew<{ response: Response}>(url, { body }, { bodyStringify: false, deleteContentType: true })
-}
-
 
 export const getSystemFeatures = () => {
   return get<SystemFeatures>('/system-features')
@@ -360,3 +348,15 @@ export const verifyDeleteAccountCode = (body: { code: string;token: string }) =>
 
 export const submitDeleteAccountFeedback = (body: { feedback: string;email: string }) =>
   post<CommonResponse>('/account/delete/feedback', { body })
+
+// 写个调用创建工作空间的函数，api的的post参数有name和owner_email
+export const createWorkspaceNew: Fetcher<ICurrentWorkspace, { url: string; body: Record<string, any> }> = ({ url, body }) => {
+  return post<ICurrentWorkspace>(url, { body })
+}
+// 写个调用删除工作空间的函数，api的的post参数有name和owner_email
+export const removeWorkspaceNew: Fetcher<ICurrentWorkspace, { url: string; body: Record<string, any> }> = ({ url, body }) => {
+  return post<ICurrentWorkspace>(url, { body })
+}
+export const annotationConvertFaq: Fetcher<{ response: Response }, { url: string; body: FormData }> = ({ url, body }) => {
+  return postNew<{ response: Response}>(url, { body }, { bodyStringify: false, deleteContentType: true })
+}

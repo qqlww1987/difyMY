@@ -528,9 +528,7 @@ const translation = {
       vectorHash: 'Vector hash:',
       hitScore: 'Retrieval Score:',
     },
-    inputPlaceholder: '和机器人聊天',
-    thinking: '深度思考中...',
-    thought: '已深度思考',
+    inputPlaceholder: 'Talk to Bot',
   },
   promptEditor: {
     placeholder: 'Write your prompt word here, enter \'{\' to insert a variable, enter \'/\' to insert a prompt content block',

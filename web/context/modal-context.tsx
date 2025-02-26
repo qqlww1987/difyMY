@@ -4,14 +4,15 @@ import type { Dispatch, SetStateAction } from 'react'
 import { useCallback, useState } from 'react'
 import { createContext, useContext, useContextSelector } from 'use-context-selector'
 import { useRouter, useSearchParams } from 'next/navigation'
+// import WorkSpaceSetting from '@/app/components/header/workspace-setting'
 import AccountSetting from '@/app/components/header/account-setting'
-import WorkSpaceSetting from '@/app/components/header/workspace-setting'
 import ApiBasedExtensionModal from '@/app/components/header/account-setting/api-based-extension-page/modal'
 import ModerationSettingModal from '@/app/components/base/features/new-feature-panel/moderation/moderation-setting-modal'
 import ExternalDataToolModal from '@/app/components/app/configuration/tools/external-data-tool-modal'
 import AnnotationFullModal from '@/app/components/billing/annotation-full/modal'
 import ModelModal from '@/app/components/header/account-setting/model-provider-page/model-modal'
 import ExternalAPIModal from '@/app/components/datasets/external-api/external-api-modal'
+import WorkSpaceSetting from '@/app/components/header/workspace-setting'
 import type {
   ConfigurationMethodEnum,
   CustomConfigurationModelFixedFields,
@@ -118,19 +119,17 @@ export const ModalContextProvider = ({
   const router = useRouter()
   const [showPricingModal, setShowPricingModal] = useState(searchParams.get('show-pricing') === '1')
   const [showAnnotationFullModal, setShowAnnotationFullModal] = useState(false)
-  
+  const handleCancelAccountSettingModal = () => {
+    setShowAccountSettingModal(null)
+    if (showAccountSettingModal?.onCancelCallback)
+      showAccountSettingModal?.onCancelCallback()
+  }
   const handleCancelCreateWorkSpaceModal = () => {
     setShowCreateWorkSpaceModal(null)
 
     if (ShowCreateWorkSpaceModal?.onCancelCallback)
       ShowCreateWorkSpaceModal?.onCancelCallback()
   }
-  const handleCancelAccountSettingModal = () => {
-    setShowAccountSettingModal(null)
-    if (showAccountSettingModal?.onCancelCallback)
-      showAccountSettingModal?.onCancelCallback()
-  }
-
   const handleCancelModerationSettingModal = () => {
     setShowModerationSettingModal(null)
     if (showModerationSettingModal?.onCancelCallback)

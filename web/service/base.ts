@@ -447,6 +447,8 @@ const baseFetchNew = <T>(
     }),
   ]) as Promise<T>
 }
+
+
 const baseFetch = <T>(
   url: string,
   fetchOptions: FetchOptionType,
@@ -784,7 +786,9 @@ export const getPublic = <T>(url: string, options = {}, otherOptions?: IOtherOpt
 export const post = <T>(url: string, options = {}, otherOptions?: IOtherOptions) => {
   return request<T>(url, Object.assign({}, options, { method: 'POST' }), otherOptions)
 }
-
+export const postNew = <T>(url: string, options = {}, otherOptions?: IOtherOptions) => {
+  return requestNew<T>(url, Object.assign({}, options, { method: 'POST' }), otherOptions)
+}
 export const postPublic = <T>(url: string, options = {}, otherOptions?: IOtherOptions) => {
   return post<T>(url, options, { ...otherOptions, isPublicAPI: true })
 }
@@ -811,7 +815,4 @@ export const patch = <T>(url: string, options = {}, otherOptions?: IOtherOptions
 
 export const patchPublic = <T>(url: string, options = {}, otherOptions?: IOtherOptions) => {
   return patch<T>(url, options, { ...otherOptions, isPublicAPI: true })
-}
-export const postNew = <T>(url: string, options = {}, otherOptions?: IOtherOptions) => {
-  return requestNew<T>(url, Object.assign({}, options, { method: 'POST' }), otherOptions)
 }
