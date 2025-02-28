@@ -491,30 +491,57 @@ export const useWorkflowInit = () => {
       setIsLoading(false)
     }
     catch (error: any) {
-      if (error && error.json && !error.bodyUsed && appDetail) {
-        error.json().then((err: any) => {
-          if (err.code === 'draft_workflow_not_exist') {
-            workflowStore.setState({ notInitialWorkflow: true })
-            syncWorkflowDraft({
-              url: `/apps/${appDetail.id}/workflows/draft`,
-              params: {
-                graph: {
-                  nodes: nodesTemplate,
-                  edges: edgesTemplate,
+        if (error && error &&error.status==400&& !error.bodyUsed && appDetail) {
+          try {
+            // const err = await error.json();
+            // if (err.code === 'draft_workflow_not_exist') {
+              workflowStore.setState({ notInitialWorkflow: true });
+              syncWorkflowDraft({
+                url: `/apps/${appDetail.id}/workflows/draft`,
+                params: {
+                  graph: {
+                    nodes: nodesTemplate,
+                    edges: edgesTemplate,
+                  },
+                  features: {
+                    retriever_resource: { enabled: true },
+                  },
+                  environment_variables: [],
+                  conversation_variables: [],
                 },
-                features: {
-                  retriever_resource: { enabled: true },
-                },
-                environment_variables: [],
-                conversation_variables: [],
-              },
-            }).then((res) => {
-              workflowStore.getState().setDraftUpdatedAt(res.updated_at)
-              handleGetInitialWorkflowData()
-            })
+              }).then((res) => {
+                workflowStore.getState().setDraftUpdatedAt(res.updated_at);
+                handleGetInitialWorkflowData();
+              });
+            // }
+          } catch (jsonError) {
+            console.error('Error parsing JSON from error response:', jsonError);
           }
-        })
-      }
+        }
+      // if (error && error.json && !error.bodyUsed && appDetail) {
+      //   error.json().then((err: any) => {
+      //     if (err.code === 'draft_workflow_not_exist') {
+      //       workflowStore.setState({ notInitialWorkflow: true })
+      //       syncWorkflowDraft({
+      //         url: `/apps/${appDetail.id}/workflows/draft`,
+      //         params: {
+      //           graph: {
+      //             nodes: nodesTemplate,
+      //             edges: edgesTemplate,
+      //           },
+      //           features: {
+      //             retriever_resource: { enabled: true },
+      //           },
+      //           environment_variables: [],
+      //           conversation_variables: [],
+      //         },
+      //       }).then((res) => {
+      //         workflowStore.getState().setDraftUpdatedAt(res.updated_at)
+      //         handleGetInitialWorkflowData()
+      //       })
+      //     }
+      //   })
+      // }
     }
   }, [appDetail, nodesTemplate, edgesTemplate, workflowStore, setSyncWorkflowDraftHash])
 

@@ -25,6 +25,7 @@ export const fetchAppTemplates: Fetcher<AppTemplatesResponse, { url: string }> =
 }
 
 export const createApp: Fetcher<AppDetailResponse, { name: string; icon_type?: AppIconType; icon?: string; icon_background?: string; mode: AppMode; description?: string; config?: ModelConfig }> = ({ name, icon_type, icon, icon_background, mode, description, config }) => {
+  console.log('qunid')
   return post<AppDetailResponse>('apps', { body: { name, icon_type, icon, icon_background, mode, description, model_config: config } })
 }
 

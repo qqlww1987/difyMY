@@ -41,12 +41,13 @@ class DraftWorkflowApi(Resource):
         # The role of the current user in the ta table must be admin, owner, or editor
         if not current_user.is_editor:
             raise Forbidden()
-
+        print('你是真的傻')
         # fetch draft workflow by app_model
         workflow_service = WorkflowService()
         workflow = workflow_service.get_draft_workflow(app_model=app_model)
 
         if not workflow:
+            print('我看看是这个吗')
             raise DraftWorkflowNotExist()
 
         # return workflow, if not found, return None (initiate graph by frontend)

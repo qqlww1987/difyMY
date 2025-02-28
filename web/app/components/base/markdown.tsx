@@ -21,6 +21,8 @@ import AudioGallery from '@/app/components/base/audio-gallery'
 import SVGRenderer from '@/app/components/base/svg-gallery'
 import MarkdownButton from '@/app/components/base/markdown-blocks/button'
 import MarkdownForm from '@/app/components/base/markdown-blocks/form'
+import ThinkBlock from '@/app/components/base/markdown-blocks/think-block'
+import { flow } from 'lodash/fp'
 
 // Available language https://github.com/react-syntax-highlighter/react-syntax-highlighter/blob/master/AVAILABLE_LANGUAGES_HLJS.MD
 const capitalizationLanguageNameMap: Record<string, string> = {
@@ -46,21 +48,31 @@ const capitalizationLanguageNameMap: Record<string, string> = {
   svg: 'SVG',
 }
 const getCorrectCapitalizationLanguageName = (language: string) => {
-  if (!language)
-    return 'Plain'
-
-  if (language in capitalizationLanguageNameMap)
-    return capitalizationLanguageNameMap[language]
-
-  return language.charAt(0).toUpperCase() + language.substring(1)
-}
+  if (!language) return 'Plain';
+  return language in capitalizationLanguageNameMap
+    ? capitalizationLanguageNameMap[language]
+    : language.charAt(0).toUpperCase() + language.substring(1);
+};
 
 const preprocessLaTeX = (content: string) => {
   if (typeof content !== 'string')
     return content
-  return content.replace(/\\\[(.*?)\\\]/g, (_, equation) => `$$${equation}$$`)
-    .replace(/\\\((.*?)\\\)/g, (_, equation) => `$$${equation}$$`)
-    .replace(/(^|[^\\])\$(.+?)\$/g, (_, prefix, equation) => `${prefix}$${equation}$`)
+
+  return flow([
+    (str: string) => str.replace(/\\\[(.*?)\\\]/g, (_, equation) => `$$${equation}$$`),
+    (str: string) => str.replace(/\\\((.*?)\\\)/g, (_, equation) => `$$${equation}$$`),
+    (str: string) => str.replace(/(^|[^\\])\$(.+?)\$/g, (_, prefix, equation) => `${prefix}$${equation}$`),
+  ])(content)
+}
+
+const preprocessThinkTag = (content: string) => {
+  if (!content.trim().startsWith('<think>\n'))
+    return content
+
+  return flow([
+    (str: string) => str.replace('<think>\n', '<details>\n'),
+    (str: string) => str.replace('\n</think>', '\n[ENDTHINKFLAG]</details>'),
+  ])(content)
 }
 
 export function PreCode(props: { children: any }) {
@@ -225,7 +237,10 @@ const Link = ({ node, ...props }: any) => {
 }
 
 export function Markdown(props: { content: string; className?: string }) {
-  const latexContent = preprocessLaTeX(props.content)
+  const latexContent = flow([
+    preprocessThinkTag,
+    preprocessLaTeX,
+  ])(props.content)
   return (
     <div className={cn(props.className, 'markdown-body')}>
       <ReactMarkdown
@@ -262,6 +277,7 @@ export function Markdown(props: { content: string; className?: string }) {
           button: MarkdownButton,
           form: MarkdownForm,
           script: ScriptBlock,
+          details: ThinkBlock,
         }}
         linkTarget='_blank'
       >

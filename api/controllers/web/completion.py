@@ -30,7 +30,7 @@ from libs.helper import uuid_value
 from models.model import AppMode
 from services.app_generate_service import AppGenerateService
 from services.errors.llm import InvokeRateLimitError
-
+from flask import make_response
 
 # define completion api for user
 class CompletionApi(WebApiResource):
@@ -136,7 +136,7 @@ class ChatApi(WebApiResource):
         except Exception as e:
             logging.exception("internal server error.")
             raise InternalServerError()
-
+ 
 
 class ChatStopApi(WebApiResource):
     def post(self, app_model, end_user, task_id):

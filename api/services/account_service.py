@@ -570,7 +570,7 @@ class TenantService:
     #     tenant.encrypt_public_key = generate_key_pair(tenant.id)
     #     db.session.commit()
     #     return tenant
-    def create_tenant(name: str) -> Tenant:
+    def create_tenant(name: str, is_setup: Optional[bool] = False, is_from_dashboard: Optional[bool] = False) -> Tenant:
         """Create tenant"""
         tenant = Tenant(name=name)
         # tenant.id=db.text('uuid_generate_v4()')
@@ -586,7 +586,7 @@ class TenantService:
         db.session.commit()
 
       
-        db.session.commit()
+
         return tenant
     @staticmethod
     def create_owner_tenant_if_not_exist(

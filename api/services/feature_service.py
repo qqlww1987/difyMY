@@ -44,9 +44,9 @@ class FeatureModel(BaseModel):
     annotation_quota_limit: LimitationModel = LimitationModel(size=0, limit=10)
     documents_upload_quota: LimitationModel = LimitationModel(size=0, limit=50)
     docs_processing: str = "standard"
-    can_replace_logo: bool = False
-    model_load_balancing_enabled: bool = False
-    dataset_operator_enabled: bool = False
+    can_replace_logo: bool = True
+    model_load_balancing_enabled: bool = True
+    dataset_operator_enabled: bool = True
 
     # pydantic configs
     model_config = ConfigDict(protected_namespaces=())
@@ -62,8 +62,8 @@ class SystemFeatureModel(BaseModel):
     enable_email_password_login: bool = True
     enable_social_oauth_login: bool = False
     is_allow_register: bool = False
-    is_allow_create_workspace: bool = False
-    is_email_setup: bool = False
+    is_allow_create_workspace: bool = True
+    is_email_setup: bool = True
     license: LicenseModel = LicenseModel()
 
 

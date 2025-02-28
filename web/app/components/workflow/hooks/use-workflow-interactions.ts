@@ -235,6 +235,7 @@ export const useWorkflowUpdate = () => {
       setConversationVariables,
     } = workflowStore.getState()
     setIsSyncingWorkflowDraft(true)
+    console.log('我不知道你想干啥')
     fetchWorkflowDraft(`/apps/${appId}/workflows/draft`).then((response) => {
       handleUpdateWorkflowCanvas(response.graph as WorkflowDataUpdater)
       setSyncWorkflowDraftHash(response.hash)

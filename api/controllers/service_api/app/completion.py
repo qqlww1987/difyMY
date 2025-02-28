@@ -1,5 +1,6 @@
 import logging
 
+from flask import make_response
 from flask_restful import Resource, reqparse  # type: ignore
 from werkzeug.exceptions import InternalServerError, NotFound
 
@@ -137,7 +138,12 @@ class ChatApi(Resource):
         except Exception as e:
             logging.exception("internal server error.")
             raise InternalServerError()
-
+    def options(self,app_model=None, end_user=None):
+        response = make_response()
+        response.headers.add('Access-Control-Allow-Origin', '*')  # 允许所有来源，可以根据需要修改
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+        return response
 
 class ChatStopApi(Resource):
     @validate_app_token(fetch_user_arg=FetchUserArg(fetch_from=WhereisUserArg.JSON, required=True))

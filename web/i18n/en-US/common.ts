@@ -529,6 +529,8 @@ const translation = {
       hitScore: 'Retrieval Score:',
     },
     inputPlaceholder: 'Talk to Bot',
+    thinking: '深度思考中...',
+    thought: '已深度思考',
   },
   promptEditor: {
     placeholder: 'Write your prompt word here, enter \'{\' to insert a variable, enter \'/\' to insert a prompt content block',

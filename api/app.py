@@ -36,6 +36,7 @@ else:
 
     app = create_app()
     celery = app.extensions["celery"]
+    app.debug = True
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001)
