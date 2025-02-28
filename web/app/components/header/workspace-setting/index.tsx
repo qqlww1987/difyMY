@@ -7,7 +7,7 @@ import { useAppContext } from '@/context/app-context'
 import { useRouter } from 'next/navigation'
 import s from './index.module.css'
 import Modal from '@/app/components/base/modal'
-// import { x } from '@/app/components/base/icons/src/vender/line/general'
+import { XClose} from '@/app/components/base/icons/src/vender/line/general'
 import Button from '@/app/components/base/button'
 import { createWorkspaceNew } from '@/service/common'
 import { ToastContext } from '@/app/components/base/toast'
@@ -19,7 +19,6 @@ const inputClassName = `
   mt-2 w-full px-3 py-2 bg-gray-100 rounded
   text-sm font-normal text-gray-800
 `
-
 
 
 export default function WorkSpaceSetting({
@@ -58,7 +57,7 @@ export default function WorkSpaceSetting({
             onClick={onCancel}
             className='flex justify-center items-center w-6 h-6 cursor-pointer'
           >
-            {/* <x className='w-4 h-4 text-gray-500' /> */}
+            <XClose className='w-4 h-4 text-gray-500' />
           </div>
         </div>
       </div>
@@ -72,7 +71,7 @@ export default function WorkSpaceSetting({
             />
             <div className='flex justify-end mt-10'>
               <Button
-                // type='primary'
+                type='primary'
                 className='text-sm font-medium'
                 onClick={createWorkspace}
               >
