@@ -30,6 +30,7 @@ import Modal from '@/app/components/base/modal'
 import useBreakpoints, { MediaType } from '@/hooks/use-breakpoints'
 import { useProviderContext } from '@/context/provider-context'
 import { useAppContext } from '@/context/app-context'
+import MorePage from './more-page'
 
 const iconClassName = `
   w-4 h-4 ml-3 mr-2
@@ -100,6 +101,12 @@ export default function AccountSetting({
       {
         key: (enableReplaceWebAppLogo || enableBilling) ? 'custom' : false,
         name: t('custom.custom'),
+        icon: <RiColorFilterLine className={iconClassName} />,
+        activeIcon: <RiColorFilterFill className={iconClassName} />,
+      },
+      {
+        key: 'more',
+        name: t('更多设置'),
         icon: <RiColorFilterLine className={iconClassName} />,
         activeIcon: <RiColorFilterFill className={iconClassName} />,
       },
@@ -206,6 +213,7 @@ export default function AccountSetting({
             {activeMenu === 'data-source' && <DataSourcePage />}
             {activeMenu === 'api-based-extension' && <ApiBasedExtensionPage />}
             {activeMenu === 'custom' && <CustomPage />}
+            {activeMenu === 'more' && <MorePage />}
           </div>
         </div>
       </div>

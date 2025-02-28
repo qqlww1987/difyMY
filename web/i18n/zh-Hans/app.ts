@@ -19,6 +19,9 @@ const translation = {
   exportFailed: '导出 DSL 失败',
   importDSL: '导入 DSL 文件',
   createFromConfigFile: '通过 DSL 文件创建',
+  deleteWorkSpaceTitle: '确认删除工作空间',
+  deleteWorkSpaceConfirmContent:
+  '删除工作空间将无法撤销。用户将不能访问工作空间内的应用，所有应用，知识库和日志均将一并被删除。',
   importFromDSL: '导入 DSL',
   importFromDSLFile: '文件',
   importFromDSLUrl: 'URL',
