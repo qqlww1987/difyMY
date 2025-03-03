@@ -1,7 +1,7 @@
 [
     {
         "provider_name": "xinference",
-        "model_name": "bge-large-zh-v1.5",
+        "model_name": "bge-m3",
         "model_type": "embeddings"
     },
     {
@@ -11,7 +11,7 @@
     },
     {
         "provider_name": "xinference",
-        "model_name": "bge-reranker-large",
+        "model_name": "bge-reranker-v2-m3",
         "model_type": "reranking"
     }
 ]
